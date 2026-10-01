@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Would maybe worth being split into multiple enums, status, winner, endType...
+enum GameStatus {
+  WAITING
+  PLAYING
+  DRAW
+  WWON
+  BWON
+  WFF
+  BFF
+}
+
+enum ChatType {
+  GROUPCHAT
+  SPECTATORCHAT
+}
+
+// Tournament and Gamification should have their own models and/or fields.
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  email      String   @unique
+  password   String? // Possibly no password if User only uses OAuth 2.0
+  // OAuth 2.0 should have its own field. Would be clearer.
+  profile    Profile? // To avoid mutual dependency, but User will have a profile after creation
+  whiteGames Game[]   @relation("WhiteGames")
+  blackGames Game[]   @relation("BlackGames")
+
+  // Following isn't really a friend system, should be replaced by something else
+  followers User[] @relation("FriendsList")
+  follows   User[] @relation("FriendsList")
+
+  chats    Chat[]
+  messages Message[]
+}
+
+model Profile {
+  avatar       String?
+  displayName  String?
+  creationDate DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int      @unique
+}
+
+model Game {
+  id        String     @id @default(uuid())
+  status    GameStatus @default(WAITING)
+  createdAt DateTime   @default(now())
+  startedAt DateTime?
+  endedAt   DateTime?
+  moves     String // Simple string to split -- Ex: f3 e5 g4 Qh4
+  white     User       @relation("WhiteGames", fields: [whiteId], references: [id])
+  whiteId   Int
+  black     User       @relation("BlackGames", fields: [blackId], references: [id])
+  blackId   Int
+  chat      Chat       @relation(fields: [chatId], references: [id])
+  chatId    Int        @unique
+  // Spectator Field probably needed
+}
+
+model Chat {
+  id        Int       @id @default(autoincrement())
+  type      ChatType
+  game      Game?
+  users     User[]
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id           Int      @id @default(autoincrement())
+  creationDate DateTime @default(now())
+  content      String
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  chat         Chat     @relation(fields: [chatId], references: [id])
+  chatId       Int
+}
