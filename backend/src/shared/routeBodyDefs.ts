@@ -1,9 +1,11 @@
 
 export type CreateGameBody = {
-	white: string;
-	black: string;
+	whiteId: number;
+	blackId: number;
 };
 
 export type CreateUserBody = {
 	name: string;
+	email: string;
+	password: string;
 };

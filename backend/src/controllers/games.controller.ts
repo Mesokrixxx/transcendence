@@ -1,22 +1,31 @@
 import { type Request, type Response } from 'express';
 import * as gameService from '../services/games.service.js';
-import { isNonEmptyString } from '../utils/validates.js';
-import { type CreateGameBody } from '../shared/routeBodyDefs.js';
+import { createGameSchema } from '../validations/games.validations.js';
 
-export function createGame(req: Request<{}, {}, CreateGameBody>, res: Response) {
-	const { white, black } = req.body ?? {};
-	if (!isNonEmptyString(white)|| !isNonEmptyString(black))
-		return res.status(400).json({ error: 'white and black shall be a non empty string' });
+export async function createGame(req: Request, res: Response) {
+	const result = createGameSchema.safeParse(req.body);
+	if (!result.success) {
+		return res.status(400).json({
+			error: 'Invalid body request',
+			details: result.error.issues
+		});
+	}
 
-	const game = gameService.create(white, black);
+	const { whiteId, blackId } = result.data;
+	const game = await gameService.create(whiteId, blackId);
 	
-	res.status(201).json(game);
+	res.status(200).json(game);
 }
 
-export function getGame(req: Request, res: Response) {
-	const game = gameService.get(Number(req.params.id));
+export async function getGame(req: Request, res: Response) {
+	const id = Number(req.params.id);
+
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const game = await gameService.get(id);
 	if (!game)
-		return res.status(404).json({ error: 'id is not link to any game' });
+		return res.status(404).json({ error: 'game not found' });
 
 	res.status(201).json(game);
 }

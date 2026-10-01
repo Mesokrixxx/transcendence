@@ -18,11 +18,6 @@ enum GameStatus {
   BFF
 }
 
-enum ChatType {
-  GROUPCHAT
-  SPECTATORCHAT
-}
-
 // Tournament and Gamification should have their own models and/or fields.
 
 model User {
@@ -35,9 +30,8 @@ model User {
   whiteGames Game[]   @relation("WhiteGames")
   blackGames Game[]   @relation("BlackGames")
 
-  // Following isn't really a friend system, should be replaced by something else
-  followers User[] @relation("FriendsList")
-  follows   User[] @relation("FriendsList")
+  followers User[]    @relation("FriendsList") 
+  follows User[]      @relation("FriendsList") 
 
   chats    Chat[]
   messages Message[]
@@ -52,28 +46,29 @@ model Profile {
 }
 
 model Game {
-  id        String     @id @default(uuid())
-  status    GameStatus @default(WAITING)
-  createdAt DateTime   @default(now())
-  startedAt DateTime?
-  endedAt   DateTime?
-  moves     String // Simple string to split -- Ex: f3 e5 g4 Qh4
-  white     User       @relation("WhiteGames", fields: [whiteId], references: [id])
-  whiteId   Int
-  black     User       @relation("BlackGames", fields: [blackId], references: [id])
-  blackId   Int
-  chat      Chat       @relation(fields: [chatId], references: [id])
-  chatId    Int        @unique
-  // Spectator Field probably needed
+  id         Int        @id @default(autoincrement())
+  status     GameStatus @default(WAITING)
+  createdAt  DateTime   @default(now())
+  startedAt  DateTime?
+  endedAt    DateTime?
+  moves      String     @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
+  white      User       @relation("WhiteGames", fields: [whiteId], references: [id])
+  whiteId    Int
+  black      User       @relation("BlackGames", fields: [blackId], references: [id])
+  blackId    Int
+  specChat   Chat       @relation("SpectatorChat", fields: [specChatId], references: [id])
+  specChatId Int        @unique
+  chat       Chat       @relation("GameChat", fields: [chatId], references: [id])
+  chatId     Int        @unique
 }
 
 model Chat {
-  id        Int       @id @default(autoincrement())
-  type      ChatType
-  game      Game?
-  users     User[]
-  updatedAt DateTime  @updatedAt
-  messages  Message[]
+  id            Int       @id @default(autoincrement())
+  users         User[]
+  updatedAt     DateTime  @updatedAt
+  messages      Message[]
+  spectatorGame Game?     @relation("SpectatorChat")
+  game          Game?     @relation("GameChat")
 }
 
 model Message {

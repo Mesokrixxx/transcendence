@@ -11,10 +11,10 @@ db:
 	$(COMPOSE) exec backend npx prisma db push
 
 down:
-	$(COMPOSE) down
+	$(COMPOSE) down $(DOWN_FLAGS)
 
-clean:
-	$(COMPOSE) down --volumes --remove-orphans
+clean: DOWN_FLAGS = --volumes --remove-orphans
+clean: down
 	-podman image rm -f $(IMAGE)
 
 re: down all
