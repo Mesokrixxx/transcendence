@@ -7,7 +7,7 @@ build:
 	podman build -t $(PACKAGE_NAME) .
 
 run:
-	podman run --rm --name $(PACKAGE_NAME) -p $(PORT):$(PORT) $(PACKAGE_NAME)
+	podman run -d --rm --name $(PACKAGE_NAME) -p $(PORT):$(PORT) $(PACKAGE_NAME)
 
 stop:
 	podman stop $(PACKAGE_NAME)

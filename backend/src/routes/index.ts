@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import gamesRoutes from './games.routes.ts';
-import usersRoutes from './users.routes.ts';
+import gamesRoutes from './games.routes.js';
+import usersRoutes from './users.routes.js';
 
 const router = Router();
 

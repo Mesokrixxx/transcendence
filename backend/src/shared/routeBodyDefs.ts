@@ -1,7 +1,7 @@
 
 export type CreateGameBody = {
-	playerA: string;
-	playerB: string;
+	white: string;
+	black: string;
 };
 
 export type CreateUserBody = {

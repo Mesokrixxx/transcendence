@@ -2,24 +2,24 @@
 const StatusWaiting = 'waiting';
 const StatusPlaying = 'playing';
 const StatusDraw = 'draw';
-const StatusPlayerAWon = 'pawon';
-const StatusPlayerBWon = 'pbwon';
-const StatusPlayerAForfeit = 'paff';
-const StatusPlayerBForfeit = 'pbff';
+const StatusWhiteWon = 'pawon';
+const StatusBlackWon = 'pbwon';
+const StatusWhiteForfeit = 'paff';
+const StatusBlackForfeit = 'pbff';
 
 type Game = {
 	id: number;
-	playerA: string;
-	playerB: string;
+	white: string;
+	black: string;
 	status: string;
 	createdAt: Date;
 };
 
-export function create(playerA: string, playerB: string): Game {
-	const game = {
+export function create(white: string, black: string): Game {
+	const game: Game = {
 		id: 0, 
-		playerA: playerA, 
-		playerB: playerB, 
+		white: white, 
+		black: black, 
 		status: StatusWaiting,
 		createdAt: new Date()
 	};
