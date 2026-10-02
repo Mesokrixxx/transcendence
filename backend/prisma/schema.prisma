@@ -30,11 +30,6 @@ enum GameEndType {
   FIFTYMOVE
 }
 
-enum ChatType {
-  GROUPCHAT
-  SPECTATORCHAT
-}
-
 // Tournament and Gamification should have their own models and/or fields.
 
 model User {
@@ -87,7 +82,6 @@ model Game {
 
 model Chat {
   id            Int       @id @default(autoincrement())
-  type          ChatType
   spectatorGame Game?     @relation("SpectatorChat")
   game          Game?     @relation("GameChat")
   users         User[]
