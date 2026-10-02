@@ -1,20 +1,26 @@
-type User = {
-	id: number,
-	name: string;
-	createdAt: Date;
-};
+import prisma from '../db/prisma.js'
+import bcrypt from 'bcrypt'
 
-export function get(id: number): User | undefined {
-	return undefined; // TODO
+export async function get(id: number) {
+	return await prisma.user.findUnique({
+		where: { id: id },
+		select: {
+			'id': true,
+			'username': true,
+			'email': true
+		}
+	});
 }
 
-export function create(name: string) {
-	const user = {
-		id: 0,
-		name: name,
-		createAt: new Date()
-	};
+export async function create(name: string, email: string, password: string) {
+	const hashedPassword = await bcrypt.hash(password, 12);
+	const user = await prisma.user.create({
+		data: {
+			username: name,
+			email: email,
+			password: hashedPassword, // TODO handle OAuth 2.0
+		}
+	});
 
-	// TODO insert in database and get id
-	return user;
+	return get(user.id);
 }

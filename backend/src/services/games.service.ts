@@ -1,33 +1,43 @@
+import prisma from '../db/prisma.js'
 
-const StatusWaiting = 'waiting';
-const StatusPlaying = 'playing';
-const StatusDraw = 'draw';
-const StatusPlayerAWon = 'pawon';
-const StatusPlayerBWon = 'pbwon';
-const StatusPlayerAForfeit = 'paff';
-const StatusPlayerBForfeit = 'pbff';
+export async function create(whiteId: number, blackId: number) {
+	return await prisma.$transaction(async (tx) => {
+		const users = await tx.user.findMany({
+			where: {
+				id: {
+					in: [whiteId, blackId]
+				}
+			}
+		});
 
-type Game = {
-	id: number;
-	playerA: string;
-	playerB: string;
-	status: string;
-	createdAt: Date;
-};
+		if (users.length !== 2)
+			throw new Error('invalid game players');
 
-export function create(playerA: string, playerB: string): Game {
-	const game = {
-		id: 0, 
-		playerA: playerA, 
-		playerB: playerB, 
-		status: StatusWaiting,
-		createdAt: new Date()
-	};
+		const specChat = await tx.chat.create({ data: {} });
+		const gameChat = await tx.chat.create({
+			data: { 
+				users: { 
+					connect: [
+						{ id: whiteId },
+						{ id: blackId }
+					]
+				}
+			}
+		});
 
-	// TODO insert into db and get id 
-	return game;
+		return await tx.game.create({
+			data: {
+				whiteId: whiteId,
+				blackId: blackId,
+				chatId: gameChat.id,
+				specChatId: specChat.id
+			}
+		});
+	});
 }
 
-export function get(id: number): Game | undefined {
-	return undefined; // TODO
+export async function get(id: number) {
+	return await prisma.game.findUnique({ 
+		where: { id: id } 
+	});
 }

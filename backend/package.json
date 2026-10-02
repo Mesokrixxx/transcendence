@@ -1,33 +1,32 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
+  "name": "transcendence-backend",
   "license": "ISC",
-  "author": "",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.ts",
-    "dev": "tsx watch src/server.ts",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run format:check && npm run build"
   },
-  "keywords": [],
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+	"bcrypt": "^6.0.0",
+	"zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.3",
     "@types/pg": "^8.23.1",
+	"@types/bcrypt": "^6.0.0",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.9",
