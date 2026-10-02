@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GameStatus {
+  WAITING
+  PLAYING
+  OVER
+}
+
+enum GameResult {
+  DRAW
+  WHITE
+  BLACK
+}
+
+enum GameEndType {
+  CHECKMATE
+  FORFEIT
+  TIMEFORFEIT
+  AGREEDDRAW
+  STALEMATE
+  INSUFMATERIAL
+  TRIPLEREPETITION
+  FIFTYMOVE
+}
+
+// Tournament and Gamification should have their own models and/or fields.
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  email      String   @unique
+  password   String? // Possibly no password if User only uses OAuth 2.0
+  // OAuth 2.0 should have its own field. Would be clearer.
+  profile    Profile? // To avoid mutual dependency, but User will have a profile after creation
+  whiteGames Game[]   @relation("WhiteGames")
+  blackGames Game[]   @relation("BlackGames")
+
+  // If Bob is in friendsAdded AND in addedBy, then Bob is User friend
+  // If Bob is ONLY in friendsAdded, then User made a friend request to Bob
+  // If Bob is ONLY in addedBy, then Bob sent User a friend request
+  friendsAdded User[] @relation("FriendsList")
+  addedBy      User[] @relation("FriendsList")
+
+  chats    Chat[]
+  messages Message[]
+}
+
+model Profile {
+  avatar       String?
+  displayName  String?
+  creationDate DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int      @unique
+}
+
+model Game {
+  id         Int          @id @default(autoincrement())
+  status     GameStatus   @default(WAITING)
+  result     GameResult?
+  endType    GameEndType?
+  createdAt  DateTime     @default(now())
+  startedAt  DateTime?
+  endedAt    DateTime?
+  moves      String       @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
+  white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
+  whiteId    Int
+  black      User         @relation("BlackGames", fields: [blackId], references: [id])
+  blackId    Int
+  specChat   Chat         @relation("SpectatorChat", fields: [specChatId], references: [id])
+  specChatId Int          @unique
+  chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
+  chatId     Int          @unique
+  // Spectator Field probably needed. Maybe Game.chat.users could be that field.
+}
+
+model Chat {
+  id            Int       @id @default(autoincrement())
+  spectatorGame Game?     @relation("SpectatorChat")
+  game          Game?     @relation("GameChat")
+  users         User[]
+  updatedAt     DateTime  @updatedAt
+  messages      Message[]
+}
+
+model Message {
+  id           Int      @id @default(autoincrement())
+  creationDate DateTime @default(now())
+  content      String
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  chat         Chat     @relation(fields: [chatId], references: [id])
+  chatId       Int
+}
