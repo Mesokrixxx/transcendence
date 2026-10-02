@@ -61,14 +61,14 @@ model Profile {
 }
 
 model Game {
-  id         String       @id @default(uuid())
+  id         Int          @id @default(autoincrement())
   status     GameStatus   @default(WAITING)
   result     GameResult?
   endType    GameEndType?
   createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
-  moves      String // Simple string to split -- Ex: f3 e5 g4 Qh4
+  moves      String       @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
   black      User         @relation("BlackGames", fields: [blackId], references: [id])

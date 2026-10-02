@@ -13,4 +13,6 @@ COPY src ./src
 RUN npx prisma generate
 RUN npm run build
 
+EXPOSE 8080
+
 CMD ["npm", "start"]
