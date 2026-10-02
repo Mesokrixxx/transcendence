@@ -7,6 +7,7 @@ function Navbar()
         <header className="navbar">
             <div className="container navbar__content">
                 <Link to="/" className="navbar__brand">
+                    <span className="navbar__icon" aria-hidden="true"><img src="/icons/rook-solid-full.svg" alt="navbar__icon" className="navbar__icon"/></span>
                     Chess<span>Move</span>
                 </Link>
                 <nav className="navbar__links" aria-label="Main navigation">

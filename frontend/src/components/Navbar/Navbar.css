@@ -18,10 +18,17 @@
 .navbar__brand{
     font-size: 24px;
     font-weight: 800;
+    display: flex;
+    align-items: center;
 }
 
 .navbar__brand span {
     color: var(--color-primary);
+}
+
+.navbar__icon {
+  width: 24px;
+  height: 28px;
 }
 
 .navbar__links,
