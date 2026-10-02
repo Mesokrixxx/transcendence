@@ -7,15 +7,27 @@ datasource db {
   provider = "postgresql"
 }
 
-// Would maybe worth being split into multiple enums, status, winner, endType...
 enum GameStatus {
   WAITING
   PLAYING
+  OVER
+}
+
+enum GameResult {
   DRAW
-  WWON
-  BWON
-  WFF
-  BFF
+  WHITE
+  BLACK
+}
+
+enum GameEndType {
+  CHECKMATE
+  FORFEIT
+  TIMEFORFEIT
+  AGREEDDRAW
+  STALEMATE
+  INSUFMATERIAL
+  TRIPLEREPETITION
+  FIFTYMOVE
 }
 
 // Tournament and Gamification should have their own models and/or fields.
@@ -30,8 +42,11 @@ model User {
   whiteGames Game[]   @relation("WhiteGames")
   blackGames Game[]   @relation("BlackGames")
 
-  followers User[]    @relation("FriendsList") 
-  follows User[]      @relation("FriendsList") 
+  // If Bob is in friendsAdded AND in addedBy, then Bob is User friend
+  // If Bob is ONLY in friendsAdded, then User made a friend request to Bob
+  // If Bob is ONLY in addedBy, then Bob sent User a friend request
+  friendsAdded User[] @relation("FriendsList")
+  addedBy      User[] @relation("FriendsList")
 
   chats    Chat[]
   messages Message[]
@@ -46,29 +61,32 @@ model Profile {
 }
 
 model Game {
-  id         Int        @id @default(autoincrement())
-  status     GameStatus @default(WAITING)
-  createdAt  DateTime   @default(now())
+  id         String       @id @default(uuid())
+  status     GameStatus   @default(WAITING)
+  result     GameResult?
+  endType    GameEndType?
+  createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
-  moves      String     @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
-  white      User       @relation("WhiteGames", fields: [whiteId], references: [id])
+  moves      String // Simple string to split -- Ex: f3 e5 g4 Qh4
+  white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
-  black      User       @relation("BlackGames", fields: [blackId], references: [id])
+  black      User         @relation("BlackGames", fields: [blackId], references: [id])
   blackId    Int
-  specChat   Chat       @relation("SpectatorChat", fields: [specChatId], references: [id])
-  specChatId Int        @unique
-  chat       Chat       @relation("GameChat", fields: [chatId], references: [id])
-  chatId     Int        @unique
+  specChat   Chat         @relation("SpectatorChat", fields: [specChatId], references: [id])
+  specChatId Int          @unique
+  chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
+  chatId     Int          @unique
+  // Spectator Field probably needed. Maybe Game.chat.users could be that field.
 }
 
 model Chat {
   id            Int       @id @default(autoincrement())
+  spectatorGame Game?     @relation("SpectatorChat")
+  game          Game?     @relation("GameChat")
   users         User[]
   updatedAt     DateTime  @updatedAt
   messages      Message[]
-  spectatorGame Game?     @relation("SpectatorChat")
-  game          Game?     @relation("GameChat")
 }
 
 model Message {
