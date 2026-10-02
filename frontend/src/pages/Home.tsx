@@ -1,7 +1,7 @@
-import Footer from '../components/Footer'
+import Footer from '../components/Footer/Footer'
 function Home(){
     return (
-        <main>
+        <main className="container">
             <h1>Chess Move</h1>
             <p>Make your move.</p>
 
