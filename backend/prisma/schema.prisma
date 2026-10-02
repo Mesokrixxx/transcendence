@@ -27,7 +27,7 @@ enum GameEndType {
   STALEMATE
   INSUFMATERIAL
   TRIPLEREPETITION
-  // Might have forgot other draw reasons, there are so many! To check.
+  FIFTYMOVE
 }
 
 enum ChatType {
