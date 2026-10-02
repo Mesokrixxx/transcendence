@@ -47,9 +47,11 @@ model User {
   whiteGames Game[]   @relation("WhiteGames")
   blackGames Game[]   @relation("BlackGames")
 
-  // Following isn't really a friend system, should be replaced by something else
-  followers User[] @relation("FriendsList")
-  follows   User[] @relation("FriendsList")
+  // If Bob is in friendsAdded AND in addedBy, then Bob is User friend
+  // If Bob is ONLY in friendsAdded, then User made a friend request to Bob
+  // If Bob is ONLY in addedBy, then Bob sent User a friend request
+  friendsAdded User[] @relation("FriendsList")
+  addedBy      User[] @relation("FriendsList")
 
   chats    Chat[]
   messages Message[]
@@ -78,7 +80,7 @@ model Game {
   blackId   Int
   chat      Chat         @relation(fields: [chatId], references: [id])
   chatId    Int          @unique
-  // Spectator Field probably needed
+  // Spectator Field probably needed. Maybe Game.chat.users could be that field.
 }
 
 model Chat {
