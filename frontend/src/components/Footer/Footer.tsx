@@ -1,9 +1,13 @@
+import './Footer.css'
+
 function Footer()
 {
     return(
         <footer>
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms of Service</a>
+            <div className="container footer__links">
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+            </div>
         </footer>
     )
 }

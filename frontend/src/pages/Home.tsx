@@ -1,19 +1,23 @@
 import Footer from '../components/Footer/Footer'
-function Home(){
-    return (
-        <main className="container">
-            <h1>Chess Move</h1>
-            <p>Make your move.</p>
+import './Home.css'
 
-            <div>
-                <button> Create account</button>
-                <button> Log in </button>
-                <button> Play as guest </button>
-            </div>
+function Home() {
+  return (
+    <div className="home">
+      <main className="container home__content">
+        <h1>Chess <span>Move</span></h1>
+        <p>Make your move.</p>
 
-            <Footer />
-        </main>
-    )
+        <div className="home__actions">
+          <button>Create account</button>
+          <button>Log in</button>
+          <button>Play as guest</button>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  )
 }
 
 export default Home
