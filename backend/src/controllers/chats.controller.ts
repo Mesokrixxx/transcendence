@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express';
 import * as chatService from '../services/chats.services.js'
 import { query } from '../utils/query.js'
-import { prismaTreatError } from '../utils/prismaError.js';
+import { treatError } from '../utils/errors.js';
 
 export async function getChat(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -10,7 +10,7 @@ export async function getChat(req: Request, res: Response) {
 
 	const { result, error } = await query(() => chatService.get(id));
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
@@ -25,7 +25,7 @@ export async function createChat(req: Request, res: Response) {
 	const { result, error } = await query(() => chatService.create());
 	
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}

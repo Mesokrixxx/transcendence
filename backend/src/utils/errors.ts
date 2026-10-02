@@ -1,11 +1,7 @@
 import { PrismaClientKnownRequestError, PrismaClientInitializationError } from "@prisma/client/runtime/client";
-import { isPrismaError } from "./query.js";
 import { BackendError } from "../types/backendError.types.js";
 
-export function prismaTreatError(err: unknown) {
-    if (!isPrismaError(err))
-        return { status: 500, error: 'internal server error' };
-    
+export function treatError(err: unknown) {
     if (err instanceof PrismaClientKnownRequestError) {
         switch (err.code) {
         case 'P2002':

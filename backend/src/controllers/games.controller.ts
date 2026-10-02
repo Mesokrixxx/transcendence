@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import * as gameService from '../services/games.service.js';
 import { createGameSchema } from '../validations/games.validations.js';
 import { query } from '../utils/query.js'
-import { prismaTreatError } from '../utils/prismaError.js';
+import { treatError } from '../utils/errors.js';
 
 export async function getGame(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -12,7 +12,7 @@ export async function getGame(req: Request, res: Response) {
 
 	const { result, error } = await query(() => gameService.get(id));
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
@@ -35,7 +35,7 @@ export async function createGame(req: Request, res: Response) {
 	const { whiteId, blackId } = treatedReq.data;
 	const { result, error } = await query(() => gameService.create(whiteId, blackId));
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}

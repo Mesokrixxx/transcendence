@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import * as userService from '../services/users.service.js';
 import { createUserScema as createUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
-import { prismaTreatError } from '../utils/prismaError.js';
+import { treatError } from '../utils/errors.js';
 
 export async function getUser(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -11,7 +11,7 @@ export async function getUser(req: Request, res: Response) {
 
 	const { result, error } = await query(() => userService.get(id));
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
@@ -34,7 +34,7 @@ export async function createUser(req: Request, res: Response) {
 	const { username, email, password } = treatedReq.data;
 	const { result, error } = await query(() => userService.create(username, email, password));
 	if (error) {
-		const treatedErr = prismaTreatError(error);
+		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
