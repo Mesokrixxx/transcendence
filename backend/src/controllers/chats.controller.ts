@@ -15,6 +15,9 @@ export async function getChat(req: Request, res: Response) {
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
 
+	if (!result)
+		return res.status(404).json({ error: 'chat not found' });
+
 	res.status(200).json(result);
 }
 

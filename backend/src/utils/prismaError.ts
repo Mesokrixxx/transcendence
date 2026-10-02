@@ -1,5 +1,6 @@
 import { PrismaClientKnownRequestError, PrismaClientInitializationError } from "@prisma/client/runtime/client";
 import { isPrismaError } from "./query.js";
+import { BackendError } from "../types/backendError.types.js";
 
 export function prismaTreatError(err: unknown) {
     if (!isPrismaError(err))
@@ -21,6 +22,9 @@ export function prismaTreatError(err: unknown) {
     if (err instanceof PrismaClientInitializationError)
         return { status: 503, error: 'database unavailable' };
 
-    return { status: 500, error: 'database error' };
+	if (err instanceof BackendError)
+		return { status: err.status, error: err.message };
+
+    return { status: 500, error: 'internal server error' };
 }
     

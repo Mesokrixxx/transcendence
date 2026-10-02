@@ -9,7 +9,7 @@ async function query<Type>(cb: () => Promise<Type>): Promise<QueryResponse<Type>
     const result = await cb();
     return { result: result, error: null } ;
   } catch (e: unknown) {
-    return { result: null, error: isPrismaError(e) ? e : new Error('DB Error') };
+    return { result: null, error: e };
   }
 }
 

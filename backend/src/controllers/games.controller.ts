@@ -4,6 +4,25 @@ import { createGameSchema } from '../validations/games.validations.js';
 import { query } from '../utils/query.js'
 import { prismaTreatError } from '../utils/prismaError.js';
 
+export async function getGame(req: Request, res: Response) {
+	const id = Number(req.params.id);
+
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const { result, error } = await query(() => gameService.get(id));
+	if (error) {
+		const treatedErr = prismaTreatError(error);
+
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+
+	if (!result)
+		return res.status(404).json({ error: 'game not found' });
+
+	res.status(200).json(result);
+}
+
 export async function createGame(req: Request, res: Response) {
 	const treatedReq = createGameSchema.safeParse(req.body);
 	if (!treatedReq.success) {
@@ -15,22 +34,6 @@ export async function createGame(req: Request, res: Response) {
 
 	const { whiteId, blackId } = treatedReq.data;
 	const { result, error } = await query(() => gameService.create(whiteId, blackId));
-	if (error) {
-		const treatedReq = prismaTreatError(error);
-
-		return res.status(treatedReq.status).json(treatedReq.error);
-	}
-
-	res.status(200).json(result);
-}
-
-export async function getGame(req: Request, res: Response) {
-	const id = Number(req.params.id);
-
-	if (!Number.isInteger(id) || id <= 0)
-		return res.status(400).json({ error: 'id shall be an integer' });
-
-	const { result, error } = await query(() => gameService.get(id));
 	if (error) {
 		const treatedErr = prismaTreatError(error);
 
