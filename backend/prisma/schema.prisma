@@ -7,15 +7,27 @@ datasource db {
   provider = "postgresql"
 }
 
-// Would maybe worth being split into multiple enums, status, winner, endType...
 enum GameStatus {
   WAITING
   PLAYING
+  OVER
+}
+
+enum GameResult {
   DRAW
-  WWON
-  BWON
-  WFF
-  BFF
+  WHITE
+  BLACK
+}
+
+enum GameEndType {
+  CHECKMATE
+  FORFEIT
+  TIMEFORFEIT
+  AGREEDDRAW
+  STALEMATE
+  INSUFMATERIAL
+  TRIPLEREPETITION
+  // Might have forgot other draw reasons, there are so many! To check.
 }
 
 enum ChatType {
@@ -52,18 +64,20 @@ model Profile {
 }
 
 model Game {
-  id        String     @id @default(uuid())
-  status    GameStatus @default(WAITING)
-  createdAt DateTime   @default(now())
+  id        String       @id @default(uuid())
+  status    GameStatus   @default(WAITING)
+  result    GameResult?
+  endType   GameEndType?
+  createdAt DateTime     @default(now())
   startedAt DateTime?
   endedAt   DateTime?
   moves     String // Simple string to split -- Ex: f3 e5 g4 Qh4
-  white     User       @relation("WhiteGames", fields: [whiteId], references: [id])
+  white     User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId   Int
-  black     User       @relation("BlackGames", fields: [blackId], references: [id])
+  black     User         @relation("BlackGames", fields: [blackId], references: [id])
   blackId   Int
-  chat      Chat       @relation(fields: [chatId], references: [id])
-  chatId    Int        @unique
+  chat      Chat         @relation(fields: [chatId], references: [id])
+  chatId    Int          @unique
   // Spectator Field probably needed
 }
 
