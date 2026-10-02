@@ -7,6 +7,7 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+    max-width: none;
     gap: 24px;
 }
 
@@ -19,12 +20,12 @@
     font-weight: 800;
 }
 
-.navbar_brand span {
-    color:var(--color-primary);
+.navbar__brand span {
+    color: var(--color-primary);
 }
 
-.navbar__link,
-.navbar_auth {
+.navbar__links,
+.navbar__auth {
     display: flex;
     align-items: center;
     flex-wrap: wrap;

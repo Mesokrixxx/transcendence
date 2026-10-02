@@ -6,10 +6,10 @@ function Navbar()
     return(
         <header className="navbar">
             <div className="container navbar__content">
-                <Link to="/" className="navbar_brand">
+                <Link to="/" className="navbar__brand">
                     Chess<span>Move</span>
                 </Link>
-                <nav className="navbar_links" aria-label="Main navigation">
+                <nav className="navbar__links" aria-label="Main navigation">
                     <Link to="/play">Play</Link>
                     <Link to="/watch">Watch</Link>
                     <Link to="/tournaments">Tournaments</Link>
