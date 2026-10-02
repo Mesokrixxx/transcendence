@@ -2,6 +2,6 @@ import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError, PrismaC
 
 type PrismaError = PrismaClientKnownRequestError | PrismaClientUnknownRequestError | PrismaClientRustPanicError | PrismaClientInitializationError | PrismaClientValidationError;
 
-type QueryResponse<Type> = Type | PrismaError | Error;
+type QueryResponse<Type> = { result: Type, error: null } | { result: null, error: PrismaError | Error };
 
 export type { PrismaError, QueryResponse }
