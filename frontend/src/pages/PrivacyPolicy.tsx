@@ -1,6 +1,6 @@
 function PrivacyPolicy() {
   return (
-    <main>
+    <main className="container">
       <h1>Privacy Policy</h1>
       {/* <h1>{t('privacy.title')}</h1> */}
 
