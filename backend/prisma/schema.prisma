@@ -66,30 +66,33 @@ model Profile {
 }
 
 model Game {
-  id        String       @id @default(uuid())
-  status    GameStatus   @default(WAITING)
-  result    GameResult?
-  endType   GameEndType?
-  createdAt DateTime     @default(now())
-  startedAt DateTime?
-  endedAt   DateTime?
-  moves     String // Simple string to split -- Ex: f3 e5 g4 Qh4
-  white     User         @relation("WhiteGames", fields: [whiteId], references: [id])
-  whiteId   Int
-  black     User         @relation("BlackGames", fields: [blackId], references: [id])
-  blackId   Int
-  chat      Chat         @relation(fields: [chatId], references: [id])
-  chatId    Int          @unique
+  id         String       @id @default(uuid())
+  status     GameStatus   @default(WAITING)
+  result     GameResult?
+  endType    GameEndType?
+  createdAt  DateTime     @default(now())
+  startedAt  DateTime?
+  endedAt    DateTime?
+  moves      String // Simple string to split -- Ex: f3 e5 g4 Qh4
+  white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
+  whiteId    Int
+  black      User         @relation("BlackGames", fields: [blackId], references: [id])
+  blackId    Int
+  specChat   Chat         @relation("SpectatorChat", fields: [specChatId], references: [id])
+  specChatId Int          @unique
+  chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
+  chatId     Int          @unique
   // Spectator Field probably needed. Maybe Game.chat.users could be that field.
 }
 
 model Chat {
-  id        Int       @id @default(autoincrement())
-  type      ChatType
-  game      Game?
-  users     User[]
-  updatedAt DateTime  @updatedAt
-  messages  Message[]
+  id            Int       @id @default(autoincrement())
+  type          ChatType
+  spectatorGame Game?     @relation("SpectatorChat")
+  game          Game?     @relation("GameChat")
+  users         User[]
+  updatedAt     DateTime  @updatedAt
+  messages      Message[]
 }
 
 model Message {
