@@ -1,5 +1,6 @@
 import Footer from '../components/Footer/Footer'
 import Navbar from '../components/Navbar/Navbar'
+import ChessBoard from '../components/ChessBoard/ChessBoard'
 import './Home.css'
 
 function Home() {
@@ -9,6 +10,8 @@ function Home() {
         <main className="container home__content">
             <h1>Chess <span>Move</span></h1>
             <p>Make your move.</p>
+
+            <ChessBoard />
 
             <div className="home__actions">
             <button>Create account</button>
