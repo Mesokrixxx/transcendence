@@ -54,3 +54,11 @@ h6 {
   margin-inline: auto;
   padding: 24px;
 }
+
+main a {
+  color: var(--color-primary);
+}
+
+main a:hover {
+  color: var(--color-text-primary);
+}

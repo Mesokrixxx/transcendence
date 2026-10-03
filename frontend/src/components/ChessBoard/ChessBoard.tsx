@@ -1,31 +1,48 @@
-import './ChessBoard.css'
+import { Board, Square, Piece } from './ChessBoard.styles'
+
+const backRow = [ 'rook', 'knight', 'bishop', 'queen', 'king', 'bishop','knight','rook']
 
 function ChessBoard ()
 {
 
     return(
-        <div className="chessboard" role="img" aria-label="ChessBoard">
+        <Board className="chessboard" role="img" aria-label="Chessboard with pieces in their starting position">
             {
                 Array.from({length: 64}, (_, index)=>{
                     const row = Math.floor(index / 8)
                     const column = index % 8
                     
-                    let squareColor = 'chessboard__square--dark'
+                    let isLight = false
 
                     if((row +column) % 2 ===0){
-                        squareColor='chessboard__square--light'
+                        isLight= true
                     }
 
-                    return (
-                        <div
-                            key={index}
-                            className={' chessboard__square ' + squareColor}
-                        />
-                    )
-                })
+                    let pieceFile = ''
 
-            }
-        </div>
+                    if(row ===0){
+                        pieceFile = 'black_' + backRow[column]
+                    }
+                    else if (row===1){
+                        pieceFile = 'black_pawn'
+                    }
+                    else if (row===6){
+                        pieceFile = 'white_pawn'
+                    }
+                    else if (row ===7){
+                        pieceFile = 'white_' + backRow[column]
+                    }
+                    let piece = null
+
+                    if (pieceFile !== ''){
+                        piece = (
+                            <Piece src={'/pieces/kosal/'+ pieceFile + '.svg'} alt="" />
+                        )
+                    }
+
+                    return<Square key={index} $isLight={isLight}> {piece}</Square>
+                })}
+        </Board>
     )
 
 }

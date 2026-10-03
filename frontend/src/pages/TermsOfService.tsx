@@ -50,6 +50,18 @@ function TermsOfService() {
           This project is provided for educational purposes and is not a
           commercial service.
         </p>
+        <h2>Credits</h2>
+        <p>
+          Chess piece artwork:{' '}
+          <a href="https://github.com/philatype/kosal">
+            Kosal by Philatype
+          </a>
+          {', licensed under '}
+          <a href="https://creativecommons.org/licenses/by/4.0/">
+            Creative Commons Attribution 4.0
+          </a>
+          {'.'}
+        </p>
       </main>
       <Footer />
      </Page>
