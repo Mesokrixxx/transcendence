@@ -22,10 +22,14 @@ export const Content = styled.div`
   grid-template-columns: 1fr auto 1fr;
   max-width: none;
   gap: 24px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr auto;
+  }
 `
 
 export const Brand = styled(Link)`
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -37,7 +41,7 @@ export const Brand = styled(Link)`
 
 export const Icon = styled.img`
   width: 24px;
-  height: 28px;
+  height: 32px;
 `
 
 export const Navigation = styled.nav`
@@ -45,6 +49,12 @@ export const Navigation = styled.nav`
   align-items: center;
   flex-wrap: wrap;
   gap: 24px;
+
+  @media (max-width: 1100px) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+  }
 `
 
 export const Auth = styled.div`

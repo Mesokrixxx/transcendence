@@ -1,25 +1,25 @@
 import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer/Footer'
 import ChessBoard from '../components/ChessBoard/ChessBoard'
-import './Home.css'
+import { Page, Content, Intro, Aside } from './Home.styles'
 
 function Home() {
   return (
-    <div className="home">
+    <Page>
       <Navbar />
 
-      <main className="container home__content">
-        <div className="home__intro">
+      <Content className="container">
+        <Intro>
           <h1>Make your <span>move!</span></h1>
-        </div>
+        </Intro>
 
         <ChessBoard />
 
-        <div className="home__aside" />
-      </main>
+        <Aside />
+      </Content>
 
       <Footer />
-    </div>
+    </Page>
   )
 }
 
