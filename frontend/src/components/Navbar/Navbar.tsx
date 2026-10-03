@@ -1,28 +1,36 @@
 import { Link } from 'react-router-dom'
-import'./Navbar.css'
+import {
+  Header,
+  Content,
+  Brand,
+  Icon,
+  Navigation,
+  Auth,
+} from './Navbar.styles'
 
-function Navbar()
-{
-    return(
-        <header className="navbar">
-            <div className="container navbar__content">
-                <Link to="/" className="navbar__brand">
-                    <span className="navbar__icon" aria-hidden="true"><img src="/icons/rook-solid-full.svg" alt="navbar__icon" className="navbar__icon"/></span>
-                    Chess<span>Move</span>
-                </Link>
-                <nav className="navbar__links" aria-label="Main navigation">
-                    <Link to="/play">Play</Link>
-                    <Link to="/watch">Watch</Link>
-                    <Link to="/tournaments">Tournaments</Link>
-                </nav>
+function Navbar() {
+  return (
+    <Header>
+      <Content className="container">
+        <Brand to="/">
+          <Icon src="/icons/rook-solid-full.svg" alt="" />
+          Chess<span>Move</span>
+        </Brand>
 
-                <div className="navbar__auth">
-                    <Link to="/login">Log in </Link>
-                    <Link to="/register" className="navbar__signup">Sign Up </Link>
-                </div>
-            </div>
-        </header>
-    )
+        <Navigation aria-label="Main navigation">
+          <Link to="/play">Play</Link>
+          <Link to="/watch">Watch</Link>
+          <Link to="/tournaments">Tournaments</Link>
+          <Link to="/tournaments">Rankings</Link>
+        </Navigation>
+
+        <Auth>
+          <Link to="/login">Log in</Link>
+          <Link to="/register">Sign Up</Link>
+        </Auth>
+      </Content>
+    </Header>
+  )
 }
 
 export default Navbar
