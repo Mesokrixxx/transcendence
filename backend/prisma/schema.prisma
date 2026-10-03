@@ -30,7 +30,7 @@ enum GameEndType {
   FIFTYMOVE
 }
 
-// Tournament and Gamification should have their own models and/or fields.
+// Tournament should have its own models and/or fields.
 
 model User {
   id         Int      @id @default(autoincrement())
@@ -55,9 +55,12 @@ model User {
 model Profile {
   avatar       String?
   displayName  String?
-  creationDate DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       Int      @unique
+  creationDate DateTime          @default(now())
+  user         User              @relation(fields: [userId], references: [id])
+  userId       Int               @unique
+  level        Int               @default(0)
+  xp           Int               @default(0)
+  badges       BadgesOnProfile[]
 }
 
 model Game {
@@ -97,4 +100,22 @@ model Message {
   userId       Int
   chat         Chat     @relation(fields: [chatId], references: [id])
   chatId       Int
+}
+
+model Badge {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  ownedBy     BadgesOnProfile[]
+}
+
+// Explicit many-to-many relationship -- Needed due to Profile model id/unique usage
+model BadgesOnProfile {
+  profile    Profile  @relation(fields: [profileUserId], references: [userId])
+  profileUserId Int
+  badge      Badge    @relation(fields: [badgeId], references: [id])
+  badgeId    Int
+  assignedAt DateTime @default(now())
+
+  @@unique([profileUserId, badgeId])
 }
