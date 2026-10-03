@@ -13,7 +13,7 @@ function ChessBoard ()
                     let squareColor = 'chessboard__square--dark'
 
                     if((row +column) % 2 ===0){
-                        squareColor='chessboard__square--lght'
+                        squareColor='chessboard__square--light'
                     }
 
                     return (

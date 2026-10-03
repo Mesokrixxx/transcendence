@@ -1,24 +1,22 @@
-import Footer from '../components/Footer/Footer'
 import Navbar from '../components/Navbar/Navbar'
+import Footer from '../components/Footer/Footer'
 import ChessBoard from '../components/ChessBoard/ChessBoard'
 import './Home.css'
 
 function Home() {
   return (
     <div className="home">
-      <Navbar/>
-        <main className="container home__content">
-            <h1>Chess <span>Move</span></h1>
-            <p>Make your move.</p>
+      <Navbar />
 
-            <ChessBoard />
+      <main className="container home__content">
+        <div className="home__intro">
+          <h1>Make your <span>move!</span></h1>
+        </div>
 
-            <div className="home__actions">
-            <button>Create account</button>
-            <button>Log in</button>
-            <button>Play as guest</button>
-            </div>
-        </main>
+        <ChessBoard />
+
+        <div className="home__aside" />
+      </main>
 
       <Footer />
     </div>
