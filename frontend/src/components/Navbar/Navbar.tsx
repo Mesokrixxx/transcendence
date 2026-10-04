@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Button from '../Button/Button'
 import {
   Header,
   Content,
@@ -25,8 +26,8 @@ function Navbar() {
         </Navigation>
 
         <Auth>
-          <Link to="/login">Log in</Link>
-          <Link to="/register">Sign Up</Link>
+          <Button to="/login" variant="secondary">Log in</Button>
+          <Button to="/register" variant="primary">Sign Up</Button>
         </Auth>
       </Content>
     </Header>

@@ -24,6 +24,10 @@ export const Content = styled.main`
 `
 
 export const Intro = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-atart;
+  gap: 24px;
   h1 {
     font-size: clamp(32px, 4vw, 56px);
     font-weight: 800;
@@ -32,6 +36,13 @@ export const Intro = styled.div`
 
   span {
     color: var(--color-primary);
+  }
+  
+  @media (max-width: 900px) {
+    h1 {
+        width: 100%;
+        text-align: center;
+    }
   }
 `
 
