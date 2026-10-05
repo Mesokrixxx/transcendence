@@ -71,7 +71,7 @@ model Game {
   createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
-  moves      String       @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
+  moves      Json
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
   black      User         @relation("BlackGames", fields: [blackId], references: [id])
