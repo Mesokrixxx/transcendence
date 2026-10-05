@@ -64,3 +64,57 @@ export const Auth = styled.div`
   gap: 24px;
   justify-self: end;
 `
+
+export const LanguageButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+  }
+`
+
+export const LanguageMenu = styled.div`
+  position: relative;
+`
+
+export const LanguageOptions = styled.ul`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+
+  min-width: 150px;
+  padding: 8px;
+  list-style: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+
+  button {
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-background);
+    }
+  }
+`
