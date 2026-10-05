@@ -36,6 +36,17 @@ interface Move {
 
 type Board = Record<Square, Piece | null>;
 
+enum GameStatus {
+  ONGOING,
+  CHECK,
+  CHECKMATE,
+  DRAW,
+  STALEMATE,
+  INSUFMATERIAL,
+  REPETITION,
+  FIFTYMOVES,
+}
+
 class ChessGame {
   // Starts a new ChessGame if no moves are provided or reconstructs game from given moves
   // Throws if a move isn't legal
@@ -56,14 +67,16 @@ class ChessGame {
   // Throws if isLegalMove(move) is false
   move(move: Move): void;
 
+
+  getGameStatus(): GameStatus;
   isCheckmate(): boolean;
   isCheck(): boolean;
-
   isDraw(): boolean;
   isStalemate(): boolean;
   isDrawByInsufficientMaterial(): boolean;
   isDrawByRepetition(): boolean;
   isDrawByFiftyMoves(): boolean;
+
 
   isOver(): boolean;
 }
