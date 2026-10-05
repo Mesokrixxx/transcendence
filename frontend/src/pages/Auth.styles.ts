@@ -10,7 +10,7 @@ export const AuthContent = styled.main`
 export const AuthPanel = styled.div`
     width: 100%;
     max-width: 440px;
-    padding 32px;
+    padding: 32px;
 
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);

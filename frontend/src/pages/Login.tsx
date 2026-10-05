@@ -38,7 +38,7 @@ function Login(){
                     </Form>
 
                     <AuthHint>
-                        No auccount yet ?<Link to="/register">Sign up</Link>
+                        No account yet ? <Link to="/register">Sign up</Link>
                     </AuthHint>
                 </AuthPanel>
             </AuthContent>
