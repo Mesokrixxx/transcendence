@@ -7,11 +7,9 @@ const isPrismaError = (err: unknown): err is PrismaError => {
 async function query<Type>(cb: () => Promise<Type>): Promise<QueryResponse<Type>> {
   try {
     const result = await cb();
-    return result;
+    return { result: result, error: null } ;
   } catch (e: unknown) {
-    if (isPrismaError(e))
-      return e;
-    return Error("DB Error");
+    return { result: null, error: e };
   }
 }
 
