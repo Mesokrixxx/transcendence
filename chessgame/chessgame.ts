@@ -1,56 +1,88 @@
-// prettier-ignore
-type DeepReadonly<T> =
-  T extends (...args: any[]) => any ? T
-  : T extends readonly (infer U)[] ? readonly DeepReadonly<U>[]
-  : T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-  : T;
+import type { Board, Color, DeepReadonly, Move, Piece, Square } from './chessgame.types';
+import { GameStatus } from './chessgame.types';
 
-type Color = "white" | "black";
-
-type PieceType = "king" | "queen" | "rook" | "bishop" | "knight" | "pawn";
-
-type PiecePromotionType = "queen" | "rook" | "bishop" | "knight";
-
-interface Piece {
-  color: Color;
-  type: PieceType;
+interface CastlingRights {
+  queenside: boolean;
+  kingside: boolean;
 }
 
-// All squares of the board, listed from White's perspective
-// prettier-ignore
-type Square = 
-  | "a8" | "b8" | "c8" | "d8" | "e8" | "f8" | "g8" | "h8"
-  | "a7" | "b7" | "c7" | "d7" | "e7" | "f7" | "g7" | "h7"
-  | "a6" | "b6" | "c6" | "d6" | "e6" | "f6" | "g6" | "h6"
-  | "a5" | "b5" | "c5" | "d5" | "e5" | "f5" | "g5" | "h5"
-  | "a4" | "b4" | "c4" | "d4" | "e4" | "f4" | "g4" | "h4"
-  | "a3" | "b3" | "c3" | "d3" | "e3" | "f3" | "g3" | "h3"
-  | "a2" | "b2" | "c2" | "d2" | "e2" | "f2" | "g2" | "h2"
-  | "a1" | "b1" | "c1" | "d1" | "e1" | "f1" | "g1" | "h1";
-
-interface Move {
-  from: Square;
-  to: Square;
-  promotion?: PiecePromotionType;
+interface Position {
+  board: string;
+  turn: Color;
+  castlingRights: Record<Color, CastlingRights>
+  enPassant: Square | null;
+  halfMoves: number;
 }
 
-type Board = Record<Square, Piece | null>;
+type History = {
+  // position is the situation before move
+  position: Position,
+  move: Move,
+}[];
 
-enum GameStatus {
-  ONGOING,
-  CHECK,
-  CHECKMATE,
-  DRAW,
-  STALEMATE,
-  INSUFMATERIAL,
-  REPETITION,
-  FIFTYMOVES,
+const boardSquares: Square[] = [
+  "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+  "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+  "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+  "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+  "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+  "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+  "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+  "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+];
+
+class InternalBoard {
+  constructor(setup?: string);
+
+  private board: Piece[];
+
+  pieceAt(square: Square): Piece | null;
+  // squareFrom("e4", 1, 1) // f5
+  squareFrom(square: Square, fileOffset: number, rankOffset: number): Square | null;
+
+  setPiece(square: Square, piece: Piece): void;
+  removePiece(square: Square): void;
+  movePiece(from: Square, to: Square): void;
+
+  toString(): string;
+}
+
+class InternalGame {
+  constructor();
+
+  private board: InternalBoard;
+  private turn: Color = 'white';
+  private castlingRights: Record<Color, CastlingRights> = {
+    white: { queenside: true, kingside: true },
+    black: { queenside: true, kingside: true },
+  };
+  private enPassant: Square | null = null;
+  // Draw by fifty moves when reaching 100 half moves
+  private halfMoves = 0;
+  private history: History = [];
+  private gameStatus: GameStatus = GameStatus.ONGOING;
+
+  // Store legalMoves once computed for the current state
+  private legalMoves: Move[] | null;
+
+  private getPseudoLegalMoves(): Move[];
+  getLegalMoves(): Move[];
+
+  makeMove(move: Move): void;
+  undoMove(): void;
+
+  getBoard(): Board;
+  getTurn(): Color;
+  getMoveHistory(): Move[];
+  getGameStatus(): GameStatus;
 }
 
 class ChessGame {
   // Starts a new ChessGame if no moves are provided or reconstructs game from given moves
   // Throws if a move isn't legal
   constructor(moves?: Move[]);
+
+  private game: InternalGame;
 
   getBoard(): DeepReadonly<Board>;
   getTurn(): Color;
