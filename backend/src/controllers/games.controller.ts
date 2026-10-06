@@ -32,7 +32,7 @@ export async function createGame(req: Request, res: Response) {
 		});
 	}
 
-	const { whiteId, blackId } = treatedReq.data;
+	const { whiteId, blackId } = treatedReq.data; // TODO maybe verify ids and use req.user.id
 	const { result, error } = await query(() => gameService.create(whiteId, blackId));
 	if (error) {
 		const treatedErr = treatError(error);

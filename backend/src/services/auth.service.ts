@@ -28,3 +28,31 @@ export async function deleteSession(token: string) {
 		where: { tokenHash: hashToken(token) }
 	});
 }
+
+export async function getSession(token: string) {
+	const session = await prisma.session.findUnique({
+		where: { tokenHash: hashToken(token) },
+		select: {
+			expiresAt: true,
+			user: {
+				select: {
+					id: true,
+					username: true,
+					email: true
+				}
+			}
+		}
+	});
+
+	if (!session)
+		return null;
+
+	if (session.expiresAt <= new Date()) {
+		await prisma.session.deleteMany({
+			where: { tokenHash: hashToken(token) }
+		});
+		return null;
+	}
+
+	return session.user;
+}
