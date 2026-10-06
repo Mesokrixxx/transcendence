@@ -11,6 +11,24 @@ import { AuthContent, AuthPanel, AuthHint, PasswordHelp} from './Auth.styles'
 function Register(){
     function handleSubmit(event: SubmitEvent<HTMLFormElement>){
         event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+
+    const password = data.get('password')
+    const confirmation = data.get('confirmPassword')
+
+    const confirmationInput = form.elements.namedItem(
+        'confirmPassword'
+    ) as HTMLInputElement
+
+    if (password !== confirmation){
+        confirmationInput.setCustomValidity('Password do not match.')
+        confirmationInput.reportValidity()
+        return
+    }
+
+    //back
+
     }
 
     return(
@@ -59,15 +77,16 @@ function Register(){
                         <Input
                             id="register-confirm-password"
                             name="confirmPassword"
-                            label="Confirm assword"
+                            label="Confirm password"
                             type="password"
                             autoComplete="new-password"
-                            placeholder="Example42$"
+                            placeholder="Repeat your password"
+                            onChange={(event)=>event.currentTarget.setCustomValidity('')}
                             required
                         />
 
                         <PasswordHelp id="password-help">
-                            At least * characters, including a letter, a number and a special character.
+                            At least 8 characters, including a letter, a number and a special character.
                         </PasswordHelp>
 
                         <Button type="submit">Create account</Button>
