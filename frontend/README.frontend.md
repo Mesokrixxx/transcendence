@@ -178,8 +178,8 @@ Le crédit est également affiché dans la page Terms of Service.
 - [x] Créer les formulaires d’inscription et de connexion.
 - [x] Afficher les critères du mot de passe pendant la saisie.
 - [x] Vérifier la confirmation du mot de passe.
-- [ ] Ajouter l’œil pour afficher ou masquer les mots de passe.
-- [ ] Bloquer l’inscription si les critères du mot de passe ne sont pas respectés.
+- [x] Ajouter l’œil pour afficher ou masquer les mots de passe.
+- [x] Bloquer l’inscription si les critères du mot de passe ne sont pas respectés.
 - [ ] Relier les formulaires au backend et afficher les erreurs ou confirmations.
 - [ ] Construire l’espace joueur.
 - [ ] Créer le profil avec avatar, statistiques et historique des matchs.

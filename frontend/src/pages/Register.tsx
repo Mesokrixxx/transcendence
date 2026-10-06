@@ -14,19 +14,41 @@ function Register(){
     const [password, setPassord] = useState('')
     function handleSubmit(event: SubmitEvent<HTMLFormElement>){
         event.preventDefault()
+
     const form = event.currentTarget
     const data = new FormData(form)
 
-    const password = data.get('password')
-    const confirmation = data.get('confirmPassword')
+    const password = String(data.get('password')?? '') 
+    const confirmation = String(data.get('confirmPassword')?? '')
+
+    const passwordInput = form.elements.namedItem(
+        'password'
+    ) as HTMLInputElement
 
     const confirmationInput = form.elements.namedItem(
         'confirmPassword'
     ) as HTMLInputElement
 
+    passwordInput.setCustomValidity('')
+    confirmationInput.setCustomValidity('')
+
+    const passwordIsValid =
+        password.length >= 8 && 
+        password.length <= 100 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /[0-9]/.test(password) && 
+        /[^A-Za-z0-9\s]/.test(password)
+    
+    if (!passwordIsValid) {
+        passwordInput.setCustomValidity('Use 8–100 characters, including an uppercase letter, a lowercase letter, a number and a special character.')
+    }
+
     if (password !== confirmation){
-        confirmationInput.setCustomValidity('Password do not match.')
-        confirmationInput.reportValidity()
+        confirmationInput.setCustomValidity('Passwords do not match.')
+    }
+
+    if (!form.reportValidity()) {
         return
     }
 
@@ -72,12 +94,17 @@ function Register(){
                             autoComplete="new-password"
                             aria-describedby="password-help"
                             placeholder="Example42$"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s]).{8,100}"
+                            title="Use 8–100 characters, including an uppercase letter, a lowercase letter, a number and a special character."
                             value={password}
-                            onChange={(event) =>setPassord(event.currentTarget.value)}
+                            onChange={(event) =>{
+                                event.currentTarget.setCustomValidity('')
+                                setPassord(event.currentTarget.value)}}
                             minLength={8}
                             maxLength={100}
                             required
                         />
+                        <PasswordRequirements password={password} />
 
                         <Input
                             id="register-confirm-password"
@@ -86,10 +113,9 @@ function Register(){
                             type="password"
                             autoComplete="new-password"
                             placeholder="Repeat your password"
-                            onChange={(event)=>event.currentTarget.setCustomValidity('')}
+                            onChange={(event)=>{event.currentTarget.setCustomValidity('') }}
                             required
                         />
-                        <PasswordRequirements password={password} />
 
                         <Button type="submit">Create account</Button>
                     </Form>
