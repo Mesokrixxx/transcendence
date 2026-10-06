@@ -1,5 +1,6 @@
 import prisma from '../db/prisma.js'
 import bcrypt from 'bcrypt'
+import { BackendError } from '../types/backendError.types.js';
 
 export async function get(id: number) {
 	return await prisma.user.findUnique({
@@ -50,4 +51,36 @@ export async function auth(email: string, password: string) {
 		username: user.username,
 		email: user.email
 	};
+}
+
+export async function update(
+	id: number,
+	data: {
+		username?: string;
+		password?: string;
+		currentPassword?: string;
+	}
+) {
+	if (data.password !== undefined) {
+		const user = await prisma.user.findUnique({
+			where: { id },
+			select: { password: true }
+		});
+
+		if (!user?.password || !data.currentPassword ||
+			!await bcrypt.compare(data.currentPassword, user.password))
+			throw new BackendError(401, 'current password is incorrect');
+	}
+
+	const updatedUser = await prisma.user.update({
+		where: { id },
+		data: {
+			...(data.username !== undefined ? { username: data.username } : {}),
+			...(data.password !== undefined
+				? { password: await bcrypt.hash(data.password, 12) }
+				: {})
+		}
+	});
+
+	return get(updatedUser.id);
 }
