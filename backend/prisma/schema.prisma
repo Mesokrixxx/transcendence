@@ -50,6 +50,19 @@ model User {
 
   chats    Chat[]
   messages Message[]
+  sessions Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Profile {

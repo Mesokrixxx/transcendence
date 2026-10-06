@@ -26,7 +26,6 @@ export async function create(name: string, email: string, password: string) {
 }
 
 export async function auth(email: string, password: string) {
-	const hashedPassword = await bcrypt.hash(password, 12);
 	const user = await prisma.user.findUnique({
 		where: { email: email },
 		select: {
@@ -41,7 +40,7 @@ export async function auth(email: string, password: string) {
 		return null;
 
 	if (user.password)
-		if (!await bcrypt.compare(user.password, hashedPassword))
+		if (!await bcrypt.compare(password, user.password))
 			return null;
 	else
 		return null; // TODO handle oauth 2.0

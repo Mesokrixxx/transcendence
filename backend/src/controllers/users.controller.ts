@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import * as userService from '../services/users.service.js';
-import { createUserSchema, authUserSchema } from '../validations/users.validation.js';
+import { createUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
 
@@ -40,27 +40,4 @@ export async function createUser(req: Request, res: Response) {
 	}
 
 	res.status(201).json(result);
-}
-
-export async function authUser(req: Request, res: Response) {
-	const treatedReq = authUserSchema.safeParse(req.body);
-	if (!treatedReq.success) {
-		return res.status(400).json({
-			error: 'Invalid request body',
-			details: treatedReq.error.issues,
-		});
-	}
-
-	const { email, password } = treatedReq.data;
-	const { result, error } = await query(() => userService.auth(email, password));
-	if (error) {
-		const treatedErr = treatError(error);
-
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-
-	if (!result)
-		return res.status(401).json({ error: 'Invalid credentials' });
-
-	res.status(200).json(result);
 }
