@@ -27,10 +27,12 @@ function Login(){
                         placeholder="you@example.com"
                         autoComplete="email"
                         required/>
+
                         <Input id="login-password"
                         name="password"
                         label="Password"
                         type="password"
+                        placeholder="Your password"
                         autoComplete="current-password"
                         required/>
 

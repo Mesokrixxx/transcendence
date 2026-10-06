@@ -8,7 +8,7 @@ import Button from '../components/Button/Button'
 import PasswordRequirements from '../components/PasswordRequirements/PasswordRequirements'
 import Footer from '../components/Footer/Footer'
 import { Page } from './Home.styles'
-import { AuthContent, AuthPanel, AuthHint, PasswordHelp} from './Auth.styles'
+import { AuthContent, AuthPanel, AuthHint} from './Auth.styles'
 
 function Register(){
     const [password, setPassord] = useState('')
