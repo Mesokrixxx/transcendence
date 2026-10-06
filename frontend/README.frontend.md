@@ -174,11 +174,19 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ## Prochaines étapes
 
-- Terminer et tester l’effet de sélection des pièces.
-- Créer les formulaires d’inscription et de connexion.
-- Construire l’espace joueur.
-- Créer le profil avec avatar, statistiques et historique des matchs.
-- Créer le classement des joueurs (ranking).
-- Ajouter le chat entre joueurs.
-- Relier l’échiquier à la logique de jeu développée par l’équipe.
-- Synchroniser les parties entre les joueurs.
+- [x] Ajouter et tester l’effet de sélection des pièces (d'échec).
+- [x] Créer les formulaires d’inscription et de connexion.
+- [x] Afficher les critères du mot de passe pendant la saisie.
+- [x] Vérifier la confirmation du mot de passe.
+- [ ] Ajouter l’œil pour afficher ou masquer les mots de passe.
+- [ ] Bloquer l’inscription si les critères du mot de passe ne sont pas respectés.
+- [ ] Relier les formulaires au backend et afficher les erreurs ou confirmations.
+- [ ] Construire l’espace joueur.
+- [ ] Créer le profil avec avatar, statistiques et historique des matchs.
+- [ ] Créer le classement des joueurs (ranking).
+- [ ] Ajouter le chat entre joueurs.
+- [ ] Relier l’échiquier à la logique de jeu développée par l’équipe.
+- [ ] Synchroniser les parties entre les joueurs.
+- [ ] Brancher les traductions en français, anglais et espagnol.
+Si le temps le permet :
+- [ ] Ajouter le parcours « Mot de passe oublié », avec le backend.
