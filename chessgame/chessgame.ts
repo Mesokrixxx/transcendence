@@ -116,9 +116,7 @@ class InternalBoard {
 }
 
 class InternalGame {
-  constructor();
-
-  private board: InternalBoard;
+  private board: InternalBoard = new InternalBoard();
   private turn: Color = 'white';
   private castlingRights: Record<Color, CastlingRights> = {
     white: { queenside: true, kingside: true },
@@ -131,7 +129,7 @@ class InternalGame {
   private gameStatus: GameStatus = GameStatus.ONGOING;
 
   // Store legalMoves once computed for the current state
-  private legalMoves: Move[] | null;
+  private legalMoves: Move[] | null = null;
 
   private getPseudoLegalMoves(): Move[];
   getLegalMoves(): Move[];
@@ -139,10 +137,32 @@ class InternalGame {
   makeMove(move: Move): void;
   undoMove(): void;
 
-  getBoard(): Board;
-  getTurn(): Color;
-  getMoveHistory(): Move[];
-  getGameStatus(): GameStatus;
+  getBoard(): Board {
+    // Type unsafe but the for-loop will properly fill the object
+    const board: Board = {} as Board;
+
+    for (const key of boardSquares) {
+      const piece = this.board.pieceAt(key);
+      if (piece == null)
+        board[key] = null;
+      else {
+        board[key] = {
+          color: piece.color,
+          type: piece.type,
+        };
+      }
+    }
+    return board;
+  }
+  getTurn(): Color {
+    return this.turn;
+  }
+  getMoveHistory(): Move[] {
+    return this.history.map((h) => h.move);
+  }
+  getGameStatus(): GameStatus {
+    return this.gameStatus;
+  }
 }
 
 class ChessGame {
