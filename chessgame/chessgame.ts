@@ -131,7 +131,35 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: Move[] | null = null;
 
-  private getPseudoLegalMoves(): Move[];
+  private getPseudoLegalMoves(): Move[] {
+    // For "ray" moves (Queen/Rook/Bishop), moves will be added until out-of-board or occupied square
+    // If the piece occupying the square is an opponent piece, the move will be added as well
+
+    // For knight and king moves (except (long-)castle),
+    // every non-out-of-board move with square non-occupied by ally piece will be added
+    // For (long-)castle, moves will be added if king and rook are well placed on the board,
+    // castling rights are available for castling type and squares between the two pieces are empty.
+
+    // For pawns, one-square move will be added if square is empty.
+    // Promotion moves (one for every promotion piece) will replace it if on the color 7th rank.
+    // two-squares moves will be added if on the color 2th rank, one-square move is available and square is empty.
+    // Lateral moves will be added if non-out-of-board and an opponent piece is on the square.
+    // En-Passant will be added if the pawn can laterally jump on the En-Passant square.
+
+    // For each piece on the board (ignoring empty squares and opponent pieces)
+    // // Queen/Rook: Add horizontal Moves
+    // // Queen/Rook: Add vertical Moves
+    // // Queen/Bishop: Add diagonal Moves
+    // // Knight: Add Knight Jumps
+    // // King: Add King "normal" moves
+    // // King: Add (long-)castle
+    // // Pawn: Add (non-promotion) one-square move
+    // // Pawn: Add one-square promotion move (with every different piece)
+    // // Pawn: Add two-squares move
+    // // Pawn: Add lateral moves
+    // // Pawn: Add En-Passant move
+  }
+
   getLegalMoves(): Move[];
 
   makeMove(move: Move): void;
