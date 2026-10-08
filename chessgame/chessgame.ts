@@ -257,9 +257,56 @@ class InternalGame {
     return moves;
   }
 
-  getLegalMoves(): Move[];
+  private isInCheck(): boolean {
+    return this.gameStatus === GameStatus.CHECK || this.gameStatus === GameStatus.CHECKMATE;
+  }
 
-  makeMove(move: Move): void;
+  private isLegalCastleMove(move: Move): boolean {
+    const direction = move.from.charCodeAt(0) < move.to.charCodeAt(0) ? 1 : -1;
+    const inBetweenSquare = this.board.squareFrom(move.from, direction, 0)!;
+    if (this.isInCheck())
+      return false;
+    this.makeMove({ from: move.from, to: inBetweenSquare }, false);
+    if (this.isInCheck()) {
+      this.undoMove();
+      return false;
+    }
+    this.undoMove();
+    this.makeMove(move, false);
+    if (this.isInCheck()) {
+      this.undoMove();
+      return false;
+    }
+    this.undoMove();
+    return true;
+  }
+
+  getLegalMoves(): Move[] {
+    if (this.legalMoves !== null)
+      return this.legalMoves;
+
+    const pseudoLegalMoves = this.getPseudoLegalMoves();
+    const legalMoves: Move[] = [];
+
+    for (const move of pseudoLegalMoves) {
+      if (this.board.pieceAt(move.from)!.type === 'king' &&
+          Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2) {
+        if (this.isLegalCastleMove(move))
+          legalMoves.push(move);
+      } else {
+        this.makeMove(move, false);
+        if (this.getGameStatus() !== GameStatus.CHECK && this.getGameStatus() !== GameStatus.CHECKMATE)
+          legalMoves.push(move);
+        this.undoMove();
+      }
+    }
+
+    this.legalMoves = legalMoves;
+    return legalMoves;
+  }
+
+  makeMove(move: Move, computeNextLegalMoves: boolean = true): void;
+
   undoMove(): void;
 
   getBoard(): Board {
