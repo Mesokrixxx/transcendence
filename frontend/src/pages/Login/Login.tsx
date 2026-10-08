@@ -1,11 +1,11 @@
 import type { SubmitEvent } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../components/Navbar/Navbar'
-import Form from '../components/Form/Form'
-import Input from '../components/Input/Input'
-import Button from '../components/Button/Button'
-import Footer from '../components/Footer/Footer'
-import { Page } from './Home.styles'
+import Navbar from '../../components/Navbar/Navbar'
+import Form from '../../components/Form/Form'
+import Input from '../../components/Input/Input'
+import Button from '../../components/Button/Button'
+import Footer from '../../components/Footer/Footer'
+import { Page } from '../Home/Home.styles'
 import { AuthContent, AuthPanel, AuthHint } from './Auth.styles'
 
 function Login(){

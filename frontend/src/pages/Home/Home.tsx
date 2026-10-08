@@ -1,8 +1,8 @@
-import Navbar from '../components/Navbar/Navbar'
-import Footer from '../components/Footer/Footer'
-import ChessBoard from '../components/ChessBoard/ChessBoard'
-import Button from '../components/Button/Button'
-import { Page, Content, Intro, Aside } from './Home.styles'
+import Navbar from '../../components/Navbar/Navbar'
+import Footer from '../../components/Footer/Footer'
+import ChessBoard from '../../components/ChessBoard/ChessBoard'
+import Button from '../../components/Button/Button'
+import { Page, Content, Intro, Aside } from './../Home/Home.styles'
 
 function Home() {
   return (

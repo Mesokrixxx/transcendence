@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar/Navbar"
-import { Page } from './Home.styles'
+import { Page } from './Home/Home.styles'
 import Footer from '../components/Footer/Footer'
 
 

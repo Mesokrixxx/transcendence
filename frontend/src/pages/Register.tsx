@@ -7,8 +7,9 @@ import Input from '../components/Input/Input'
 import Button from '../components/Button/Button'
 import PasswordRequirements from '../components/PasswordRequirements/PasswordRequirements'
 import Footer from '../components/Footer/Footer'
-import { Page } from './Home.styles'
-import { AuthContent, AuthPanel, AuthHint} from './Auth.styles'
+import { Page } from './Home/Home.styles'
+import { AuthContent, AuthPanel, AuthHint} from './Login/Auth.styles'
+import {validatePassword, PASSWORD_PATTERN, PASSWORD_MESSAGE, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,} from '../services/passwordValidation'
 
 function Register(){
     const [password, setPassord] = useState('')
@@ -32,17 +33,11 @@ function Register(){
     passwordInput.setCustomValidity('')
     confirmationInput.setCustomValidity('')
 
-    const passwordIsValid =
-        password.length >= 8 && 
-        password.length <= 100 &&
-        /[A-Z]/.test(password) &&
-        /[a-z]/.test(password) &&
-        /[0-9]/.test(password) && 
-        /[^A-Za-z0-9\s]/.test(password)
-    
-    if (!passwordIsValid) {
-        passwordInput.setCustomValidity('Use 8–100 characters, including an uppercase letter, a lowercase letter, a number and a special character.')
-    }
+    const validation = validatePassword(password)
+
+    if (!validation.isValid) {
+    passwordInput.setCustomValidity(PASSWORD_MESSAGE)
+}
 
     if (password !== confirmation){
         confirmationInput.setCustomValidity('Passwords do not match.')
@@ -94,14 +89,14 @@ function Register(){
                             autoComplete="new-password"
                             aria-describedby="password-help"
                             placeholder="Example42$"
-                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s]).{8,100}"
-                            title="Use 8–100 characters, including an uppercase letter, a lowercase letter, a number and a special character."
+                            pattern={PASSWORD_PATTERN}
+                            title={PASSWORD_MESSAGE}
                             value={password}
                             onChange={(event) =>{
                                 event.currentTarget.setCustomValidity('')
                                 setPassord(event.currentTarget.value)}}
-                            minLength={8}
-                            maxLength={100}
+                            minLength={PASSWORD_MIN_LENGTH}
+                            maxLength={PASSWORD_MAX_LENGTH}
                             required
                         />
                         <PasswordRequirements password={password} />
@@ -121,7 +116,7 @@ function Register(){
                     </Form>
 
                     <AuthHint>
-                        Already have an acount? <Link to="/login">Log in</Link>
+                        Already have an account? <Link to="/login">Log in</Link>
                     </AuthHint>
                 </AuthPanel>
             </AuthContent>
