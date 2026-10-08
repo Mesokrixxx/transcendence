@@ -142,6 +142,16 @@ class InternalGame {
     }
   }
 
+  private getPseudoLegalMovesFromList(moves: Move[], square: Square, list: number[][]): void {
+    for (const direction of list) {
+      const tempSquare = this.board.squareFrom(square, direction[0], direction[1]);
+      if (tempSquare === null) continue;
+      const piece = this.board.pieceAt(tempSquare);
+      if (piece === null || piece.color !== this.turn)
+        moves.push({ from: square, to: tempSquare });
+    }
+  }
+
   private getPseudoLegalMoves(): Move[] {
     const moves: Move[] = [];
     // For "ray" moves (Queen/Rook/Bishop), moves will be added until out-of-board or occupied square
@@ -180,8 +190,11 @@ class InternalGame {
         this.getRayPseudoLegalMoves(moves, square, 1, -1);
       }
 
-    // // Knight: Add Knight Jumps
-    // // King: Add King "normal" moves
+      // Knight: Add Knight Jumps
+      this.getPseudoLegalMovesFromList(moves, square, [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]])
+
+      // King: Add King "normal" moves
+      this.getPseudoLegalMovesFromList(moves, square, [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]);
     // // King: Add (long-)castle
     // // Pawn: Add (non-promotion) one-square move
     // // Pawn: Add one-square promotion move (with every different piece)
