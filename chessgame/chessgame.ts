@@ -312,7 +312,80 @@ class InternalGame {
     return legalMoves;
   }
 
-  makeMove(move: Move, computeNextLegalMoves: boolean = true): void;
+
+  private getFirstPieceInRay(square: Square, fileDirection: -1 | 0 | 1, rankDirection: -1 | 0 | 1): Piece | null {
+    let tempSquare: Square | null;
+
+    for (let i = 1; (tempSquare = this.board.squareFrom(square, i * fileDirection, i * rankDirection)) !== null; i++) {
+      const piece = this.board.pieceAt(tempSquare);
+      if (piece !== null)
+        return piece;
+    }
+    return null;
+  }
+
+  private kingIsAttacked(): boolean {
+    let kingSquare: Square | null = null;
+    for (const square of boardSquares) {
+      const king = this.board.pieceAt(square);
+      if (king && king.type === 'king' && king.color === this.turn) {
+        kingSquare = square;
+        break;
+      }
+    }
+    if (!kingSquare) // never
+      return false;
+
+    // Horizontal checks
+    for (const ray of [[-1, 0], [1, 0]]) {
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
+      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'rook'))
+        return true;
+    }
+
+    // Vertical checks
+    for (const ray of [[0, 1], [0, -1]]) {
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
+      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'rook'))
+        return true;
+    }
+
+    // Diagonal checks
+    for (const ray of [[-1, -1], [-1, 1], [1, 1], [1, -1]]) {
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
+      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'bishop'))
+        return true;
+    }
+
+    // Knight checks
+    for (const jump of knightMoves) {
+      const square = this.board.squareFrom(kingSquare, jump[0], jump[1]);
+      if (square === null) continue;
+      const piece = this.board.pieceAt(square);
+      if (piece && piece.color !== this.turn && piece.type === 'knight')
+        return true;
+    }
+
+    // Kings Duel Situation
+    for (const move of kingMoves) {
+      const square = this.board.squareFrom(kingSquare, move[0], move[1]);
+      if (square === null) continue;
+      const piece = this.board.pieceAt(square);
+      if (piece && piece.color !== this.turn && piece.type === 'king')
+        return true;
+    }
+
+    // Pawn checks
+    const pawnSquares = [this.board.squareFrom(kingSquare, -1, this.turn === 'white' ? 1 : -1),
+      this.board.squareFrom(kingSquare, 1, this.turn === 'white' ? 1 : -1)];
+    for (const square of pawnSquares) {
+      if (!square) continue;
+      const piece = this.board.pieceAt(square);
+      if (piece && piece.color !== this.turn && piece.type === 'pawn')
+        return true;
+    }
+    return false;
+  }
 
   undoMove(): void;
 
