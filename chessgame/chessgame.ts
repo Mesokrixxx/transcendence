@@ -12,6 +12,7 @@ interface Position {
   castlingRights: Record<Color, CastlingRights>
   enPassant: Square | null;
   halfMoves: number;
+  gameStatus: GameStatus;
 }
 
 type History = {
@@ -19,6 +20,8 @@ type History = {
   position: Position,
   move: Move,
 }[];
+
+type Direction = -1 | 0 | 1;
 
 // prettier-ignore
 const boardSquares: readonly Square[] = [
@@ -31,6 +34,10 @@ const boardSquares: readonly Square[] = [
   "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
   "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 ];
+
+const knightMoves: number[][]= [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]];
+
+const kingMoves: number[][] = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]];
 
 class InternalBoard {
   private static readonly charToPiece: DeepReadonly<Record<string, Piece>> =  {
@@ -131,7 +138,7 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: Move[] | null = null;
 
-  private getRayPseudoLegalMoves(moves: Move[], square: Square, fileDirection: -1 | 0 | 1, rankDirection: -1 | 0 | 1): void {
+  private getRayPseudoLegalMoves(moves: Move[], square: Square, fileDirection: Direction, rankDirection: Direction): void {
     let tempSquare: Square | null = null;
 
     for (let i = 1; (tempSquare = this.board.squareFrom(square, i * fileDirection, i * rankDirection)) !== null; i++) {
@@ -240,11 +247,11 @@ class InternalGame {
 
       // Knight: Add Knight Jumps
       if (piece.type === 'knight')
-        this.getPseudoLegalMovesFromList(moves, square, [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]]);
+        this.getPseudoLegalMovesFromList(moves, square, knightMoves);
 
       if (piece.type === 'king') {
         // King: Add King "normal" moves
-        this.getPseudoLegalMovesFromList(moves, square, [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]);
+        this.getPseudoLegalMovesFromList(moves, square, kingMoves);
         // King: Add (long-)castle
         this.getPseudoLegalCastleMoves(moves, square);
       }
