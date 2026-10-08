@@ -131,7 +131,19 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: Move[] | null = null;
 
+  private getRayPseudoLegalMoves(moves: Move[], square: Square, fileDirection: -1 | 0 | 1, rankDirection: -1 | 0 | 1): void {
+    let tempSquare: Square | null = null;
+
+    for (let i = 1; (tempSquare = this.board.squareFrom(square, i * fileDirection, i * rankDirection)) !== null; i++) {
+      const tempPiece = this.board.pieceAt(tempSquare);
+      if (tempPiece === null || tempPiece.color !== this.turn)
+        moves.push({ from: square, to: tempSquare });
+      if (tempPiece !== null) break;
+    }
+  }
+
   private getPseudoLegalMoves(): Move[] {
+    const moves: Move[] = [];
     // For "ray" moves (Queen/Rook/Bishop), moves will be added until out-of-board or occupied square
     // If the piece occupying the square is an opponent piece, the move will be added as well
 
@@ -147,9 +159,27 @@ class InternalGame {
     // En-Passant will be added if the pawn can laterally jump on the En-Passant square.
 
     // For each piece on the board (ignoring empty squares and opponent pieces)
-    // // Queen/Rook: Add horizontal Moves
-    // // Queen/Rook: Add vertical Moves
-    // // Queen/Bishop: Add diagonal Moves
+    for (const square of boardSquares) {
+      const piece = this.board.pieceAt(square);
+      if (piece === null || piece.color !== this.turn) continue;
+
+      if (piece.type === 'queen' || piece.type === 'rook') {
+        // Queen/Rook: Add horizontal Moves
+        this.getRayPseudoLegalMoves(moves, square, -1, 0);
+        this.getRayPseudoLegalMoves(moves, square, 1, 0);
+        // Queen/Rook: Add vertical Moves
+        this.getRayPseudoLegalMoves(moves, square, 0, -1);
+        this.getRayPseudoLegalMoves(moves, square, 0, 1);
+      }
+
+      if (piece.type === 'queen' || piece.type === 'bishop') {
+        // Queen/Bishop: Add diagonal Moves
+        this.getRayPseudoLegalMoves(moves, square, -1, -1);
+        this.getRayPseudoLegalMoves(moves, square, -1, 1);
+        this.getRayPseudoLegalMoves(moves, square, 1, 1);
+        this.getRayPseudoLegalMoves(moves, square, 1, -1);
+      }
+
     // // Knight: Add Knight Jumps
     // // King: Add King "normal" moves
     // // King: Add (long-)castle
@@ -158,6 +188,7 @@ class InternalGame {
     // // Pawn: Add two-squares move
     // // Pawn: Add lateral moves
     // // Pawn: Add En-Passant move
+    }
   }
 
   getLegalMoves(): Move[];
