@@ -152,6 +152,25 @@ class InternalGame {
     }
   }
 
+  private getPseudoLegalCastleMoves(moves: Move[], square: Square): void {
+    if (this.turn === 'white' && square !== 'e1' ||
+        this.turn === 'black' && square !== 'e8')
+      return;
+    const queensideRook = this.board.pieceAt(this.board.squareFrom(square, -4, 0)!);
+    const kingsideRook = this.board.pieceAt(this.board.squareFrom(square, 3, 0)!);
+    if (this.castlingRights[this.turn].queenside && queensideRook !== null &&
+        queensideRook.color === this.turn && queensideRook.type === 'rook' &&
+        this.board.pieceAt(this.board.squareFrom(square, -3, 0)!) === null &&
+        this.board.pieceAt(this.board.squareFrom(square, -2, 0)!) === null &&
+        this.board.pieceAt(this.board.squareFrom(square, -1, 0)!) === null)
+      moves.push({ from: square, to: this.board.squareFrom(square, -2, 0)! });
+    if (this.castlingRights[this.turn].kingside && kingsideRook !== null &&
+        kingsideRook.color === this.turn && kingsideRook.type === 'rook' &&
+        this.board.pieceAt(this.board.squareFrom(square, 1, 0)!) === null &&
+        this.board.pieceAt(this.board.squareFrom(square, 2, 0)!) === null)
+      moves.push({ from: square, to: this.board.squareFrom(square, 2, 0)! });
+  }
+
   private getPseudoLegalMoves(): Move[] {
     const moves: Move[] = [];
     // For "ray" moves (Queen/Rook/Bishop), moves will be added until out-of-board or occupied square
@@ -191,11 +210,15 @@ class InternalGame {
       }
 
       // Knight: Add Knight Jumps
-      this.getPseudoLegalMovesFromList(moves, square, [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]])
+      if (piece.type === 'knight')
+        this.getPseudoLegalMovesFromList(moves, square, [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]]);
 
-      // King: Add King "normal" moves
-      this.getPseudoLegalMovesFromList(moves, square, [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]);
-    // // King: Add (long-)castle
+      if (piece.type === 'king') {
+        // King: Add King "normal" moves
+        this.getPseudoLegalMovesFromList(moves, square, [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]);
+        // King: Add (long-)castle
+        this.getPseudoLegalCastleMoves(moves, square);
+      }
     // // Pawn: Add (non-promotion) one-square move
     // // Pawn: Add one-square promotion move (with every different piece)
     // // Pawn: Add two-squares move
