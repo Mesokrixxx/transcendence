@@ -171,6 +171,49 @@ class InternalGame {
       moves.push({ from: square, to: this.board.squareFrom(square, 2, 0)! });
   }
 
+  private getPseudoLegalPawnMoves(moves: Move[], square: Square, direction: -1 | 1) {
+    const frontSquare = this.board.squareFrom(square, 0, direction)!;
+    const twoStepsSquare = this.board.squareFrom(square, 0, direction * 2);
+    const lateralSquares = [this.board.squareFrom(square, -1, direction), this.board.squareFrom(square, 1, direction)];
+    const isTouchdown = twoStepsSquare === null;
+    const onFirstPawnRank = (this.turn === 'white' && square.charAt(1) === '2') ||
+      (this.turn === 'black' && square.charAt(1) === '7');
+
+    // Pawn: Add (non-promotion) one-square move
+    if (this.board.pieceAt(frontSquare) === null && !isTouchdown)
+      moves.push({ from: square, to: frontSquare });
+
+    // Pawn: Add one-square promotion move (with every different piece)
+    if (this.board.pieceAt(frontSquare) === null && isTouchdown) {
+      moves.push({ from: square, to: frontSquare, promotion: 'queen' })
+      moves.push({ from: square, to: frontSquare, promotion: 'rook' })
+      moves.push({ from: square, to: frontSquare, promotion: 'bishop' })
+      moves.push({ from: square, to: frontSquare, promotion: 'knight' })
+    }
+
+    // Pawn: Add two-squares move
+    if (onFirstPawnRank && this.board.pieceAt(frontSquare) === null &&
+        this.board.pieceAt(twoStepsSquare!) === null)
+      moves.push({ from: square, to: twoStepsSquare! });
+    for (const lateralSquare of lateralSquares) {
+      if (lateralSquare === null) continue;
+      const piece = this.board.pieceAt(lateralSquare);
+      // Pawn: Add lateral moves
+      if (piece !== null && piece.color !== this.turn) {
+        if (isTouchdown) {
+          moves.push({ from: square, to: lateralSquare, promotion: 'queen' })
+          moves.push({ from: square, to: lateralSquare, promotion: 'rook' })
+          moves.push({ from: square, to: lateralSquare, promotion: 'bishop' })
+          moves.push({ from: square, to: lateralSquare, promotion: 'knight' })
+        } else
+          moves.push({ from: square, to: lateralSquare });
+      }
+      // Pawn: Add En-Passant move
+      else if (lateralSquare === this.enPassant)
+        moves.push({ from: square, to: lateralSquare });
+    }
+  }
+
   private getPseudoLegalMoves(): Move[] {
     const moves: Move[] = [];
     // For "ray" moves (Queen/Rook/Bishop), moves will be added until out-of-board or occupied square
@@ -219,11 +262,9 @@ class InternalGame {
         // King: Add (long-)castle
         this.getPseudoLegalCastleMoves(moves, square);
       }
-    // // Pawn: Add (non-promotion) one-square move
-    // // Pawn: Add one-square promotion move (with every different piece)
-    // // Pawn: Add two-squares move
-    // // Pawn: Add lateral moves
-    // // Pawn: Add En-Passant move
+
+      if (piece.type === 'pawn')
+        this.getPseudoLegalPawnMoves(moves, square, this.turn === 'white' ? 1 : -1);
     }
   }
 
