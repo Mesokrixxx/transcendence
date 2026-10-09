@@ -39,7 +39,6 @@ export enum GameStatus {
   ONGOING,
   CHECK,
   CHECKMATE,
-  DRAW,
   STALEMATE,
   INSUFMATERIAL,
   REPETITION,
