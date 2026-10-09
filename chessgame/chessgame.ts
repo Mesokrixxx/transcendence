@@ -311,6 +311,21 @@ class InternalGame {
     return legalMoves;
   }
 
+  private castle(move: Move): void {
+    const rookFrom = move.to.charAt(0) === 'c'
+      ? this.board.squareFrom(move.from, -4, 0)!
+      : this.board.squareFrom(move.from, 3, 0)!;
+    const rookTo = move.to.charAt(0) === 'c'
+      ? this.board.squareFrom(rookFrom, 3, 0)!
+      : this.board.squareFrom(rookFrom, -2, 0)!;
+
+    this.board.movePiece(move.from, move.to);
+    this.board.movePiece(rookFrom, rookTo);
+
+    // Remove castling rights
+    this.castlingRights[this.turn].queenside = false;
+    this.castlingRights[this.turn].kingside  = false;
+  }
 
   private getFirstPieceInRay(square: Square, fileDirection: -1 | 0 | 1, rankDirection: -1 | 0 | 1): Piece | null {
     let tempSquare: Square | null;
@@ -473,6 +488,75 @@ class InternalGame {
       this.gameStatus = GameStatus.FIFTYMOVES;
     else
       this.gameStatus = GameStatus.ONGOING;
+  }
+
+  makeMove(move: Move, computeNextLegalMoves: boolean = true): void {
+    this.history.push({
+      position: {
+        board: this.board.toString(),
+        turn: this.turn,
+        castlingRights: {
+          white: {
+            queenside: this.castlingRights.white.queenside,
+            kingside: this.castlingRights.white.kingside,
+          },
+          black: {
+            queenside: this.castlingRights.black.queenside,
+            kingside: this.castlingRights.black.kingside,
+          }
+        },
+        enPassant: this.enPassant,
+        halfMoves: this.halfMoves,
+        gameStatus: this.gameStatus
+      },
+      move: move,
+    });
+
+    const piece = this.board.pieceAt(move.from)!;
+    let isHalfMove = true;
+    if (piece.type === 'king' && Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2)
+      this.castle(move);
+    else if (piece.type === 'pawn' && move.promotion) {
+      this.board.removePiece(move.from);
+      this.board.setPiece({ color: this.turn, type: move.promotion }, move.to);
+      isHalfMove = false;
+    }
+    else if (piece.type === 'pawn' && move.to === this.enPassant) {
+      this.board.removePiece(this.board.squareFrom(this.enPassant, 0, this.turn === 'white' ? -1 : 1)!);
+      this.board.movePiece(move.from, move.to);
+      isHalfMove = false;
+    }
+    else {
+      if (this.board.pieceAt(move.to) !== null || piece.type === 'pawn')
+        isHalfMove = false;
+      this.board.movePiece(move.from, move.to);
+    }
+
+    // Update castling rights
+    if (piece.type === 'king') {
+      this.castlingRights[this.turn].queenside = false;
+      this.castlingRights[this.turn].kingside  = false;
+    } 
+    if (move.from === 'a1' || move.to === 'a1')
+      this.castlingRights['white'].queenside = false;
+    else if (move.from === 'h1' || move.to === 'h1')
+      this.castlingRights['white'].kingside = false;
+    if (move.from === 'a8' || move.to === 'a8')
+      this.castlingRights['black'].queenside = false;
+    else if (move.from === 'h8' || move.to === 'h8')
+      this.castlingRights['black'].kingside = false;
+
+    // Update position
+    if (piece.type === 'pawn' && Math.abs(move.from.charCodeAt(1) - move.to.charCodeAt(1)) === 2)
+      this.enPassant = this.board.squareFrom(move.from, 0, this.turn === 'white' ? 1 : -1);
+    else
+      this.enPassant = null;
+    this.turn = this.turn === 'white' ? 'black' : 'white';
+    this.halfMoves = isHalfMove ? this.halfMoves + 1 : 0;
+    this.legalMoves = null;
+    if (computeNextLegalMoves)
+      this.legalMoves = this.getLegalMoves();
+    this.setGameStatus();
   }
 
 
