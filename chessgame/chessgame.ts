@@ -559,6 +559,28 @@ class InternalGame {
     this.setGameStatus();
   }
 
+  undoMove(): void {
+    if (this.history.length === 0)
+      return;
+
+    const position = this.history.pop()!.position;
+    this.board = new InternalBoard(position.board);
+    this.turn = position.turn;
+    this.castlingRights = {
+      white: {
+        queenside: position.castlingRights.white.queenside,
+        kingside: position.castlingRights.white.kingside,
+      },
+      black: {
+        queenside: position.castlingRights.black.queenside,
+        kingside: position.castlingRights.black.kingside,
+      },
+    };
+    this.enPassant = position.enPassant;
+    this.halfMoves = position.halfMoves;
+    this.gameStatus = position.gameStatus;
+    this.legalMoves = null;
+  }
 
   getBoard(): Board {
     // Type unsafe but the for-loop will properly fill the object
