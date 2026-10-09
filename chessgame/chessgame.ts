@@ -386,7 +386,95 @@ class InternalGame {
     return false;
   }
 
-  undoMove(): void;
+  private isInsufficientMaterial(): boolean {
+    const pieces = {
+      bishop: 0,
+      knight: 0,
+    };
+    let pieceCount = 0;
+    let lsb = 0;
+    let squareColor: Color = 'black';
+
+    for (const square of boardSquares) {
+      const piece = this.board.pieceAt(square);
+      if (piece !== null) {
+        if (piece.type === 'bishop') {
+          pieces.bishop++;
+          if (squareColor === 'white')
+            lsb++;
+        }
+        else if (piece.type === 'knight')
+          pieces.knight++;
+        pieceCount++;
+      }
+      squareColor = squareColor === 'white' ? 'black' : 'white';
+    }
+
+    if (pieceCount === 2)
+      return true;
+    if (pieceCount === 3 && (pieces.bishop === 1 || pieces.knight === 1))
+      return true;
+    if (pieceCount === 2 + pieces.bishop && (lsb === 0 || lsb === pieces.bishop))
+      return true;
+    return false;
+  }
+
+  private hashPosition(position: Position): string {
+    let positionStr = position.board;
+    positionStr += position.turn === 'white' ? 'w' : 'b';
+    positionStr += position.castlingRights.white.queenside === true ? 'Q' : 'x';
+    positionStr += position.castlingRights.white.kingside === true ? 'K' : 'x';
+    positionStr += position.castlingRights.black.queenside === true ? 'q' : 'x';
+    positionStr += position.castlingRights.black.kingside === true ? 'k' : 'x';
+    positionStr += position.enPassant ?? 'xx';
+    return positionStr;
+  }
+
+  private isThreefoldRepetition(): boolean {
+    const uniquePositions: Record<string, number> = {};
+
+    for (let i = this.history.length - 1; i >= 0; i--) {
+      const positionStr = this.hashPosition(this.history[i].position);
+      if (uniquePositions[positionStr])
+        uniquePositions[positionStr]++;
+      else
+        uniquePositions[positionStr] = 1;
+      if (this.history[i].position.halfMoves === 0)
+        break;
+    }
+    const currentPositionStr = this.hashPosition({
+      board: this.board.toString(),
+      turn: this.turn,
+      castlingRights: this.castlingRights,
+      enPassant: this.enPassant,
+      halfMoves: this.halfMoves,
+      gameStatus: this.gameStatus,
+    });
+    return (uniquePositions[currentPositionStr] >= 2);
+  }
+
+  private setGameStatus(): void {
+    const isAttacked = this.kingIsAttacked();
+    if (this.legalMoves === null) {
+      this.gameStatus = isAttacked ? GameStatus.CHECK : GameStatus.ONGOING;
+      return;
+    }
+    if (isAttacked && this.legalMoves.length === 0)
+      this.gameStatus = GameStatus.CHECKMATE;
+    else if (this.legalMoves.length === 0)
+      this.gameStatus = GameStatus.STALEMATE;
+    else if (this.isInsufficientMaterial())
+      this.gameStatus = GameStatus.INSUFMATERIAL;
+    else if (this.isThreefoldRepetition())
+      this.gameStatus = GameStatus.REPETITION;
+    else if (isAttacked)
+      this.gameStatus = GameStatus.CHECK;
+    else if (this.halfMoves >= 100)
+      this.gameStatus = GameStatus.FIFTYMOVES;
+    else
+      this.gameStatus = GameStatus.ONGOING;
+  }
+
 
   getBoard(): Board {
     // Type unsafe but the for-loop will properly fill the object
