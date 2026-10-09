@@ -264,23 +264,20 @@ class InternalGame {
     return moves;
   }
 
-  private isInCheck(): boolean {
-    return this.gameStatus === GameStatus.CHECK || this.gameStatus === GameStatus.CHECKMATE;
-  }
-
   private isLegalCastleMove(move: Move): boolean {
     const direction = move.from.charCodeAt(0) < move.to.charCodeAt(0) ? 1 : -1;
     const inBetweenSquare = this.board.squareFrom(move.from, direction, 0)!;
-    if (this.isInCheck())
+    const color = this.turn;
+    if (this.kingIsAttacked(color))
       return false;
     this.makeMove({ from: move.from, to: inBetweenSquare }, false);
-    if (this.isInCheck()) {
+    if (this.kingIsAttacked(color)) {
       this.undoMove();
       return false;
     }
     this.undoMove();
     this.makeMove(move, false);
-    if (this.isInCheck()) {
+    if (this.kingIsAttacked(color)) {
       this.undoMove();
       return false;
     }
@@ -301,8 +298,10 @@ class InternalGame {
         if (this.isLegalCastleMove(move))
           legalMoves.push(move);
       } else {
+        const color = this.turn;
         this.makeMove(move, false);
-        if (this.getGameStatus() !== GameStatus.CHECK && this.getGameStatus() !== GameStatus.CHECKMATE)
+        const isAttacked = this.kingIsAttacked(color);
+        if (!isAttacked)
           legalMoves.push(move);
         this.undoMove();
       }
@@ -324,11 +323,11 @@ class InternalGame {
     return null;
   }
 
-  private kingIsAttacked(): boolean {
+  private kingIsAttacked(color: Color = this.turn): boolean {
     let kingSquare: Square | null = null;
     for (const square of boardSquares) {
       const king = this.board.pieceAt(square);
-      if (king && king.type === 'king' && king.color === this.turn) {
+      if (king && king.type === 'king' && king.color === color) {
         kingSquare = square;
         break;
       }
@@ -339,21 +338,21 @@ class InternalGame {
     // Horizontal checks
     for (const ray of [[-1, 0], [1, 0]]) {
       const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'rook'))
+      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'rook'))
         return true;
     }
 
     // Vertical checks
     for (const ray of [[0, 1], [0, -1]]) {
       const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'rook'))
+      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'rook'))
         return true;
     }
 
     // Diagonal checks
     for (const ray of [[-1, -1], [-1, 1], [1, 1], [1, -1]]) {
       const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== this.turn && (piece.type === 'queen' || piece.type === 'bishop'))
+      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'bishop'))
         return true;
     }
 
@@ -362,7 +361,7 @@ class InternalGame {
       const square = this.board.squareFrom(kingSquare, jump[0], jump[1]);
       if (square === null) continue;
       const piece = this.board.pieceAt(square);
-      if (piece && piece.color !== this.turn && piece.type === 'knight')
+      if (piece && piece.color !== color && piece.type === 'knight')
         return true;
     }
 
@@ -371,17 +370,17 @@ class InternalGame {
       const square = this.board.squareFrom(kingSquare, move[0], move[1]);
       if (square === null) continue;
       const piece = this.board.pieceAt(square);
-      if (piece && piece.color !== this.turn && piece.type === 'king')
+      if (piece && piece.color !== color && piece.type === 'king')
         return true;
     }
 
     // Pawn checks
-    const pawnSquares = [this.board.squareFrom(kingSquare, -1, this.turn === 'white' ? 1 : -1),
-      this.board.squareFrom(kingSquare, 1, this.turn === 'white' ? 1 : -1)];
+    const pawnSquares = [this.board.squareFrom(kingSquare, -1, color === 'white' ? 1 : -1),
+      this.board.squareFrom(kingSquare, 1, color === 'white' ? 1 : -1)];
     for (const square of pawnSquares) {
       if (!square) continue;
       const piece = this.board.pieceAt(square);
-      if (piece && piece.color !== this.turn && piece.type === 'pawn')
+      if (piece && piece.color !== color && piece.type === 'pawn')
         return true;
     }
     return false;
