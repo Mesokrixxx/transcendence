@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import ChessGame from './chessgame';
-import { GameStatus, type Move } from './chessgame.types';
+import ChessGame from '../src/chessgame';
+import { GameStatus, type Move } from '../src/chessgame.types';
 
 describe('ChessGame', () => {
   it('starts game in correct position', () => {
