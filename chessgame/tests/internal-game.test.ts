@@ -64,4 +64,30 @@ describe('InternalGame', () => {
       type: 'queen',
     });
   });
+
+  it('promotes to expected piece', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        'P.......',
+        '.K....k.',
+        '........',
+        '........',
+        '........',
+        '........',
+        '........',
+      ]),
+    });
+
+    const move: Move = { from: 'a7', to: 'a8', promotion: 'queen' };
+    expect(game.getLegalMoves()).toContainEqual(move);
+    game.makeMove(move);
+    expect(game.getTurn()).toBe('black');
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.getBoard().a7).toBeNull();
+    expect(game.getBoard().a8).toEqual({
+      color: 'white',
+      type: 'queen',
+    });
+  });
 });
