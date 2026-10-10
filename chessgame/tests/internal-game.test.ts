@@ -1,17 +1,45 @@
-import { describe, expect, it } from "vitest";
-import InternalGame from "../src/internal-game";
-import { GameStatus } from "../src/chessgame.types";
+import { describe, expect, it } from 'vitest';
+import InternalGame from '../src/internal-game';
+import { GameStatus, type Move } from '../src/chessgame.types';
 
 // This test suite is designed to test cases from specific positions
 // The InternalGame class will be instantiated with a custom board setup
 // To play a game in a safe way, the ChessGame class should be used
+
+/*
+Default Board Visual from White's perspective
+['rnbqkbnr',
+'pppppppp',
+'........',
+'........',
+'........',
+'........',
+'PPPPPPPP',
+'RNBQKBNR']
+*/
+
+function boardFromVisual(visual: string[]): string {
+  if (visual.length !== 8) throw new Error('Invalid board visual');
+  let board = '';
+  for (let i = visual.length - 1; i >= 0; i--) board += visual[i];
+  return board;
+}
 
 describe('InternalGame', () => {
   // Checks that custom position is read properly
   it('works on basic position', () => {
     const game = new InternalGame({
       // King and Queen are inverted
-      board: 'RNBKQBNRPPPPPPPP................................pppppppprnbkqbnr',
+      board: boardFromVisual([
+        'rnbkqbnr',
+        'pppppppp',
+        '........',
+        '........',
+        '........',
+        '........',
+        'PPPPPPPP',
+        'RNBKQBNR',
+      ]),
     });
 
     expect(Object.values(game.getBoard())).toHaveLength(64);
