@@ -29,6 +29,33 @@ const knightMoves: number[][]= [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, 
 const kingMoves: number[][] = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]];
 
 class InternalGame {
+  constructor(position?: Partial<Omit<Position, 'gameStatus'>>) {
+    // Starts the game from unique position
+    // Unsafe for invalid fields, should only be called with valid data
+    if (position) {
+      if (position.board)
+        this.board = new InternalBoard(position.board);
+      if (position.turn)
+        this.turn = position.turn;
+      if (position.castlingRights) {
+        this.castlingRights.white = {
+          queenside: position.castlingRights.white.queenside,
+          kingside: position.castlingRights.white.kingside,
+        }
+        this.castlingRights.black = {
+          queenside: position.castlingRights.black.queenside,
+          kingside: position.castlingRights.black.kingside,
+        }
+      }
+      if (position.enPassant !== undefined)
+        this.enPassant = position.enPassant;
+      if (position.halfMoves !== undefined)
+        this.halfMoves = position.halfMoves;
+      this.getLegalMoves();
+      this.setGameStatus();
+    }
+  }
+
   private board: InternalBoard = new InternalBoard();
   private turn: Color = 'white';
   private castlingRights: Record<Color, CastlingRights> = {
