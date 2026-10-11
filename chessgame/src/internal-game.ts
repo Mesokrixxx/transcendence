@@ -355,7 +355,8 @@ class InternalGame {
           pieces.knight++;
         pieceCount++;
       }
-      squareColor = squareColor === 'white' ? 'black' : 'white';
+      if (square.charAt(0) !== 'h')
+        squareColor = squareColor === 'white' ? 'black' : 'white';
     }
 
     if (pieceCount === 2)
