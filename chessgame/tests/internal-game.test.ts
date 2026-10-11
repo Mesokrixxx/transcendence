@@ -350,4 +350,125 @@ describe('InternalGame', () => {
     playLegalMove(game, move);
     expect(game.getGameStatus()).toBe(GameStatus.STALEMATE);
   });
+
+  it('detects insufficient material', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '....k...',
+        '........',
+        '...QK...',
+        '........',
+        '........',
+        '........',
+        '........',
+        '........',
+      ]),
+    });
+
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+
+    playLegalMove(game, { from: 'd6', to: 'd8' }); // ??
+    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+    playLegalMove(game, { from: 'e8', to: 'd8' });
+    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+  });
+
+  it('detects insufficient material for knight', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '.....k..',
+        '........',
+        '........',
+        '........',
+        '....NKp.',
+        '........',
+      ]),
+    });
+
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+
+    playLegalMove(game, { from: 'f2', to: 'g2' });
+    // Only one knight remaining, game is over
+    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+  });
+
+  it('detects insufficient material for bishops', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '......B.',
+        '.....kB.',
+        '........',
+        '........',
+        '........',
+        '.....Kb.',
+        '........',
+      ]),
+      turn: 'black'
+    });
+
+    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+
+    playLegalMove(game, { from: 'f6', to: 'g7' });
+    // Insufficient material, bishops of same color
+    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+    game.undoMove();
+
+    playLegalMove(game, { from: 'f6', to: 'g6' });
+    // Bishops of opposite colors, game might end up in checkmate
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    playLegalMove(game, { from: 'f2', to: 'g2' });
+    // Only one bishop left, game is over
+    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+  });
+
+  it('detects threefold repetition', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '.....k..',
+        '.....p..',
+        '.....P..',
+        '.....K..',
+        '........',
+        '........',
+      ]),
+    });
+
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    playLegalMove(game, { from: 'f3', to: 'e3' }); // 1
+    playLegalMove(game, { from: 'f6', to: 'e6' });
+    playLegalMove(game, { from: 'e3', to: 'f2' });
+    playLegalMove(game, { from: 'e6', to: 'f6' });
+    playLegalMove(game, { from: 'f2', to: 'e3' }); // 2
+    playLegalMove(game, { from: 'f6', to: 'e6' });
+    playLegalMove(game, { from: 'e3', to: 'f3' });
+    playLegalMove(game, { from: 'e6', to: 'f6' });
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    playLegalMove(game, { from: 'f3', to: 'e3' }); // 3
+    expect(game.getGameStatus()).toBe(GameStatus.REPETITION);
+  });
+
+  it('handles fifty moves rule', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '....k...',
+        '........',
+        '........',
+        '....BKN.',
+        '........',
+        '........',
+      ]),
+      halfMoves: 99,
+    });
+
+    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    playLegalMove(game, { from: 'e3', to: 'd4' });
+    expect(game.getGameStatus()).toBe(GameStatus.FIFTYMOVES);
+  });
 });
