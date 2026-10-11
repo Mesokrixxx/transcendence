@@ -10,7 +10,7 @@ export const AvatarWrapper = styled.div<{ $size: number}>`
 export const AvatarImage = styled.img`
     width: 100%;
     height: 100%;
-    border-raius: 50%;
+    border-radius: 50%;
     object-fit: cover;
     display: block;
 `
@@ -21,6 +21,7 @@ export const AvatarFallback = styled.div`
     border-radius: 50%;
     display: flex;
     align-items: center;
+    justify-content: center;
     background: var(--color-primary);
     color: var(--color-background);
     font-size: 1.5rem;
@@ -34,7 +35,7 @@ export const StatusDot = styled.span<{ $isOnline: boolean }>`
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    boder: 2px solid var(--color-surface);
-    background: ${({ $isOnline })=>$isOnline ? 'var(--color-accent': 'var(--color-text-secondary'};
+    border: 2px solid var(--color-surface);
+    background: ${({ $isOnline })=>$isOnline ? 'var(--color-accent)': 'var(--color-text-secondary)'};
 
 `
