@@ -27,6 +27,11 @@ function boardFromVisual(visual: string[]): string {
   return board;
 }
 
+function playLegalMove(game: InternalGame, move: Move) {
+  expect(game.getLegalMoves()).toContainEqual(move);
+  game.makeMove(move);
+}
+
 describe('InternalGame', () => {
   // Checks that custom position is read properly
   it('works on basic position', () => {
@@ -82,8 +87,7 @@ describe('InternalGame', () => {
     });
 
     const move: Move = { from: 'a7', to: 'a8', promotion: 'queen' };
-    expect(game.getLegalMoves()).toContainEqual(move);
-    game.makeMove(move);
+    playLegalMove(game, move);
     expect(game.getTurn()).toBe('black');
     expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
     expect(game.getBoard().a7).toBeNull();
@@ -115,8 +119,7 @@ describe('InternalGame', () => {
       { from: 'a7', to: 'a8', promotion: 'knight' },
     ];
     for (const move of moves) {
-      expect(game.getLegalMoves()).toContainEqual(move);
-      game.makeMove(move);
+      playLegalMove(game, move);
       expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
       expect(game.getBoard().a7).toBeNull();
       expect(game.getBoard().a8).toEqual({
@@ -149,28 +152,28 @@ describe('InternalGame', () => {
     expect(game.getLegalMoves()).toContainEqual({ from: 'e1', to: 'g1' });
     expect(game.getLegalMoves()).toContainEqual({ from: 'e1', to: 'c1' });
     // Move White's queenside rook
-    game.makeMove({ from: 'a1', to: 'b1' });
+    playLegalMove(game, { from: 'a1', to: 'b1' });
 
     expect(game.getLegalMoves()).toContainEqual({ from: 'e8', to: 'g8' });
     expect(game.getLegalMoves()).toContainEqual({ from: 'e8', to: 'c8' });
     // Move Black's king
-    game.makeMove({ from: 'e8', to: 'd8' });
+    playLegalMove(game, { from: 'e8', to: 'd8' });
 
     expect(game.getLegalMoves()).toContainEqual({ from: 'e1', to: 'g1' });
     expect(game.getLegalMoves()).not.toContainEqual({ from: 'e1', to: 'c1' });
     // Put White's rook back to its original place
-    game.makeMove({ from: 'b1', to: 'a1' });
+    playLegalMove(game, { from: 'b1', to: 'a1' });
 
     expect(game.getLegalMoves()).not.toContainEqual({ from: 'e8', to: 'g8' });
     expect(game.getLegalMoves()).not.toContainEqual({ from: 'e8', to: 'c8' });
     // Put Black's king back to its original place
-    game.makeMove({ from: 'd8', to: 'e8' });
+    playLegalMove(game, { from: 'd8', to: 'e8' });
 
     // Still can't castle on the queenside
     expect(game.getLegalMoves()).toContainEqual({ from: 'e1', to: 'g1' });
     expect(game.getLegalMoves()).not.toContainEqual({ from: 'e1', to: 'c1' });
     // Castling isn't affected on the kingside
-    game.makeMove({ from: 'e1', to: 'g1' });
+    playLegalMove(game, { from: 'e1', to: 'g1' });
     expect(game.getBoard().e1).toBeNull();
     expect(game.getBoard().g1).toEqual({
       color: 'white',
@@ -201,7 +204,7 @@ describe('InternalGame', () => {
       turn: 'black',
     });
 
-    game.makeMove({ from: 'e7', to: 'e5' });
+    playLegalMove(game, { from: 'e7', to: 'e5' });
     expect(game.getBoard().e7).toBeNull();
     expect(game.getBoard().e5).toEqual({
       color: 'black',
@@ -213,8 +216,7 @@ describe('InternalGame', () => {
       { from: 'f5', to: 'e6' },
     ];
     for (const move of enPassantMoves) {
-      expect(game.getLegalMoves()).toContainEqual(move);
-      game.makeMove(move);
+      playLegalMove(game, move);
       expect(game.getBoard()[move.from]).toBeNull();
       expect(game.getBoard()[move.to]).toEqual({
         color: 'white',
@@ -249,7 +251,7 @@ describe('InternalGame', () => {
       turn: 'black',
     });
 
-    game.makeMove({ from: 'e7', to: 'e5' });
+    playLegalMove(game, { from: 'e7', to: 'e5' });
 
     const enPassantMoves: Move[] = [
       { from: 'd5', to: 'e6' },
@@ -259,8 +261,8 @@ describe('InternalGame', () => {
     for (const move of enPassantMoves)
       expect(game.getLegalMoves()).toContainEqual(move);
 
-    game.makeMove({ from: 'e1', to: 'e2' });
-    game.makeMove({ from: 'e8', to: 'e7' });
+    playLegalMove(game, { from: 'e1', to: 'e2' });
+    playLegalMove(game, { from: 'e8', to: 'e7' });
 
     for (const move of enPassantMoves)
       expect(game.getLegalMoves()).not.toContainEqual(move);
@@ -282,8 +284,7 @@ describe('InternalGame', () => {
 
     const move: Move = { from: 'd6', to: 'd8' };
 
-    expect(game.getLegalMoves()).toContainEqual(move);
-    game.makeMove(move);
+    playLegalMove(game, move);
     expect(game.getGameStatus()).toBe(GameStatus.CHECK);
   });
 
@@ -303,8 +304,7 @@ describe('InternalGame', () => {
 
     const move: Move = { from: 'd6', to: 'd8' };
 
-    expect(game.getLegalMoves()).toContainEqual(move);
-    game.makeMove(move);
+    playLegalMove(game, move);
     expect(game.getGameStatus()).toBe(GameStatus.CHECK);
 
     expect(game.getLegalMoves()).toHaveLength(1);
@@ -327,8 +327,7 @@ describe('InternalGame', () => {
 
     const move: Move = { from: 'c6', to: 'c8' };
 
-    expect(game.getLegalMoves()).toContainEqual(move);
-    game.makeMove(move);
+    playLegalMove(game, move);
     expect(game.getGameStatus()).toBe(GameStatus.CHECKMATE);
   });
 
@@ -348,8 +347,7 @@ describe('InternalGame', () => {
 
     const move: Move = { from: 'h6', to: 'h7' };
 
-    expect(game.getLegalMoves()).toContainEqual(move);
-    game.makeMove(move);
+    playLegalMove(game, move);
     expect(game.getGameStatus()).toBe(GameStatus.STALEMATE);
   });
 });
