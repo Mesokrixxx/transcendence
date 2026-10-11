@@ -43,4 +43,34 @@ describe('ChessGame', () => {
     expect(game.getHistory()).toHaveLength(0);
     expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
   });
+
+  it('plays castling properly', () => {
+    const game = new ChessGame();
+
+    const moves: Move[] = [
+      { from: 'e2', to: 'e4' },
+      { from: 'e7', to: 'e5' },
+      { from: 'g1', to: 'f3' },
+      { from: 'b8', to: 'c6' },
+      { from: 'f1', to: 'b5' },
+      { from: 'g8', to: 'f6' },
+      { from: 'e1', to: 'g1' },
+    ];
+
+    for (const move of moves) {
+      const piece = game.getBoard()[move.from];
+      expect(piece).not.toBeNull();
+      expect(game.getMoves(move.from)).toContainEqual(move);
+      game.move(move);
+      expect(game.getBoard()[move.from]).toBeNull();
+      expect(game.getBoard()[move.to]).toEqual(piece);
+      expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    }
+    expect(game.getHistory()).toEqual(moves);
+    expect(game.getBoard().h1).toBeNull();
+    expect(game.getBoard().f1).toEqual({
+      color: 'white',
+      type: 'rook',
+    });
+  });
 });
