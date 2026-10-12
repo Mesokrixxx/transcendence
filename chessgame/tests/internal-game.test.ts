@@ -436,6 +436,16 @@ describe('InternalGame', () => {
         '........',
         '........',
       ]),
+      castlingRights: {
+        white: {
+          queenside: false,
+          kingside: false,
+        },
+        black: {
+          queenside: false,
+          kingside: false,
+        },
+      }
     });
 
     expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
