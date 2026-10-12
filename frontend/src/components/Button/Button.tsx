@@ -8,20 +8,34 @@ type ButtonProps = {
   onClick?: () => void
   variant?: 'primary' | 'secondary' | 'accent'
   type?: 'button' | 'submit' | 'reset'
+  'aria-expanded'?: boolean
+  'aria-controls'?: string
 }
 
-function Button({ children, to, onClick, variant= 'primary', type ='button'}: 
+function Button({ children, to, onClick, variant= 'primary', type ='button', 'aria-expanded': ariaExpanded, 'aria-controls': ariaControls}: 
   ButtonProps) {
   if (to !== undefined) {
     return (
-      <StyledButton as={Link} to={to} $variant={variant}>
+      <StyledButton 
+        as={Link} 
+        to={to} 
+        $variant={variant}
+        aria-expanded={ariaExpanded}
+        aria-controls={ariaControls}
+        >
         {children}
       </StyledButton>
     )
   }
 
   return (
-    <StyledButton type={type} onClick={onClick} $variant={variant}>
+    <StyledButton 
+      type={type} 
+      onClick={onClick} 
+      $variant={variant}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
+      >
       {children}
     </StyledButton>
   )

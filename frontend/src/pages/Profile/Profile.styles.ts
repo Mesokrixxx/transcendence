@@ -14,6 +14,11 @@ export const ProfileHeader = styled.div`
     gap: 24px;
     flex-wrap: wrap;
 
+    .profile-info {
+        flex:1;
+        min-width:0;
+    }
+
     h1 {
         margin: 0;
         color: var(--color-text-primary);
@@ -22,5 +27,38 @@ export const ProfileHeader = styled.div`
     p {
         margin: 8px 0 0;
         color: var(--color-text-secondary);
+    }
+`
+
+export const AvatarUpload = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+
+    label {
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    input {
+        max-width: 100%;
+        color: var(--color-text-primary);
+    }
+
+    input:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 4px;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+    }
+
+    #avatar-error {
+        color: var(--color-text-primary);
     }
 `
