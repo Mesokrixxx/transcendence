@@ -2,10 +2,9 @@ import type { Board, Color, Move, Piece, Square } from './chessgame.types.js';
 import { boardSquares, InternalBoard } from './internal-board.js';
 import { GameStatus } from './chessgame.types.js';
 
-interface CastlingRights {
-  queenside: boolean;
-  kingside: boolean;
-}
+type CastleSide = 'queenside' | 'kingside';
+
+type CastlingRights = Record<CastleSide, boolean>;
 
 interface Position {
   board: string;
