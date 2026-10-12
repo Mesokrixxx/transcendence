@@ -299,6 +299,11 @@ class InternalGame {
         );
     }
 
+    // Will become return value after return type change
+    const internalMoves: InternalMove[] = [];
+    for (const move of moves)
+      internalMoves.push(this.getInternalMove(move));
+
     return moves;
   }
 
