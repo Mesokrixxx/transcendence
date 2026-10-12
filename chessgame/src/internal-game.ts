@@ -15,6 +15,14 @@ interface Position {
   gameStatus: GameStatus;
 }
 
+interface InternalMove extends Move {
+  piece: Piece;
+  capturedPiece?: Piece;
+  castleSide?: CastleSide;
+  isEnPassant: boolean;
+  isDoublePawnPush: boolean;
+}
+
 type History = {
   // position is the situation before move
   position: Position;
