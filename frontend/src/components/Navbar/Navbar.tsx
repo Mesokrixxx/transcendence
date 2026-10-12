@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Button from '../Button/Button'
 import {
   Header,
@@ -15,6 +15,32 @@ import {
 
 function Navbar() {
   const [showLanguages, setShowLanguages] = useState(false)
+  const languageMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!showLanguages) return
+
+    function handleClickOutside(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        languageMenuRef.current &&
+        !languageMenuRef.current.contains(event.target)
+      ) {setShowLanguages(false)}
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+    if (event.key === 'Escape') {setShowLanguages(false)}
+    }
+
+  document.addEventListener('pointerdown', handleClickOutside)
+  document.addEventListener('keydown', handleEscape)
+
+  return () => {
+    document.removeEventListener('pointerdown', handleClickOutside)
+    document.removeEventListener('keydown', handleEscape)
+  }
+}, [showLanguages])
+
   return (
     <Header>
       <Content className="container">
@@ -34,10 +60,10 @@ function Navbar() {
           <Button to="/login" variant="secondary">Log in</Button>
           <Button to="/register" variant="primary">Sign Up</Button>
 
-          <LanguageMenu>
+          <LanguageMenu ref={languageMenuRef}>
             <LanguageButton 
             type="button" 
-            arial-label="Change language" 
+            aria-label="Change language" 
             aria-expanded={showLanguages}
             aria-controls="language-options"
             onClick={() => setShowLanguages(!showLanguages)}>
@@ -45,7 +71,7 @@ function Navbar() {
             </LanguageButton>
 
             {showLanguages && (
-              <LanguageOptions id="language-otptions">
+              <LanguageOptions id="language-options">
                 <li><button type="button" lang="fr">Français</button></li>
                 <li><button type="button" lang="es">Español</button></li>
                 <li><button type="button" lang="en">English</button></li>
