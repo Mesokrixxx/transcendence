@@ -1,4 +1,4 @@
-import type { DeepReadonly, Piece, Square } from './chessgame.types';
+import type { DeepReadonly, Piece, Square } from './chessgame.types.js';
 
 // prettier-ignore
 export const boardSquares: readonly Square[] = [
@@ -39,12 +39,19 @@ export class InternalBoard {
       setup = 'RNBQKBNRPPPPPPPP................................pppppppprnbqkbnr';
 
     for (let i = 0; i < InternalBoard.boardSize; i++) {
-      board.push(setup[i] === '.'
-        ? null
-        : {
-          color: InternalBoard.charToPiece[setup[i]].color,
-          type: InternalBoard.charToPiece[setup[i]].type
+      const c = setup[i];
+      if (!c || c === '.') {
+        board.push(null);
+        continue;
+      }
+      const piece = InternalBoard.charToPiece[c];
+      if (piece) {
+        board.push({
+          color: piece.color,
+          type: piece.type,
         });
+      } else
+        board.push(null);
     }
     this.board = board;
   }
@@ -56,7 +63,7 @@ export class InternalBoard {
   }
 
   pieceAt(square: Square): Piece | null {
-    return this.board[InternalBoard.squareToIndex(square)];
+    return this.board[InternalBoard.squareToIndex(square)] ?? null;
   }
   // squareFrom("e4", 1, 1) // f5
   squareFrom(square: Square, fileOffset: number, rankOffset: number): Square | null {
@@ -64,7 +71,7 @@ export class InternalBoard {
     const rank = Math.floor(squareIndex / 8) + rankOffset, file = squareIndex % 8 + fileOffset;
     if (rank < 0 || rank >= 8 || file < 0 || file >= 8)
       return null;
-    return boardSquares[rank * 8 + file];
+    return boardSquares[rank * 8 + file] ?? null;
   }
 
   setPiece(piece: Piece, square: Square): void {
@@ -73,7 +80,7 @@ export class InternalBoard {
   removePiece(square: Square): Piece | null {
     const piece = this.board[InternalBoard.squareToIndex(square)];
     this.board[InternalBoard.squareToIndex(square)] = null;
-    return piece;
+    return piece ?? null;
   }
   movePiece(from: Square, to: Square): void {
     const piece = this.removePiece(from);

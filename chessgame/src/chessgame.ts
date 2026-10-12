@@ -1,6 +1,6 @@
-import type { Board, Color, DeepReadonly, Move, Square } from './chessgame.types';
-import { GameStatus } from './chessgame.types';
-import InternalGame from './internal-game';
+import type { Board, Color, DeepReadonly, Move, Square } from './chessgame.types.js';
+import { GameStatus } from './chessgame.types.js';
+import InternalGame from './internal-game.js';
 
 class ChessGame {
   // Starts a new ChessGame if no moves are provided or reconstructs game from given moves
@@ -33,8 +33,12 @@ class ChessGame {
   getMoves(square?: Square): DeepReadonly<Move[]> {
     const moves: Move[] = [];
     for (const move of this.game.getLegalMoves()) {
-      if (!square || move.from === square)
-        moves.push({ from: move.from, to: move.to, promotion: move.promotion });
+      if (!square || move.from === square) {
+        if (move.promotion)
+          moves.push({ from: move.from, to: move.to, promotion: move.promotion });
+        else
+          moves.push({ from: move.from, to: move.to });
+      }
     }
     return moves;
   }
@@ -43,7 +47,10 @@ class ChessGame {
   getHistory(): DeepReadonly<Move[]> {
     const history: Move[] = [];
     for (const move of this.game.getMoveHistory()) {
-      history.push({ from: move.from, to: move.to, promotion: move.promotion });
+        if (move.promotion)
+          history.push({ from: move.from, to: move.to, promotion: move.promotion });
+        else
+          history.push({ from: move.from, to: move.to });
     }
     return history;
   }

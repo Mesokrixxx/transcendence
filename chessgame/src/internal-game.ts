@@ -1,6 +1,6 @@
-import type { Board, Color, Move, Piece, Square } from './chessgame.types';
-import { boardSquares, InternalBoard } from './internal-board';
-import { GameStatus } from './chessgame.types';
+import type { Board, Color, Move, Piece, Square } from './chessgame.types.js';
+import { boardSquares, InternalBoard } from './internal-board.js';
+import { GameStatus } from './chessgame.types.js';
 
 interface CastlingRights {
   queenside: boolean;
@@ -24,9 +24,9 @@ type History = {
 
 type Direction = -1 | 0 | 1;
 
-const knightMoves: number[][]= [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]];
+const knightMoves: [number, number][]= [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]];
 
-const kingMoves: number[][] = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]];
+const kingMoves: [number, number][] = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]];
 
 class InternalGame {
   constructor(position?: Partial<Omit<Position, 'gameStatus'>>) {
@@ -82,7 +82,7 @@ class InternalGame {
     }
   }
 
-  private getPseudoLegalMovesFromList(moves: Move[], square: Square, list: number[][]): void {
+  private getPseudoLegalMovesFromList(moves: Move[], square: Square, list: [number, number][]): void {
     for (const direction of list) {
       const tempSquare = this.board.squareFrom(square, direction[0], direction[1]);
       if (tempSquare === null) continue;
@@ -383,12 +383,13 @@ class InternalGame {
     const uniquePositions: Record<string, number> = {};
 
     for (let i = this.history.length - 1; i >= 0; i--) {
-      const positionStr = this.hashPosition(this.history[i].position);
+      const h = this.history[i]!;
+      const positionStr = this.hashPosition(h.position);
       if (uniquePositions[positionStr])
         uniquePositions[positionStr]++;
       else
         uniquePositions[positionStr] = 1;
-      if (this.history[i].position.halfMoves === 0)
+      if (h.position.halfMoves === 0)
         break;
     }
     const currentPositionStr = this.hashPosition({
@@ -399,7 +400,8 @@ class InternalGame {
       halfMoves: this.halfMoves,
       gameStatus: this.gameStatus,
     });
-    return (uniquePositions[currentPositionStr] >= 2);
+    const count = uniquePositions[currentPositionStr];
+    return (count !== undefined && count >= 2);
   }
 
   private setGameStatus(): void {
