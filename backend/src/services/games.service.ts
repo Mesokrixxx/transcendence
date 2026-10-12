@@ -1,4 +1,5 @@
 import prisma from '../db/prisma.js'
+import { BackendError } from '../types/backendError.types.js';
 
 export async function create(whiteId: number, blackId: number) {
 	return await prisma.$transaction(async (tx) => {
@@ -11,7 +12,7 @@ export async function create(whiteId: number, blackId: number) {
 		});
 
 		if (users.length !== 2)
-			throw new Error('invalid game players');
+			throw new BackendError(400, 'invalid game players');
 
 		const specChat = await tx.chat.create({ data: {} });
 		const gameChat = await tx.chat.create({
