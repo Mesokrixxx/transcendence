@@ -100,6 +100,33 @@ class InternalGame {
     return to.charCodeAt(1) - from.charCodeAt(1);
   }
 
+  private getInternalMove(move: Move): InternalMove {
+    const piece: Piece = this.board.pieceAt(move.from)!;
+    const isCastle =
+      piece.type === 'king' &&
+      Math.abs(this.fileDiff(move.to, move.from)) === 2;
+    const internalMove: InternalMove = {
+      from: move.from,
+      to: move.to,
+      piece: piece,
+      isEnPassant:
+        piece.type === 'pawn' &&
+        this.enPassant !== null &&
+        move.to === this.enPassant,
+      isDoublePawnPush:
+        piece.type === 'pawn' && Math.abs(this.rankDiff(move.to, move.from)) === 2,
+    };
+    if (move.promotion)
+      internalMove.promotion = move.promotion;
+    const capturedPieceSquare = internalMove.isEnPassant ? this.board.squareFrom(move.from, this.fileDiff(move.from, move.to), 0)! : move.to;
+    const capturedPiece = this.board.pieceAt(capturedPieceSquare);
+    if (capturedPiece) internalMove.capturedPiece = capturedPiece;
+    if (isCastle)
+      internalMove.castleSide =
+        this.fileDiff(move.from, move.to) < 0 ? 'queenside' : 'kingside';
+    return internalMove;
+  }
+
   private getRayPseudoLegalMoves(
     moves: Move[],
     square: Square,
