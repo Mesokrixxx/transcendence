@@ -5,11 +5,12 @@ export type DeepReadonly<T> =
   : T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
   : T;
 
-export type Color = "white" | "black";
+export type Color = 'white' | 'black';
 
-export type PieceType = "king" | "queen" | "rook" | "bishop" | "knight" | "pawn";
+export type PieceType =
+  'king' | 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn';
 
-export type PiecePromotionType = "queen" | "rook" | "bishop" | "knight";
+export type PiecePromotionType = 'queen' | 'rook' | 'bishop' | 'knight';
 
 export interface Piece {
   color: Color;

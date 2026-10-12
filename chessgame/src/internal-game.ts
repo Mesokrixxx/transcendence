@@ -10,7 +10,7 @@ interface CastlingRights {
 interface Position {
   board: string;
   turn: Color;
-  castlingRights: Record<Color, CastlingRights>
+  castlingRights: Record<Color, CastlingRights>;
   enPassant: Square | null;
   halfMoves: number;
   gameStatus: GameStatus;
@@ -18,39 +18,53 @@ interface Position {
 
 type History = {
   // position is the situation before move
-  position: Position,
-  move: Move,
+  position: Position;
+  move: Move;
 }[];
 
 type Direction = -1 | 0 | 1;
 
-const knightMoves: [number, number][]= [[-2, -1], [-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2]];
+const knightMoves: [number, number][] = [
+  [-2, -1],
+  [-2, 1],
+  [-1, 2],
+  [1, 2],
+  [2, 1],
+  [2, -1],
+  [1, -2],
+  [-1, -2],
+];
 
-const kingMoves: [number, number][] = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]];
+const kingMoves: [number, number][] = [
+  [-1, -1],
+  [-1, 0],
+  [-1, 1],
+  [0, 1],
+  [1, 1],
+  [1, 0],
+  [1, -1],
+  [0, -1],
+];
 
 class InternalGame {
   constructor(position?: Partial<Omit<Position, 'gameStatus'>>) {
     // Starts the game from unique position
     // Unsafe for invalid fields, should only be called with valid data
     if (position) {
-      if (position.board)
-        this.board = new InternalBoard(position.board);
-      if (position.turn)
-        this.turn = position.turn;
+      if (position.board) this.board = new InternalBoard(position.board);
+      if (position.turn) this.turn = position.turn;
       if (position.castlingRights) {
         this.castlingRights.white = {
           queenside: position.castlingRights.white.queenside,
           kingside: position.castlingRights.white.kingside,
-        }
+        };
         this.castlingRights.black = {
           queenside: position.castlingRights.black.queenside,
           kingside: position.castlingRights.black.kingside,
-        }
+        };
       }
-      if (position.enPassant !== undefined)
-        this.enPassant = position.enPassant;
-      if (position.halfMoves !== undefined)
-        this.halfMoves = position.halfMoves;
+      if (position.enPassant !== undefined) this.enPassant = position.enPassant;
+      if (position.halfMoves !== undefined) this.halfMoves = position.halfMoves;
       this.getLegalMoves();
       this.setGameStatus();
     }
@@ -71,10 +85,23 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: Move[] | null = null;
 
-  private getRayPseudoLegalMoves(moves: Move[], square: Square, fileDirection: Direction, rankDirection: Direction): void {
+  private getRayPseudoLegalMoves(
+    moves: Move[],
+    square: Square,
+    fileDirection: Direction,
+    rankDirection: Direction,
+  ): void {
     let tempSquare: Square | null = null;
 
-    for (let i = 1; (tempSquare = this.board.squareFrom(square, i * fileDirection, i * rankDirection)) !== null; i++) {
+    for (
+      let i = 1;
+      (tempSquare = this.board.squareFrom(
+        square,
+        i * fileDirection,
+        i * rankDirection,
+      )) !== null;
+      i++
+    ) {
       const tempPiece = this.board.pieceAt(tempSquare);
       if (tempPiece === null || tempPiece.color !== this.turn)
         moves.push({ from: square, to: tempSquare });
@@ -82,9 +109,17 @@ class InternalGame {
     }
   }
 
-  private getPseudoLegalMovesFromList(moves: Move[], square: Square, list: [number, number][]): void {
+  private getPseudoLegalMovesFromList(
+    moves: Move[],
+    square: Square,
+    list: [number, number][],
+  ): void {
     for (const direction of list) {
-      const tempSquare = this.board.squareFrom(square, direction[0], direction[1]);
+      const tempSquare = this.board.squareFrom(
+        square,
+        direction[0],
+        direction[1],
+      );
       if (tempSquare === null) continue;
       const piece = this.board.pieceAt(tempSquare);
       if (piece === null || piece.color !== this.turn)
@@ -93,30 +128,52 @@ class InternalGame {
   }
 
   private getPseudoLegalCastleMoves(moves: Move[], square: Square): void {
-    if (this.turn === 'white' && square !== 'e1' ||
-        this.turn === 'black' && square !== 'e8')
+    if (
+      (this.turn === 'white' && square !== 'e1') ||
+      (this.turn === 'black' && square !== 'e8')
+    )
       return;
-    const queensideRook = this.board.pieceAt(this.board.squareFrom(square, -4, 0)!);
-    const kingsideRook = this.board.pieceAt(this.board.squareFrom(square, 3, 0)!);
-    if (this.castlingRights[this.turn].queenside && queensideRook !== null &&
-        queensideRook.color === this.turn && queensideRook.type === 'rook' &&
-        this.board.pieceAt(this.board.squareFrom(square, -3, 0)!) === null &&
-        this.board.pieceAt(this.board.squareFrom(square, -2, 0)!) === null &&
-        this.board.pieceAt(this.board.squareFrom(square, -1, 0)!) === null)
+    const queensideRook = this.board.pieceAt(
+      this.board.squareFrom(square, -4, 0)!,
+    );
+    const kingsideRook = this.board.pieceAt(
+      this.board.squareFrom(square, 3, 0)!,
+    );
+    if (
+      this.castlingRights[this.turn].queenside &&
+      queensideRook !== null &&
+      queensideRook.color === this.turn &&
+      queensideRook.type === 'rook' &&
+      this.board.pieceAt(this.board.squareFrom(square, -3, 0)!) === null &&
+      this.board.pieceAt(this.board.squareFrom(square, -2, 0)!) === null &&
+      this.board.pieceAt(this.board.squareFrom(square, -1, 0)!) === null
+    )
       moves.push({ from: square, to: this.board.squareFrom(square, -2, 0)! });
-    if (this.castlingRights[this.turn].kingside && kingsideRook !== null &&
-        kingsideRook.color === this.turn && kingsideRook.type === 'rook' &&
-        this.board.pieceAt(this.board.squareFrom(square, 1, 0)!) === null &&
-        this.board.pieceAt(this.board.squareFrom(square, 2, 0)!) === null)
+    if (
+      this.castlingRights[this.turn].kingside &&
+      kingsideRook !== null &&
+      kingsideRook.color === this.turn &&
+      kingsideRook.type === 'rook' &&
+      this.board.pieceAt(this.board.squareFrom(square, 1, 0)!) === null &&
+      this.board.pieceAt(this.board.squareFrom(square, 2, 0)!) === null
+    )
       moves.push({ from: square, to: this.board.squareFrom(square, 2, 0)! });
   }
 
-  private getPseudoLegalPawnMoves(moves: Move[], square: Square, direction: -1 | 1) {
+  private getPseudoLegalPawnMoves(
+    moves: Move[],
+    square: Square,
+    direction: -1 | 1,
+  ) {
     const frontSquare = this.board.squareFrom(square, 0, direction)!;
     const twoStepsSquare = this.board.squareFrom(square, 0, direction * 2);
-    const lateralSquares = [this.board.squareFrom(square, -1, direction), this.board.squareFrom(square, 1, direction)];
+    const lateralSquares = [
+      this.board.squareFrom(square, -1, direction),
+      this.board.squareFrom(square, 1, direction),
+    ];
     const isTouchdown = twoStepsSquare === null;
-    const onFirstPawnRank = (this.turn === 'white' && square.charAt(1) === '2') ||
+    const onFirstPawnRank =
+      (this.turn === 'white' && square.charAt(1) === '2') ||
       (this.turn === 'black' && square.charAt(1) === '7');
 
     // Pawn: Add (non-promotion) one-square move
@@ -125,15 +182,18 @@ class InternalGame {
 
     // Pawn: Add one-square promotion move (with every different piece)
     if (this.board.pieceAt(frontSquare) === null && isTouchdown) {
-      moves.push({ from: square, to: frontSquare, promotion: 'queen' })
-      moves.push({ from: square, to: frontSquare, promotion: 'rook' })
-      moves.push({ from: square, to: frontSquare, promotion: 'bishop' })
-      moves.push({ from: square, to: frontSquare, promotion: 'knight' })
+      moves.push({ from: square, to: frontSquare, promotion: 'queen' });
+      moves.push({ from: square, to: frontSquare, promotion: 'rook' });
+      moves.push({ from: square, to: frontSquare, promotion: 'bishop' });
+      moves.push({ from: square, to: frontSquare, promotion: 'knight' });
     }
 
     // Pawn: Add two-squares move
-    if (onFirstPawnRank && this.board.pieceAt(frontSquare) === null &&
-        this.board.pieceAt(twoStepsSquare!) === null)
+    if (
+      onFirstPawnRank &&
+      this.board.pieceAt(frontSquare) === null &&
+      this.board.pieceAt(twoStepsSquare!) === null
+    )
       moves.push({ from: square, to: twoStepsSquare! });
     for (const lateralSquare of lateralSquares) {
       if (lateralSquare === null) continue;
@@ -141,12 +201,11 @@ class InternalGame {
       // Pawn: Add lateral moves
       if (piece !== null && piece.color !== this.turn) {
         if (isTouchdown) {
-          moves.push({ from: square, to: lateralSquare, promotion: 'queen' })
-          moves.push({ from: square, to: lateralSquare, promotion: 'rook' })
-          moves.push({ from: square, to: lateralSquare, promotion: 'bishop' })
-          moves.push({ from: square, to: lateralSquare, promotion: 'knight' })
-        } else
-          moves.push({ from: square, to: lateralSquare });
+          moves.push({ from: square, to: lateralSquare, promotion: 'queen' });
+          moves.push({ from: square, to: lateralSquare, promotion: 'rook' });
+          moves.push({ from: square, to: lateralSquare, promotion: 'bishop' });
+          moves.push({ from: square, to: lateralSquare, promotion: 'knight' });
+        } else moves.push({ from: square, to: lateralSquare });
       }
       // Pawn: Add En-Passant move
       else if (lateralSquare === this.enPassant)
@@ -191,7 +250,11 @@ class InternalGame {
 
       // Pawn: Add Pawn moves
       if (piece.type === 'pawn')
-        this.getPseudoLegalPawnMoves(moves, square, this.turn === 'white' ? 1 : -1);
+        this.getPseudoLegalPawnMoves(
+          moves,
+          square,
+          this.turn === 'white' ? 1 : -1,
+        );
     }
 
     return moves;
@@ -201,8 +264,7 @@ class InternalGame {
     const direction = move.from.charCodeAt(0) < move.to.charCodeAt(0) ? 1 : -1;
     const inBetweenSquare = this.board.squareFrom(move.from, direction, 0)!;
     const color = this.turn;
-    if (this.kingIsAttacked(color))
-      return false;
+    if (this.kingIsAttacked(color)) return false;
     this.makeMove({ from: move.from, to: inBetweenSquare }, false);
     if (this.kingIsAttacked(color)) {
       this.undoMove();
@@ -219,23 +281,22 @@ class InternalGame {
   }
 
   getLegalMoves(): Move[] {
-    if (this.legalMoves !== null)
-      return this.legalMoves;
+    if (this.legalMoves !== null) return this.legalMoves;
 
     const pseudoLegalMoves = this.getPseudoLegalMoves();
     const legalMoves: Move[] = [];
 
     for (const move of pseudoLegalMoves) {
-      if (this.board.pieceAt(move.from)!.type === 'king' &&
-          Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2) {
-        if (this.isLegalCastleMove(move))
-          legalMoves.push(move);
+      if (
+        this.board.pieceAt(move.from)!.type === 'king' &&
+        Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2
+      ) {
+        if (this.isLegalCastleMove(move)) legalMoves.push(move);
       } else {
         const color = this.turn;
         this.makeMove(move, false);
         const isAttacked = this.kingIsAttacked(color);
-        if (!isAttacked)
-          legalMoves.push(move);
+        if (!isAttacked) legalMoves.push(move);
         this.undoMove();
       }
     }
@@ -245,28 +306,41 @@ class InternalGame {
   }
 
   private castle(move: Move): void {
-    const rookFrom = move.to.charAt(0) === 'c'
-      ? this.board.squareFrom(move.from, -4, 0)!
-      : this.board.squareFrom(move.from, 3, 0)!;
-    const rookTo = move.to.charAt(0) === 'c'
-      ? this.board.squareFrom(rookFrom, 3, 0)!
-      : this.board.squareFrom(rookFrom, -2, 0)!;
+    const rookFrom =
+      move.to.charAt(0) === 'c'
+        ? this.board.squareFrom(move.from, -4, 0)!
+        : this.board.squareFrom(move.from, 3, 0)!;
+    const rookTo =
+      move.to.charAt(0) === 'c'
+        ? this.board.squareFrom(rookFrom, 3, 0)!
+        : this.board.squareFrom(rookFrom, -2, 0)!;
 
     this.board.movePiece(move.from, move.to);
     this.board.movePiece(rookFrom, rookTo);
 
     // Remove castling rights
     this.castlingRights[this.turn].queenside = false;
-    this.castlingRights[this.turn].kingside  = false;
+    this.castlingRights[this.turn].kingside = false;
   }
 
-  private getFirstPieceInRay(square: Square, fileDirection: -1 | 0 | 1, rankDirection: -1 | 0 | 1): Piece | null {
+  private getFirstPieceInRay(
+    square: Square,
+    fileDirection: -1 | 0 | 1,
+    rankDirection: -1 | 0 | 1,
+  ): Piece | null {
     let tempSquare: Square | null;
 
-    for (let i = 1; (tempSquare = this.board.squareFrom(square, i * fileDirection, i * rankDirection)) !== null; i++) {
+    for (
+      let i = 1;
+      (tempSquare = this.board.squareFrom(
+        square,
+        i * fileDirection,
+        i * rankDirection,
+      )) !== null;
+      i++
+    ) {
       const piece = this.board.pieceAt(tempSquare);
-      if (piece !== null)
-        return piece;
+      if (piece !== null) return piece;
     }
     return null;
   }
@@ -280,27 +354,63 @@ class InternalGame {
         break;
       }
     }
-    if (!kingSquare) // never
+    if (!kingSquare)
+      // never
       return false;
 
     // Horizontal checks
-    for (const ray of [[-1, 0], [1, 0]]) {
-      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'rook'))
+    for (const ray of [
+      [-1, 0],
+      [1, 0],
+    ]) {
+      const piece = this.getFirstPieceInRay(
+        kingSquare,
+        ray[0] as Direction,
+        ray[1] as Direction,
+      );
+      if (
+        piece &&
+        piece.color !== color &&
+        (piece.type === 'queen' || piece.type === 'rook')
+      )
         return true;
     }
 
     // Vertical checks
-    for (const ray of [[0, 1], [0, -1]]) {
-      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'rook'))
+    for (const ray of [
+      [0, 1],
+      [0, -1],
+    ]) {
+      const piece = this.getFirstPieceInRay(
+        kingSquare,
+        ray[0] as Direction,
+        ray[1] as Direction,
+      );
+      if (
+        piece &&
+        piece.color !== color &&
+        (piece.type === 'queen' || piece.type === 'rook')
+      )
         return true;
     }
 
     // Diagonal checks
-    for (const ray of [[-1, -1], [-1, 1], [1, 1], [1, -1]]) {
-      const piece = this.getFirstPieceInRay(kingSquare, ray[0] as Direction, ray[1] as Direction);
-      if (piece && piece.color !== color && (piece.type === 'queen' || piece.type === 'bishop'))
+    for (const ray of [
+      [-1, -1],
+      [-1, 1],
+      [1, 1],
+      [1, -1],
+    ]) {
+      const piece = this.getFirstPieceInRay(
+        kingSquare,
+        ray[0] as Direction,
+        ray[1] as Direction,
+      );
+      if (
+        piece &&
+        piece.color !== color &&
+        (piece.type === 'queen' || piece.type === 'bishop')
+      )
         return true;
     }
 
@@ -318,18 +428,18 @@ class InternalGame {
       const square = this.board.squareFrom(kingSquare, move[0], move[1]);
       if (square === null) continue;
       const piece = this.board.pieceAt(square);
-      if (piece && piece.color !== color && piece.type === 'king')
-        return true;
+      if (piece && piece.color !== color && piece.type === 'king') return true;
     }
 
     // Pawn checks
-    const pawnSquares = [this.board.squareFrom(kingSquare, -1, color === 'white' ? 1 : -1),
-      this.board.squareFrom(kingSquare, 1, color === 'white' ? 1 : -1)];
+    const pawnSquares = [
+      this.board.squareFrom(kingSquare, -1, color === 'white' ? 1 : -1),
+      this.board.squareFrom(kingSquare, 1, color === 'white' ? 1 : -1),
+    ];
     for (const square of pawnSquares) {
       if (!square) continue;
       const piece = this.board.pieceAt(square);
-      if (piece && piece.color !== color && piece.type === 'pawn')
-        return true;
+      if (piece && piece.color !== color && piece.type === 'pawn') return true;
     }
     return false;
   }
@@ -348,22 +458,21 @@ class InternalGame {
       if (piece !== null) {
         if (piece.type === 'bishop') {
           pieces.bishop++;
-          if (squareColor === 'white')
-            lsb++;
-        }
-        else if (piece.type === 'knight')
-          pieces.knight++;
+          if (squareColor === 'white') lsb++;
+        } else if (piece.type === 'knight') pieces.knight++;
         pieceCount++;
       }
       if (square.charAt(0) !== 'h')
         squareColor = squareColor === 'white' ? 'black' : 'white';
     }
 
-    if (pieceCount === 2)
-      return true;
+    if (pieceCount === 2) return true;
     if (pieceCount === 3 && (pieces.bishop === 1 || pieces.knight === 1))
       return true;
-    if (pieceCount === 2 + pieces.bishop && (lsb === 0 || lsb === pieces.bishop))
+    if (
+      pieceCount === 2 + pieces.bishop &&
+      (lsb === 0 || lsb === pieces.bishop)
+    )
       return true;
     return false;
   }
@@ -385,12 +494,9 @@ class InternalGame {
     for (let i = this.history.length - 1; i >= 0; i--) {
       const h = this.history[i]!;
       const positionStr = this.hashPosition(h.position);
-      if (uniquePositions[positionStr])
-        uniquePositions[positionStr]++;
-      else
-        uniquePositions[positionStr] = 1;
-      if (h.position.halfMoves === 0)
-        break;
+      if (uniquePositions[positionStr]) uniquePositions[positionStr]++;
+      else uniquePositions[positionStr] = 1;
+      if (h.position.halfMoves === 0) break;
     }
     const currentPositionStr = this.hashPosition({
       board: this.board.toString(),
@@ -401,7 +507,7 @@ class InternalGame {
       gameStatus: this.gameStatus,
     });
     const count = uniquePositions[currentPositionStr];
-    return (count !== undefined && count >= 2);
+    return count !== undefined && count >= 2;
   }
 
   private setGameStatus(): void {
@@ -418,12 +524,9 @@ class InternalGame {
       this.gameStatus = GameStatus.INSUFMATERIAL;
     else if (this.isThreefoldRepetition())
       this.gameStatus = GameStatus.REPETITION;
-    else if (isAttacked)
-      this.gameStatus = GameStatus.CHECK;
-    else if (this.halfMoves >= 100)
-      this.gameStatus = GameStatus.FIFTYMOVES;
-    else
-      this.gameStatus = GameStatus.ONGOING;
+    else if (isAttacked) this.gameStatus = GameStatus.CHECK;
+    else if (this.halfMoves >= 100) this.gameStatus = GameStatus.FIFTYMOVES;
+    else this.gameStatus = GameStatus.ONGOING;
   }
 
   makeMove(move: Move, computeNextLegalMoves: boolean = true): void {
@@ -439,30 +542,37 @@ class InternalGame {
           black: {
             queenside: this.castlingRights.black.queenside,
             kingside: this.castlingRights.black.kingside,
-          }
+          },
         },
         enPassant: this.enPassant,
         halfMoves: this.halfMoves,
-        gameStatus: this.gameStatus
+        gameStatus: this.gameStatus,
       },
       move: move,
     });
 
     const piece = this.board.pieceAt(move.from)!;
     let isHalfMove = true;
-    if (piece.type === 'king' && Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2)
+    if (
+      piece.type === 'king' &&
+      Math.abs(move.from.charCodeAt(0) - move.to.charCodeAt(0)) === 2
+    )
       this.castle(move);
     else if (piece.type === 'pawn' && move.promotion) {
       this.board.removePiece(move.from);
       this.board.setPiece({ color: this.turn, type: move.promotion }, move.to);
       isHalfMove = false;
-    }
-    else if (piece.type === 'pawn' && move.to === this.enPassant) {
-      this.board.removePiece(this.board.squareFrom(this.enPassant, 0, this.turn === 'white' ? -1 : 1)!);
+    } else if (piece.type === 'pawn' && move.to === this.enPassant) {
+      this.board.removePiece(
+        this.board.squareFrom(
+          this.enPassant,
+          0,
+          this.turn === 'white' ? -1 : 1,
+        )!,
+      );
       this.board.movePiece(move.from, move.to);
       isHalfMove = false;
-    }
-    else {
+    } else {
       if (this.board.pieceAt(move.to) !== null || piece.type === 'pawn')
         isHalfMove = false;
       this.board.movePiece(move.from, move.to);
@@ -471,8 +581,8 @@ class InternalGame {
     // Update castling rights
     if (piece.type === 'king') {
       this.castlingRights[this.turn].queenside = false;
-      this.castlingRights[this.turn].kingside  = false;
-    } 
+      this.castlingRights[this.turn].kingside = false;
+    }
     if (move.from === 'a1' || move.to === 'a1')
       this.castlingRights['white'].queenside = false;
     else if (move.from === 'h1' || move.to === 'h1')
@@ -483,21 +593,25 @@ class InternalGame {
       this.castlingRights['black'].kingside = false;
 
     // Update position
-    if (piece.type === 'pawn' && Math.abs(move.from.charCodeAt(1) - move.to.charCodeAt(1)) === 2)
-      this.enPassant = this.board.squareFrom(move.from, 0, this.turn === 'white' ? 1 : -1);
-    else
-      this.enPassant = null;
+    if (
+      piece.type === 'pawn' &&
+      Math.abs(move.from.charCodeAt(1) - move.to.charCodeAt(1)) === 2
+    )
+      this.enPassant = this.board.squareFrom(
+        move.from,
+        0,
+        this.turn === 'white' ? 1 : -1,
+      );
+    else this.enPassant = null;
     this.turn = this.turn === 'white' ? 'black' : 'white';
     this.halfMoves = isHalfMove ? this.halfMoves + 1 : 0;
     this.legalMoves = null;
-    if (computeNextLegalMoves)
-      this.legalMoves = this.getLegalMoves();
+    if (computeNextLegalMoves) this.legalMoves = this.getLegalMoves();
     this.setGameStatus();
   }
 
   undoMove(): void {
-    if (this.history.length === 0)
-      return;
+    if (this.history.length === 0) return;
 
     const position = this.history.pop()!.position;
     this.board = new InternalBoard(position.board);
@@ -524,8 +638,7 @@ class InternalGame {
 
     for (const key of boardSquares) {
       const piece = this.board.pieceAt(key);
-      if (piece == null)
-        board[key] = null;
+      if (piece == null) board[key] = null;
       else {
         board[key] = {
           color: piece.color,

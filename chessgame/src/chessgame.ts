@@ -1,4 +1,10 @@
-import type { Board, Color, DeepReadonly, Move, Square } from './chessgame.types.js';
+import type {
+  Board,
+  Color,
+  DeepReadonly,
+  Move,
+  Square,
+} from './chessgame.types.js';
 import { GameStatus } from './chessgame.types.js';
 import InternalGame from './internal-game.js';
 
@@ -12,9 +18,10 @@ class ChessGame {
           this.move(move);
         } catch (e: unknown) {
           if (e instanceof Error)
-            throw new Error(`Invalid game initialization move list: ${e.message}`);
-          else
-            throw new Error('Unexpected error during game initialization');
+            throw new Error(
+              `Invalid game initialization move list: ${e.message}`,
+            );
+          else throw new Error('Unexpected error during game initialization');
         }
       }
     }
@@ -35,9 +42,12 @@ class ChessGame {
     for (const move of this.game.getLegalMoves()) {
       if (!square || move.from === square) {
         if (move.promotion)
-          moves.push({ from: move.from, to: move.to, promotion: move.promotion });
-        else
-          moves.push({ from: move.from, to: move.to });
+          moves.push({
+            from: move.from,
+            to: move.to,
+            promotion: move.promotion,
+          });
+        else moves.push({ from: move.from, to: move.to });
       }
     }
     return moves;
@@ -47,28 +57,33 @@ class ChessGame {
   getHistory(): DeepReadonly<Move[]> {
     const history: Move[] = [];
     for (const move of this.game.getMoveHistory()) {
-        if (move.promotion)
-          history.push({ from: move.from, to: move.to, promotion: move.promotion });
-        else
-          history.push({ from: move.from, to: move.to });
+      if (move.promotion)
+        history.push({
+          from: move.from,
+          to: move.to,
+          promotion: move.promotion,
+        });
+      else history.push({ from: move.from, to: move.to });
     }
     return history;
   }
 
   isLegalMove(move: Move): boolean {
     return this.getMoves(move.from).some((m) => {
-      return m.from === move.from && m.to === move.to && m.promotion === move.promotion;
+      return (
+        m.from === move.from &&
+        m.to === move.to &&
+        m.promotion === move.promotion
+      );
     });
   }
   // Throws if isLegalMove(move) is false
   move(move: Move): void {
     if (this.isOver())
       throw new Error('Trying to play move while game is over');
-    if (!this.isLegalMove(move))
-      throw new Error('Invalid move');
+    if (!this.isLegalMove(move)) throw new Error('Invalid move');
     this.game.makeMove(move);
   }
-
 
   getGameStatus(): GameStatus {
     return this.game.getGameStatus();
@@ -79,12 +94,19 @@ class ChessGame {
   }
 
   isCheck(): boolean {
-    return this.game.getGameStatus() === GameStatus.CHECK || this.game.getGameStatus() === GameStatus.CHECKMATE;
+    return (
+      this.game.getGameStatus() === GameStatus.CHECK ||
+      this.game.getGameStatus() === GameStatus.CHECKMATE
+    );
   }
 
   isDraw(): boolean {
-    return this.isStalemate() || this.isDrawByInsufficientMaterial() ||
-      this.isDrawByRepetition() || this.isDrawByFiftyMoves();
+    return (
+      this.isStalemate() ||
+      this.isDrawByInsufficientMaterial() ||
+      this.isDrawByRepetition() ||
+      this.isDrawByFiftyMoves()
+    );
   }
 
   isStalemate(): boolean {

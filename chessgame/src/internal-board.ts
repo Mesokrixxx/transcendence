@@ -13,19 +13,19 @@ export const boardSquares: readonly Square[] = [
 ];
 
 export class InternalBoard {
-  private static readonly charToPiece: DeepReadonly<Record<string, Piece>> =  {
-    'K': { color: 'white', type: 'king' },
-    'k': { color: 'black', type: 'king' },
-    'Q': { color: 'white', type: 'queen' },
-    'q': { color: 'black', type: 'queen' },
-    'R': { color: 'white', type: 'rook' },
-    'r': { color: 'black', type: 'rook' },
-    'B': { color: 'white', type: 'bishop' },
-    'b': { color: 'black', type: 'bishop' },
-    'N': { color: 'white', type: 'knight' },
-    'n': { color: 'black', type: 'knight' },
-    'P': { color: 'white', type: 'pawn' },
-    'p': { color: 'black', type: 'pawn' },
+  private static readonly charToPiece: DeepReadonly<Record<string, Piece>> = {
+    K: { color: 'white', type: 'king' },
+    k: { color: 'black', type: 'king' },
+    Q: { color: 'white', type: 'queen' },
+    q: { color: 'black', type: 'queen' },
+    R: { color: 'white', type: 'rook' },
+    r: { color: 'black', type: 'rook' },
+    B: { color: 'white', type: 'bishop' },
+    b: { color: 'black', type: 'bishop' },
+    N: { color: 'white', type: 'knight' },
+    n: { color: 'black', type: 'knight' },
+    P: { color: 'white', type: 'pawn' },
+    p: { color: 'black', type: 'pawn' },
   };
 
   private static readonly boardSize = 64;
@@ -36,7 +36,8 @@ export class InternalBoard {
     // Constructor assumes a valid setup, as it should only be called with
     // setups returned from InternalBoard.toString().
     if (!setup)
-      setup = 'RNBQKBNRPPPPPPPP................................pppppppprnbqkbnr';
+      setup =
+        'RNBQKBNRPPPPPPPP................................pppppppprnbqkbnr';
 
     for (let i = 0; i < InternalBoard.boardSize; i++) {
       const c = setup[i];
@@ -50,8 +51,7 @@ export class InternalBoard {
           color: piece.color,
           type: piece.type,
         });
-      } else
-        board.push(null);
+      } else board.push(null);
     }
     this.board = board;
   }
@@ -59,18 +59,25 @@ export class InternalBoard {
   private board: (Piece | null)[];
 
   private static squareToIndex(square: Square): number {
-    return (square.charCodeAt(1) - '1'.charCodeAt(0)) * 8 + (square.charCodeAt(0) - 'a'.charCodeAt(0));
+    return (
+      (square.charCodeAt(1) - '1'.charCodeAt(0)) * 8 +
+      (square.charCodeAt(0) - 'a'.charCodeAt(0))
+    );
   }
 
   pieceAt(square: Square): Piece | null {
     return this.board[InternalBoard.squareToIndex(square)] ?? null;
   }
   // squareFrom("e4", 1, 1) // f5
-  squareFrom(square: Square, fileOffset: number, rankOffset: number): Square | null {
+  squareFrom(
+    square: Square,
+    fileOffset: number,
+    rankOffset: number,
+  ): Square | null {
     const squareIndex = InternalBoard.squareToIndex(square);
-    const rank = Math.floor(squareIndex / 8) + rankOffset, file = squareIndex % 8 + fileOffset;
-    if (rank < 0 || rank >= 8 || file < 0 || file >= 8)
-      return null;
+    const rank = Math.floor(squareIndex / 8) + rankOffset,
+      file = (squareIndex % 8) + fileOffset;
+    if (rank < 0 || rank >= 8 || file < 0 || file >= 8) return null;
     return boardSquares[rank * 8 + file] ?? null;
   }
 
@@ -84,18 +91,17 @@ export class InternalBoard {
   }
   movePiece(from: Square, to: Square): void {
     const piece = this.removePiece(from);
-    if (piece)
-      this.setPiece(piece, to);
+    if (piece) this.setPiece(piece, to);
   }
 
   toString(): string {
     let boardString = '';
     this.board.forEach((p) => {
-      if (p === null)
-        boardString += '.';
+      if (p === null) boardString += '.';
       else {
         const pieceChar = p.type === 'knight' ? 'n' : p.type.charAt(0);
-        boardString += p.color === 'white' ? pieceChar.toUpperCase() : pieceChar;
+        boardString +=
+          p.color === 'white' ? pieceChar.toUpperCase() : pieceChar;
       }
     });
     return boardString;
