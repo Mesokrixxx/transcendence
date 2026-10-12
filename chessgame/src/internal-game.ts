@@ -84,6 +84,14 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: Move[] | null = null;
 
+  private fileDiff(from: Square, to: Square): number {
+    return to.charCodeAt(0) - from.charCodeAt(0) 
+  }
+
+  private rankDiff(from: Square, to: Square): number {
+    return to.charCodeAt(1) - from.charCodeAt(1);
+  }
+
   private getRayPseudoLegalMoves(
     moves: Move[],
     square: Square,
