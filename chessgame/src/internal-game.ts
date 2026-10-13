@@ -90,7 +90,7 @@ class InternalGame {
   private gameStatus: GameStatus = GameStatus.ONGOING;
 
   // Store legalMoves once computed for the current state
-  private legalMoves: Move[] | null = null;
+  private legalMoves: InternalMove[] | null = null;
 
   private fileDiff(from: Square, to: Square): number {
     return to.charCodeAt(0) - from.charCodeAt(0);
@@ -329,25 +329,34 @@ class InternalGame {
   }
 
   getLegalMoves(): Move[] {
-    if (this.legalMoves !== null) return this.legalMoves;
+    if (this.legalMoves === null) {
+      const pseudoLegalMoves = this.getPseudoLegalMoves();
+      const legalMoves: InternalMove[] = [];
 
-    const pseudoLegalMoves = this.getPseudoLegalMoves();
-    const legalMoves: Move[] = [];
-
-    for (const move of pseudoLegalMoves) {
-      if (move.castleSide) {
-        if (this.isLegalCastleMove(move)) legalMoves.push(move);
-      } else {
-        const color = this.turn;
-        this.makeMove(move, false);
-        const isAttacked = this.kingIsAttacked(color);
-        if (!isAttacked) legalMoves.push(move);
-        this.undoMove();
+      for (const move of pseudoLegalMoves) {
+        if (move.castleSide) {
+          if (this.isLegalCastleMove(move)) legalMoves.push(move);
+        } else {
+          const color = this.turn;
+          this.makeMove(move, false);
+          const isAttacked = this.kingIsAttacked(color);
+          if (!isAttacked) legalMoves.push(move);
+          this.undoMove();
+        }
       }
+
+      this.legalMoves = legalMoves;
     }
 
-    this.legalMoves = legalMoves;
-    return legalMoves;
+    return this.legalMoves.map((m) => {
+      const move: Move = {
+        from: m.from,
+        to: m.to,
+      };
+      if (m.promotion)
+        move.promotion = m.promotion;
+      return move;
+    });
   }
 
   private castle(move: InternalMove): void {
@@ -587,8 +596,7 @@ class InternalGame {
     const internalMove = this.getInternalMove(move);
     const piece = this.board.pieceAt(move.from)!;
     let isHalfMove = true;
-    if (internalMove.castleSide)
-      this.castle(internalMove);
+    if (internalMove.castleSide) this.castle(internalMove);
     else if (piece.type === 'pawn' && move.promotion) {
       this.board.removePiece(move.from);
       this.board.setPiece({ color: this.turn, type: move.promotion }, move.to);
@@ -634,7 +642,7 @@ class InternalGame {
     this.turn = this.turn === 'white' ? 'black' : 'white';
     this.halfMoves = isHalfMove ? this.halfMoves + 1 : 0;
     this.legalMoves = null;
-    if (computeNextLegalMoves) this.legalMoves = this.getLegalMoves();
+    if (computeNextLegalMoves) this.getLegalMoves();
     this.setGameStatus();
   }
 
@@ -688,4 +696,3 @@ class InternalGame {
 }
 
 export default InternalGame;
-
