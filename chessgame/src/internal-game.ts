@@ -93,7 +93,7 @@ class InternalGame {
   private legalMoves: Move[] | null = null;
 
   private fileDiff(from: Square, to: Square): number {
-    return to.charCodeAt(0) - from.charCodeAt(0) 
+    return to.charCodeAt(0) - from.charCodeAt(0);
   }
 
   private rankDiff(from: Square, to: Square): number {
@@ -114,11 +114,13 @@ class InternalGame {
         this.enPassant !== null &&
         move.to === this.enPassant,
       isDoublePawnPush:
-        piece.type === 'pawn' && Math.abs(this.rankDiff(move.to, move.from)) === 2,
+        piece.type === 'pawn' &&
+        Math.abs(this.rankDiff(move.to, move.from)) === 2,
     };
-    if (move.promotion)
-      internalMove.promotion = move.promotion;
-    const capturedPieceSquare = internalMove.isEnPassant ? this.board.squareFrom(move.from, this.fileDiff(move.from, move.to), 0)! : move.to;
+    if (move.promotion) internalMove.promotion = move.promotion;
+    const capturedPieceSquare = internalMove.isEnPassant
+      ? this.board.squareFrom(move.from, this.fileDiff(move.from, move.to), 0)!
+      : move.to;
     const capturedPiece = this.board.pieceAt(capturedPieceSquare);
     if (capturedPiece) internalMove.capturedPiece = capturedPiece;
     if (isCastle)
@@ -301,8 +303,7 @@ class InternalGame {
 
     // Will become return value after return type change
     const internalMoves: InternalMove[] = [];
-    for (const move of moves)
-      internalMoves.push(this.getInternalMove(move));
+    for (const move of moves) internalMoves.push(this.getInternalMove(move));
 
     return moves;
   }
@@ -410,11 +411,7 @@ class InternalGame {
       [-1, 0],
       [1, 0],
     ] as const) {
-      const piece = this.getFirstPieceInRay(
-        kingSquare,
-        ray[0],
-        ray[1],
-      );
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0], ray[1]);
       if (
         piece &&
         piece.color !== color &&
@@ -428,11 +425,7 @@ class InternalGame {
       [0, 1],
       [0, -1],
     ] as const) {
-      const piece = this.getFirstPieceInRay(
-        kingSquare,
-        ray[0],
-        ray[1],
-      );
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0], ray[1]);
       if (
         piece &&
         piece.color !== color &&
@@ -448,11 +441,7 @@ class InternalGame {
       [1, 1],
       [1, -1],
     ] as const) {
-      const piece = this.getFirstPieceInRay(
-        kingSquare,
-        ray[0],
-        ray[1],
-      );
+      const piece = this.getFirstPieceInRay(kingSquare, ray[0], ray[1]);
       if (
         piece &&
         piece.color !== color &&
