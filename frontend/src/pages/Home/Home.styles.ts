@@ -9,9 +9,13 @@ export const Page = styled.div`
 export const Content = styled.main`
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
   align-items: center;
   gap: 24px;
+
+  width: 100%;
+  max-width: 1500px;
+  margin-inline: auto;
   padding-block: 24px;
 
   > .chessboard {
@@ -20,6 +24,7 @@ export const Content = styled.main`
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    justify-self: center;
   }
 `
 

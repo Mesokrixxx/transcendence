@@ -5,8 +5,8 @@ export const Board = styled.div`
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1;
+  max-width: min(800px, 75dvh);
+  aspect-ratio: 1/1;
   border: 4px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
