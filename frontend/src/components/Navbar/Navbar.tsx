@@ -53,7 +53,7 @@ function Navbar() {
           <Link to="/play">Play</Link>
           <Link to="/watch">Watch</Link>
           <Link to="/tournaments">Tournaments</Link>
-          <Link to="/tournaments">Rankings</Link>
+          <Link to="/rankings">Rankings</Link>
         </Navigation>
 
         <Auth>

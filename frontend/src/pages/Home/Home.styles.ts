@@ -26,7 +26,7 @@ export const Content = styled.main`
 export const Intro = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-atart;
+  align-items: flex-start;
   gap: 24px;
   h1 {
     font-size: clamp(32px, 4vw, 56px);
