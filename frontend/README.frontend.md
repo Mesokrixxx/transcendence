@@ -174,19 +174,46 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ## Prochaines étapes
 
-- [x] Ajouter et tester l’effet de sélection des pièces (d'échec).
-- [x] Créer les formulaires d’inscription et de connexion.
+### Interface et authentification
+- [x] Ajouter et tester l'effet de sélection des pièces d'échecs.
+- [x] Créer les formulaires d'inscription et de connexion.
 - [x] Afficher les critères du mot de passe pendant la saisie.
 - [x] Vérifier la confirmation du mot de passe.
-- [x] Ajouter l’œil pour afficher ou masquer les mots de passe.
-- [x] Bloquer l’inscription si les critères du mot de passe ne sont pas respectés.
+- [x] Ajouter l'œil pour afficher ou masquer les mots de passe.
+- [x] Bloquer l'inscription si les critères du mot de passe ne sont pas respectés.
 - [ ] Relier les formulaires au backend et afficher les erreurs ou confirmations.
-- [ ] Construire l’espace joueur.
-- [ ] Créer le profil avec avatar, statistiques et historique des matchs.
-- [ ] Créer le classement des joueurs (ranking).
-- [ ] Ajouter le chat entre joueurs.
-- [ ] Relier l’échiquier à la logique de jeu développée par l’équipe.
+
+### Échiquier et logique de jeu
+- [ ] Rendre l'échiquier responsive et adapter sa taille aux différentes résolutions d'écran (Mac et écrans de l'école).
+- [ ] Intégrer la logique du jeu d'échecs développée par Noa (`chessgame`).
+- [ ] Connecter les interactions de l'échiquier frontend aux déplacements et aux règles du jeu.
 - [ ] Synchroniser les parties entre les joueurs.
+
+### Espace joueur
+- [ ] Finaliser l'espace joueur.
+- [ ] Finaliser le profil avec avatar, pseudo, prénom, nom, statistiques et historique des matchs.
+- [x] Créer le composant Avatar réutilisable.
+- [x] Ajouter le bouton `Edit` au profil joueur.
+- [x] Ajouter la possibilité de changer l'avatar dans l'interface.
+- [ ] Ajouter les champs facultatifs prénom et nom au profil joueur.
+- [ ] Finaliser le formulaire de modification du profil accessible depuis le bouton `Edit`.
+- [ ] Permettre de modifier le pseudo, le prénom et le nom.
+- [ ] Relier les modifications du profil et de l'avatar au backend.
+- [ ] Afficher les messages de confirmation et d'erreur lors des modifications du profil.
+
+### Liste d'amis
+- [ ] Afficher la liste d'amis avec leur avatar, pseudo et statut de connexion.
+(- [ ] Permettre d'envoyer, d'accepter et de refuser les demandes d'amis.)
+- [ ] Permettre de supprimer un ami de sa liste.
+- [ ] Relier la gestion des amis au backend.
+
+### Classement et communication
+- [x] Créer le classement des joueurs (ranking).
+- [ ] Intégrer le composant Avatar au ranking.
+- [ ] Ajouter le chat entre joueurs.
+
+### Internationalisation
 - [ ] Brancher les traductions en français, anglais et espagnol.
-Si le temps le permet :
+
+### Si le temps le permet
 - [ ] Ajouter le parcours « Mot de passe oublié », avec le backend.
