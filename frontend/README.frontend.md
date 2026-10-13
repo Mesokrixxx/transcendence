@@ -42,17 +42,43 @@ npm run build
 - `src/styles/variables.css` : couleurs de l’application.
 - `public/icons/` : icônes, notamment la tour du logo.
 - `public/pieces/kosal/` : pièces d’échecs au format SVG.
+- `src/services/passwordValidation.ts` : validation des mots de passe.
+- `src/services/fetchAPI.ts` : exemple de structure pour la future fonction commune d'appels HTTP.
+- `src/types/fetch.ts` : fichier prévu pour les types TypeScript de `fetchAPI` (à compléter).
 
 Les composants migrés vers Styled Components utilisent
 un fichier `.styles.ts` à côté de leur fichier `.tsx`.
 
+## Communication avec le backend
+
+Les appels HTTP du frontend vers le backend devront passer par une fonction commune `fetchAPI`, selon le modèle proposé par Noa.
+
+Un exemple de cette fonction est conservé dans `src/services/fetchAPI.ts`. Il sert de référence pour l'équipe frontend, mais n'est pas encore opérationnel.
+
+Le fichier `src/types/fetch.ts` devra notamment définir les types `APIResponse`, `Method` et `RequestOptions`.
+
+La future fonction devra centraliser :
+- L'URL de l'API, récupérée depuis la variable d'environnement `VITE_API_URL`.
+- Les méthodes HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, selon les besoins).
+- L'envoi de données au format JSON.
+- L'utilisation de `credentials: 'include'` pour les requêtes nécessitant des cookies.
+- La gestion des réponses et des erreurs.
+
+Une fois l'utilitaire finalisé, les pages et composants devront l'utiliser plutôt que multiplier les appels `fetch()` directs.
+
+L'intégration au backend reste à réaliser et à tester.
+
 ## Pages réalisées
 
-- `Home` : landing page avec titre, bouton Start et échiquier.
+- `Home` : landing page avec titre, bouton Get Started et échiquier.
+- `Login` : formulaire de connexion.
+- `Register` : formulaire d'inscription avec validation du mot de passe.
+- `Profile` : interface du profil joueur avec avatar et bouton Edit.
+- `Rankings` : classement des joueurs, développé par un membre de l'équipe.
 - `PrivacyPolicy` : politique de confidentialité.
-- `TermsOfService` : conditions d’utilisation et crédits.
+- `TermsOfService` : conditions d'utilisation et crédits.
 
-Les liens vers les autres pages sont prévus dans la navbar.
+L'intégration des données du backend et certaines fonctionnalités restent à finaliser.
 
 ## Composants réalisés
 
@@ -87,6 +113,22 @@ Leur couleur dépend de la ligne et de la colonne.
 Les pièces sont des images SVG affichées dans les cases.
 Les règles de déplacement ne sont pas encore intégrées.
 
+### Avatar
+
+Composant réutilisable permettant d'afficher l'avatar d'un joueur.
+
+Il accepte notamment une image, un pseudo, une taille et un statut de connexion. Si aucune image n'est fournie, il affiche une initiale.
+
+Il est destiné à être utilisé dans le profil, le classement et la liste d'amis.
+
+### Formulaires d'authentification
+
+Les pages de connexion et d'inscription utilisent des composants de formulaire réutilisables.
+
+L'inscription comprend la vérification des critères du mot de passe, sa confirmation et la possibilité d'afficher ou de masquer les mots de passe.
+
+La connexion au backend reste à réaliser.
+
 ## Charte graphique
 
 Police utilisée : Poppins, chargée depuis Google Fonts.
@@ -107,8 +149,7 @@ Les couleurs sont définies comme variables CSS dans `variables.css`.
 
 ## Mise en page responsive
 
-La classe commune `container` limite la largeur du contenu
-à 1200 px et ajoute un padding de 24 px.
+La classe commune container définit une largeur maximale de 1200 px et un padding de 24 px. Certaines pages, notamment Home, possèdent leurs propres règles de dimensionnement. Le responsive mobile et tablette reste en cours d'amélioration.
 
 Sur grand écran, la landing page utilise trois colonnes :
 texte, échiquier et espace latéral.
@@ -143,7 +184,7 @@ https://react.dev/reference/react/useState
 Il mémorise une information et déclenche une mise à jour
 de l’affichage quand elle change.
 
-Nous l’utilisons pour préparer la sélection d’une pièce.
+Nous l'utilisons notamment pour gérer la sélection des pièces sur l'échiquier et les interactions des formulaires.
 
 ### Propriétés de style avec $
 
@@ -181,7 +222,7 @@ Le crédit est également affiché dans la page Terms of Service.
 - [x] Vérifier la confirmation du mot de passe.
 - [x] Ajouter l'œil pour afficher ou masquer les mots de passe.
 - [x] Bloquer l'inscription si les critères du mot de passe ne sont pas respectés.
-- [ ] Relier les formulaires au backend et afficher les erreurs ou confirmations.
+- [ ] Relier les formulaires d'inscription et de connexion au backend via `fetchAPI`, et gérer les messages d'erreur ou de confirmation.
 
 ### Échiquier et logique de jeu
 - [ ] Rendre l'échiquier responsive et adapter sa taille aux différentes résolutions d'écran (Mac et écrans de l'école).
@@ -203,7 +244,7 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ### Liste d'amis
 - [ ] Afficher la liste d'amis avec leur avatar, pseudo et statut de connexion.
-(- [ ] Permettre d'envoyer, d'accepter et de refuser les demandes d'amis.)
+- [ ] Permettre d'envoyer, d'accepter et de refuser les demandes d'amis.
 - [ ] Permettre de supprimer un ami de sa liste.
 - [ ] Relier la gestion des amis au backend.
 
@@ -211,6 +252,9 @@ Le crédit est également affiché dans la page Terms of Service.
 - [x] Créer le classement des joueurs (ranking).
 - [ ] Intégrer le composant Avatar au ranking.
 - [ ] Ajouter le chat entre joueurs.
+
+### Communication avec le backend
+- [ ] Finaliser et tester l'utilitaire commun `fetchAPI` à partir du modèle proposé par Noa.
 
 ### Internationalisation
 - [ ] Brancher les traductions en français, anglais et espagnol.

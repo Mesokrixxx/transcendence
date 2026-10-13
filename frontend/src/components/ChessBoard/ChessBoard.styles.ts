@@ -2,14 +2,26 @@ import styled from 'styled-components'
 
 export const Board = styled.div`
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(8, 1fr);
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr));
   width: 100%;
-  max-width: min(800px, 75dvh);
+  max-width: min(900px, 90dvh);
   aspect-ratio: 1/1;
+  box-sizing: border-box;
+
   border: 4px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
+
+   @media (max-width: 900px) {
+    width: min(100%, 600px, 65dvh);
+    max-width: none;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `
 
 type SquareProps = {

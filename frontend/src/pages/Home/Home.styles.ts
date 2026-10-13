@@ -9,12 +9,12 @@ export const Page = styled.div`
 export const Content = styled.main`
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.5fr);
   align-items: center;
   gap: 24px;
 
   width: 100%;
-  max-width: 1500px;
+  max-width: 1600px;
   margin-inline: auto;
   padding-block: 24px;
 
@@ -23,9 +23,16 @@ export const Content = styled.main`
   }
 
   @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    justify-self: center;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: center;
+    gap: 32px;
   }
+
+  @media (max-width: 480px){
+    padding:24px 16px;
+    gap: 24px
+    }
 `
 
 export const Intro = styled.div`
@@ -33,6 +40,8 @@ export const Intro = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 24px;
+  min-width: 0;
+
   h1 {
     font-size: clamp(32px, 4vw, 56px);
     font-weight: 800;
@@ -44,8 +53,10 @@ export const Intro = styled.div`
   }
   
   @media (max-width: 900px) {
+    align-items: center;
+    text-align: center;
+    
     h1 {
-        width: 100%;
         text-align: center;
     }
   }
