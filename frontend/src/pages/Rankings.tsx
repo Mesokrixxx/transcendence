@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer/Footer'
-import {Page} from './Home.styles'
+import {Page} from './Home/Home.styles'
 import { Content, TableWrapper, Table } from './Rankings.styles'
 
 type Player =  {
