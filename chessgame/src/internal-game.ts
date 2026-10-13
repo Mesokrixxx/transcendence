@@ -372,8 +372,8 @@ class InternalGame {
 
   private getFirstPieceInRay(
     square: Square,
-    fileDirection: -1 | 0 | 1,
-    rankDirection: -1 | 0 | 1,
+    fileDirection: Direction,
+    rankDirection: Direction,
   ): Piece | null {
     let tempSquare: Square | null;
 
@@ -409,11 +409,11 @@ class InternalGame {
     for (const ray of [
       [-1, 0],
       [1, 0],
-    ]) {
+    ] as const) {
       const piece = this.getFirstPieceInRay(
         kingSquare,
-        ray[0] as Direction,
-        ray[1] as Direction,
+        ray[0],
+        ray[1],
       );
       if (
         piece &&
@@ -427,11 +427,11 @@ class InternalGame {
     for (const ray of [
       [0, 1],
       [0, -1],
-    ]) {
+    ] as const) {
       const piece = this.getFirstPieceInRay(
         kingSquare,
-        ray[0] as Direction,
-        ray[1] as Direction,
+        ray[0],
+        ray[1],
       );
       if (
         piece &&
@@ -447,11 +447,11 @@ class InternalGame {
       [-1, 1],
       [1, 1],
       [1, -1],
-    ]) {
+    ] as const) {
       const piece = this.getFirstPieceInRay(
         kingSquare,
-        ray[0] as Direction,
-        ray[1] as Direction,
+        ray[0],
+        ray[1],
       );
       if (
         piece &&
