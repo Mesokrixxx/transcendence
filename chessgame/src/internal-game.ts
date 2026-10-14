@@ -594,7 +594,7 @@ class InternalGame {
     });
 
     const internalMove = this.getInternalMove(move);
-    const piece = this.board.pieceAt(move.from)!;
+    const piece = internalMove.piece;
     let isHalfMove = true;
     if (internalMove.castleSide) this.castle(internalMove);
     else if (piece.type === 'pawn' && move.promotion) {
