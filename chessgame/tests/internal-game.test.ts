@@ -29,7 +29,7 @@ function boardFromVisual(visual: string[]): string {
 
 function playLegalMove(game: InternalGame, move: Move) {
   expect(game.getLegalMoves()).toContainEqual(move);
-  game.makeMove(move);
+  game.move(move);
 }
 
 describe('InternalGame', () => {
