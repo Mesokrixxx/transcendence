@@ -629,11 +629,11 @@ class InternalGame {
     }
     if (move.from === 'a1' || move.to === 'a1')
       this.castlingRights['white'].queenside = false;
-    else if (move.from === 'h1' || move.to === 'h1')
+    if (move.from === 'h1' || move.to === 'h1')
       this.castlingRights['white'].kingside = false;
     if (move.from === 'a8' || move.to === 'a8')
       this.castlingRights['black'].queenside = false;
-    else if (move.from === 'h8' || move.to === 'h8')
+    if (move.from === 'h8' || move.to === 'h8')
       this.castlingRights['black'].kingside = false;
 
     // Update position
