@@ -313,13 +313,15 @@ class InternalGame {
     const inBetweenSquare = this.board.squareFrom(move.from, direction, 0)!;
     const color = this.turn;
     if (this.kingIsAttacked(color)) return false;
-    this.makeMove({ from: move.from, to: inBetweenSquare }, false);
+    this.makeMove(
+      this.getInternalMove({ from: move.from, to: inBetweenSquare }),
+    );
     if (this.kingIsAttacked(color)) {
       this.undoMove();
       return false;
     }
     this.undoMove();
-    this.makeMove(move, false);
+    this.makeMove(move);
     if (this.kingIsAttacked(color)) {
       this.undoMove();
       return false;
@@ -338,7 +340,7 @@ class InternalGame {
           if (this.isLegalCastleMove(move)) legalMoves.push(move);
         } else {
           const color = this.turn;
-          this.makeMove(move, false);
+          this.makeMove(move);
           const isAttacked = this.kingIsAttacked(color);
           if (!isAttacked) legalMoves.push(move);
           this.undoMove();
@@ -571,7 +573,12 @@ class InternalGame {
     else this.gameStatus = GameStatus.ONGOING;
   }
 
-  makeMove(move: Move, computeNextLegalMoves: boolean = true): void {
+  private makeMove(move: InternalMove): void {
+    const publicMove: Move = {
+      from: move.from,
+      to: move.to,
+    }
+    if (move.promotion) publicMove.promotion = move.promotion;
     this.history.push({
       position: {
         board: this.board.toString(),
@@ -590,18 +597,17 @@ class InternalGame {
         halfMoves: this.halfMoves,
         gameStatus: this.gameStatus,
       },
-      move: move,
+      move: publicMove,
     });
 
-    const internalMove = this.getInternalMove(move);
-    const piece = internalMove.piece;
+    const piece = move.piece;
     let isHalfMove = true;
-    if (internalMove.castleSide) this.castle(internalMove);
+    if (move.castleSide) this.castle(move);
     else if (piece.type === 'pawn' && move.promotion) {
       this.board.removePiece(move.from);
       this.board.setPiece({ color: this.turn, type: move.promotion }, move.to);
       isHalfMove = false;
-    } else if (internalMove.isEnPassant && this.enPassant) {
+    } else if (move.isEnPassant && this.enPassant) {
       this.board.removePiece(
         this.board.squareFrom(
           this.enPassant,
@@ -612,8 +618,7 @@ class InternalGame {
       this.board.movePiece(move.from, move.to);
       isHalfMove = false;
     } else {
-      if (internalMove.capturedPiece || piece.type === 'pawn')
-        isHalfMove = false;
+      if (move.capturedPiece || piece.type === 'pawn') isHalfMove = false;
       this.board.movePiece(move.from, move.to);
     }
 
@@ -632,7 +637,7 @@ class InternalGame {
       this.castlingRights['black'].kingside = false;
 
     // Update position
-    if (internalMove.isDoublePawnPush)
+    if (move.isDoublePawnPush)
       this.enPassant = this.board.squareFrom(
         move.from,
         0,
