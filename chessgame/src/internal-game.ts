@@ -647,7 +647,18 @@ class InternalGame {
     this.turn = this.turn === 'white' ? 'black' : 'white';
     this.halfMoves = isHalfMove ? this.halfMoves + 1 : 0;
     this.legalMoves = null;
-    if (computeNextLegalMoves) this.getLegalMoves();
+  }
+
+  move(move: Move): void {
+    if (!this.legalMoves) this.getLegalMoves();
+    const internalMove = this.legalMoves!.find((m) => {
+      return (move.from === m.from &&
+              move.to === m.to &&
+              move.promotion === m.promotion);
+    });
+    if (!internalMove) throw new Error('Invalid move');
+    this.makeMove(internalMove);
+    this.getLegalMoves();
     this.setGameStatus();
   }
 
