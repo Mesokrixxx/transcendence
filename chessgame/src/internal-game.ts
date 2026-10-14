@@ -355,8 +355,7 @@ class InternalGame {
         from: m.from,
         to: m.to,
       };
-      if (m.promotion)
-        move.promotion = m.promotion;
+      if (m.promotion) move.promotion = m.promotion;
       return move;
     });
   }
@@ -577,7 +576,7 @@ class InternalGame {
     const publicMove: Move = {
       from: move.from,
       to: move.to,
-    }
+    };
     if (move.promotion) publicMove.promotion = move.promotion;
     this.history.push({
       position: {
@@ -652,9 +651,11 @@ class InternalGame {
   move(move: Move): void {
     if (!this.legalMoves) this.getLegalMoves();
     const internalMove = this.legalMoves!.find((m) => {
-      return (move.from === m.from &&
-              move.to === m.to &&
-              move.promotion === m.promotion);
+      return (
+        move.from === m.from &&
+        move.to === m.to &&
+        move.promotion === m.promotion
+      );
     });
     if (!internalMove) throw new Error('Invalid move');
     this.makeMove(internalMove);
