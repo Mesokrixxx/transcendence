@@ -44,7 +44,7 @@ npm run build
 - `public/pieces/kosal/` : pièces d’échecs au format SVG.
 - `src/services/passwordValidation.ts` : validation des mots de passe.
 - `src/services/fetchAPI.ts` : exemple de structure pour la future fonction commune d'appels HTTP.
-- `src/types/fetch.ts` : fichier prévu pour les types TypeScript de `fetchAPI` (à compléter).
+- `src/types/fetch.ts` : types TypeScript fournis par Noa pour les appels API (en commentaire, à finaliser).
 
 Les composants migrés vers Styled Components utilisent
 un fichier `.styles.ts` à côté de leur fichier `.tsx`.
@@ -55,7 +55,11 @@ Les appels HTTP du frontend vers le backend devront passer par une fonction comm
 
 Un exemple de cette fonction est conservé dans `src/services/fetchAPI.ts`. Il sert de référence pour l'équipe frontend, mais n'est pas encore opérationnel.
 
-Le fichier `src/types/fetch.ts` devra notamment définir les types `APIResponse`, `Method` et `RequestOptions`.
+Le fichier `src/types/fetch.ts` contient les types proposés par Noa : `Method`, `RequestOptions`, `APIResponse`, `SuccessfulResponse` et `ErrorResponse`.
+
+Ces définitions sont actuellement conservées en commentaire. Le type `APIError` reste à définir selon la structure des erreurs du backend.
+
+La fonction `fetchAPI` et ses types devront être activés, adaptés et testés lors de l'intégration avec le backend.
 
 La future fonction devra centraliser :
 - L'URL de l'API, récupérée depuis la variable d'environnement `VITE_API_URL`.
