@@ -81,8 +81,7 @@ class ChessGame {
   move(move: Move): void {
     if (this.isOver())
       throw new Error('Trying to play move while game is over');
-    if (!this.isLegalMove(move)) throw new Error('Invalid move');
-    this.game.makeMove(move);
+    this.game.move(move);
   }
 
   getGameStatus(): GameStatus {
