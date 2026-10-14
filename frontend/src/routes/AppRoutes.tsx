@@ -6,6 +6,7 @@ import Profile from '../pages/Profile/Profile'
 import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsOfService from '../pages/TermsOfService'
 import Rankings from '../pages/Rankings'
+import Chat from '../pages/Chat'
 
 
 function AppRoutes(){
@@ -18,6 +19,7 @@ function AppRoutes(){
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/rankings" element={<Rankings />} />
+            <Route path="/chat" element={<Chat />} />
         </Routes>
     )
 }
