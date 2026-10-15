@@ -34,7 +34,7 @@ export async function add(chatId: number, userIds: number[]) {
 }
 
 export async function append(message: string, chatId: number, userId: number) {
-	if (!await prisma.chat.findUnique({ where: { id: chatId } }))
+	if (!await get(chatId))
 		return null;
 
 	await prisma.message.create({
