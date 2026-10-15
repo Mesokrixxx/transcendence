@@ -6,6 +6,21 @@ type CastleSide = 'queenside' | 'kingside';
 
 type CastlingRights = Record<CastleSide, boolean>;
 
+enum GameFlags {
+  NONE = 0,
+  CHECK = 1 << 0,
+  CHECKMATE = 1 << 1,
+  STALEMATE = 1 << 2,
+  INSUFMATERIAL = 1 << 3,
+  THREEFOLDREPETITION = 1 << 4,
+  FIVEFOLDREPETITION = 1 << 5,
+  FIFTYMOVES = 1 << 6,
+  SEVENTYFIVEMOVES = 1 << 7,
+  DRAW_AUTO = STALEMATE | INSUFMATERIAL | FIVEFOLDREPETITION | SEVENTYFIVEMOVES,
+  DRAW_CLAIM = THREEFOLDREPETITION | FIFTYMOVES,
+  OVER = CHECKMATE | DRAW_AUTO,
+}
+
 interface Position {
   board: string;
   turn: Color;
