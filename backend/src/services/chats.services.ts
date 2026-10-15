@@ -2,7 +2,10 @@ import prisma from '../db/prisma.js'
 
 export async function get(id: number) {
 	return await prisma.chat.findUnique({
-		where: { id: id }
+		where: { id: id },
+		include: {
+			messages: true,
+		}
 	});
 }
 
@@ -28,4 +31,19 @@ export async function add(chatId: number, userIds: number[]) {
 			}
 		}
 	});
+}
+
+export async function append(message: string, chatId: number, userId: number) {
+	if (!await prisma.chat.findUnique({ where: { id: chatId } }))
+		return null;
+
+	await prisma.message.create({
+		data: {
+			content: message,
+			userId,
+			chatId,
+		}
+	});
+
+	return await get(chatId);
 }
