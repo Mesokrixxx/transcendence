@@ -724,6 +724,22 @@ class InternalGame {
   getGameStatus(): GameStatus {
     return this.gameStatus;
   }
+
+  isCheck(): boolean;
+
+  isCheckmate(): boolean;
+
+  isStalemate(): boolean;
+
+  isInsufficientMaterial(): boolean;
+
+  isDrawByFivefoldRepetition(): boolean;
+
+  isDrawBySeventyFiveMoves(): boolean;
+
+  canClaimDrawByThreefoldRepetition(): boolean;
+
+  canClaimDrawByFiftyMoves(): boolean;
 }
 
 export default InternalGame;
