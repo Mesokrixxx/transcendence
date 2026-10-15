@@ -38,12 +38,9 @@ export type Board = Record<Square, Piece | null>;
 
 export enum GameStatus {
   ONGOING,
-  CHECK,
-  CHECKMATE,
-  STALEMATE,
-  INSUFMATERIAL,
-  REPETITION,
-  FIFTYMOVES,
+  DRAW,
+  WHITEWON,
+  BLACKWON,
 }
 
 export type DrawReason =
