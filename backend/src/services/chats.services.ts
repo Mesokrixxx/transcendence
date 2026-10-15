@@ -1,10 +1,12 @@
 import prisma from '../db/prisma.js'
+import { BackendError } from '../types/backendError.types.js';
 
 export async function get(id: number) {
 	return await prisma.chat.findUnique({
 		where: { id: id },
 		include: {
 			messages: true,
+			users: true
 		}
 	});
 }
@@ -34,8 +36,12 @@ export async function add(chatId: number, userIds: number[]) {
 }
 
 export async function append(message: string, chatId: number, userId: number) {
-	if (!await get(chatId))
+	const chat = await get(chatId);
+	if (!chat)
 		return null;
+
+	if (!chat.users.some((chatUser) => chatUser.id === userId))
+		throw new BackendError(403, 'user is not a member of this chat');
 
 	await prisma.message.create({
 		data: {
