@@ -27,7 +27,7 @@ interface Position {
   castlingRights: Record<Color, CastlingRights>;
   enPassant: Square | null;
   halfMoves: number;
-  gameStatus: GameStatus;
+  gameFlags: GameFlags; 
   hash: string;
 }
 
@@ -564,6 +564,7 @@ class InternalGame {
     return count !== undefined && count >= 2;
   }
 
+  // Will be replaced by setGameFlags
   private setGameStatus(): void {
     const isAttacked = this.kingIsAttacked();
     if (this.legalMoves === null) {
@@ -582,6 +583,8 @@ class InternalGame {
     else if (this.halfMoves >= 100) this.gameStatus = GameStatus.FIFTYMOVES;
     else this.gameStatus = GameStatus.ONGOING;
   }
+
+  private setGameFlags(): void;
 
   private makeMove(move: InternalMove): void {
     const publicMove: Move = {
@@ -715,14 +718,13 @@ class InternalGame {
     }
     return board;
   }
+
   getTurn(): Color {
     return this.turn;
   }
+
   getMoveHistory(): Move[] {
     return this.history.map((h) => h.move);
-  }
-  getGameStatus(): GameStatus {
-    return this.gameStatus;
   }
 
   isCheck(): boolean;
