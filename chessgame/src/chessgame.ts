@@ -5,7 +5,7 @@ import type {
   Move,
   Square,
 } from './chessgame.types.js';
-import { GameStatus } from './chessgame.types.js';
+import { GameStatus, type DrawReason, type DrawClaimReason } from './chessgame.types.js';
 import InternalGame from './internal-game.js';
 
 class ChessGame {
@@ -88,15 +88,15 @@ class ChessGame {
     return this.game.getGameStatus();
   }
 
-  isCheckmate(): boolean {
-    return this.game.getGameStatus() === GameStatus.CHECKMATE;
-  }
-
   isCheck(): boolean {
     return (
       this.game.getGameStatus() === GameStatus.CHECK ||
       this.game.getGameStatus() === GameStatus.CHECKMATE
     );
+  }
+
+  isCheckmate(): boolean {
+    return this.game.getGameStatus() === GameStatus.CHECKMATE;
   }
 
   isDraw(): boolean {
@@ -108,21 +108,9 @@ class ChessGame {
     );
   }
 
-  isStalemate(): boolean {
-    return this.game.getGameStatus() === GameStatus.STALEMATE;
-  }
+  getDrawReason(): DrawReason | null;
 
-  isDrawByInsufficientMaterial(): boolean {
-    return this.game.getGameStatus() === GameStatus.INSUFMATERIAL;
-  }
-
-  isDrawByRepetition(): boolean {
-    return this.game.getGameStatus() === GameStatus.REPETITION;
-  }
-
-  isDrawByFiftyMoves(): boolean {
-    return this.game.getGameStatus() === GameStatus.FIFTYMOVES;
-  }
+  canClaimDraw(): DrawClaimReason[];
 
   isOver(): boolean {
     return this.isCheckmate() || this.isDraw();
