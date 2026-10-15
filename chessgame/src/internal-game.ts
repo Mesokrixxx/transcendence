@@ -13,6 +13,7 @@ interface Position {
   enPassant: Square | null;
   halfMoves: number;
   gameStatus: GameStatus;
+  hash: string;
 }
 
 interface InternalMove extends Move {
@@ -535,11 +536,10 @@ class InternalGame {
     const uniquePositions: Record<string, number> = {};
 
     for (let i = this.history.length - 1; i >= 0; i--) {
-      const h = this.history[i]!;
-      const positionStr = this.hashPosition(h.position);
-      if (uniquePositions[positionStr]) uniquePositions[positionStr]++;
-      else uniquePositions[positionStr] = 1;
-      if (h.position.halfMoves === 0) break;
+      const position = this.history[i]!.position;
+      if (uniquePositions[position.hash]) uniquePositions[position.hash]!++;
+      else uniquePositions[position.hash] = 1;
+      if (position.halfMoves === 0) break;
     }
     const currentPositionStr = this.hashPosition({
       board: this.board.toString(),
