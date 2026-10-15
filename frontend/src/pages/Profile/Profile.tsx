@@ -12,6 +12,9 @@ function Profile() {
     const [avatarSrc, setAvatarSrc] = useState<string>()
     const [avatarError, setAvatarError] = useState('')
     const [isEditing, setIsEditing] = useState(false)
+    const [username, setUsername] = useState('UserName')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
 
     useEffect(()=> {
         if(!avatarFile)
@@ -54,13 +57,18 @@ function Profile() {
                     <ProfileHeader>
                         <Avatar
                             src={avatarSrc}
-                            username="UserName"
+                            username={username}
                             isOnline={true}
                             size={96}
                         />
 
                         <div className="profile-info">
-                            <h1>UserName</h1>
+                            <h1>{username}</h1>
+
+                            {(firstName || lastName) && (
+                                <p>{[firstName, lastName].filter(Boolean).join(' ')}</p>
+                            )}
+
                             <p>Online</p>
                         </div>
 
@@ -81,6 +89,33 @@ function Profile() {
                         <label htmlFor="profile-avatar">
                             Change avatar
                         </label>
+                        <label htmlFor="profile-username">Username</label>
+                            <input
+                                id="profile-username"
+                                type="text"
+                                value={username}
+                                onChange={(event) => setUsername(event.target.value)}
+                                autoComplete="username"
+                                required
+                            />
+
+                            <label htmlFor="profile-firstname">First name (optional)</label>
+                            <input
+                                id="profile-firstname"
+                                type="text"
+                                value={firstName}
+                                onChange={(event) => setFirstName(event.target.value)}
+                                autoComplete="given-name"
+                            />
+
+                            <label htmlFor="profile-lastname">Last name (optional)</label>
+                            <input
+                                id="profile-lastname"
+                                type="text"
+                                value={lastName}
+                                onChange={(event) => setLastName(event.target.value)}
+                                autoComplete="family-name"
+                            />
 
                         <input
                             id="profile-avatar"

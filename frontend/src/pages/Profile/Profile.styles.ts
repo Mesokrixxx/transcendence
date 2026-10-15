@@ -42,6 +42,18 @@ export const AvatarUpload = styled.div`
         color: var(--color-text-primary);
     }
 
+    input[type='text'] {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 440px;
+        padding: 12px 16px;
+        background: var(--color-background);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        color: var(--color-text-primary);
+        font: inherit;
+    }
+
     input {
         max-width: 100%;
         color: var(--color-text-primary);
