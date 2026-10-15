@@ -521,14 +521,17 @@ class InternalGame {
     return false;
   }
 
-  private hashPosition(position: Position): string {
-    let positionStr = position.board;
-    positionStr += position.turn === 'white' ? 'w' : 'b';
-    positionStr += position.castlingRights.white.queenside === true ? 'Q' : 'x';
-    positionStr += position.castlingRights.white.kingside === true ? 'K' : 'x';
-    positionStr += position.castlingRights.black.queenside === true ? 'q' : 'x';
-    positionStr += position.castlingRights.black.kingside === true ? 'k' : 'x';
-    positionStr += position.enPassant ?? 'xx';
+  // Hash is only accurate when legalMoves are computed for position
+  private hashCurrentPosition(): string {
+    let positionStr = this.board.toString();
+    positionStr += this.turn === 'white' ? 'w' : 'b';
+    positionStr += this.castlingRights.white.queenside === true ? 'Q' : 'x';
+    positionStr += this.castlingRights.white.kingside === true ? 'K' : 'x';
+    positionStr += this.castlingRights.black.queenside === true ? 'q' : 'x';
+    positionStr += this.castlingRights.black.kingside === true ? 'k' : 'x';
+    if (this.legalMoves !== null && this.legalMoves.some((m) => m.isEnPassant))
+      positionStr += this.enPassant;
+    else positionStr += 'xx';
     return positionStr;
   }
 
@@ -541,14 +544,7 @@ class InternalGame {
       else uniquePositions[position.hash] = 1;
       if (position.halfMoves === 0) break;
     }
-    const currentPositionStr = this.hashPosition({
-      board: this.board.toString(),
-      turn: this.turn,
-      castlingRights: this.castlingRights,
-      enPassant: this.enPassant,
-      halfMoves: this.halfMoves,
-      gameStatus: this.gameStatus,
-    });
+    const currentPositionStr = this.hashCurrentPosition();
     const count = uniquePositions[currentPositionStr];
     return count !== undefined && count >= 2;
   }
@@ -578,24 +574,27 @@ class InternalGame {
       to: move.to,
     };
     if (move.promotion) publicMove.promotion = move.promotion;
-    this.history.push({
-      position: {
-        board: this.board.toString(),
-        turn: this.turn,
-        castlingRights: {
-          white: {
-            queenside: this.castlingRights.white.queenside,
-            kingside: this.castlingRights.white.kingside,
-          },
-          black: {
-            queenside: this.castlingRights.black.queenside,
-            kingside: this.castlingRights.black.kingside,
-          },
+    const position: Position = {
+      board: this.board.toString(),
+      turn: this.turn,
+      castlingRights: {
+        white: {
+          queenside: this.castlingRights.white.queenside,
+          kingside: this.castlingRights.white.kingside,
         },
-        enPassant: this.enPassant,
-        halfMoves: this.halfMoves,
-        gameStatus: this.gameStatus,
+        black: {
+          queenside: this.castlingRights.black.queenside,
+          kingside: this.castlingRights.black.kingside,
+        },
       },
+      enPassant: this.enPassant,
+      halfMoves: this.halfMoves,
+      gameStatus: this.gameStatus,
+      hash: this.hashCurrentPosition(),
+    };
+
+    this.history.push({
+      position: position,
       move: publicMove,
     });
 
