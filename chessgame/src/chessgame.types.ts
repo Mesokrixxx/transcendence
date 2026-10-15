@@ -45,3 +45,13 @@ export enum GameStatus {
   REPETITION,
   FIFTYMOVES,
 }
+
+export type DrawReason =
+  | 'stalemate'
+  | 'insufficient material'
+  | 'threefold-repetition'
+  | 'fivefold-repetition'
+  | 'fifty moves'
+  | 'seventy-five moves';
+
+export type DrawClaimReason = 'threefold-repetition' | 'fifty moves';
