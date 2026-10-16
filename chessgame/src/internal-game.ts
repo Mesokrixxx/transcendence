@@ -107,6 +107,10 @@ class InternalGame {
   // Store legalMoves once computed for the current state
   private legalMoves: InternalMove[] | null = null;
 
+  private hasSomeFlags(flags: GameFlags): boolean {
+    return !!(this.gameFlags &= flags);
+  }
+
   private fileDiff(from: Square, to: Square): number {
     return to.charCodeAt(0) - from.charCodeAt(0);
   }
@@ -722,21 +726,40 @@ class InternalGame {
     return this.history.map((h) => h.move);
   }
 
-  isCheck(): boolean;
+  isCheck(): boolean {
+    return this.hasSomeFlags(GameFlags.CHECK | GameFlags.CHECKMATE);
+  }
 
-  isCheckmate(): boolean;
+  isCheckmate(): boolean {
+    return this.hasSomeFlags(GameFlags.CHECKMATE);
+  }
 
-  isStalemate(): boolean;
+  isStalemate(): boolean {
+    return this.hasSomeFlags(GameFlags.INSUFMATERIAL);
+  }
 
-  isInsufficientMaterial(): boolean;
+  isInsufficientMaterial(): boolean {
+    return this.hasSomeFlags(GameFlags.INSUFMATERIAL);
+  }
 
-  isDrawByFivefoldRepetition(): boolean;
+  isDrawByFivefoldRepetition(): boolean {
+    return this.hasSomeFlags(GameFlags.FIVEFOLDREPETITION);
+  }
 
-  isDrawBySeventyFiveMoves(): boolean;
+  isDrawBySeventyFiveMoves(): boolean {
+    return (
+      !this.hasSomeFlags(GameFlags.CHECKMATE) &&
+      this.hasSomeFlags(GameFlags.SEVENTYFIVEMOVES)
+    );
+  }
 
-  canClaimDrawByThreefoldRepetition(): boolean;
+  canClaimDrawByThreefoldRepetition(): boolean {
+    return this.hasSomeFlags(GameFlags.THREEFOLDREPETITION);
+  }
 
-  canClaimDrawByFiftyMoves(): boolean;
+  canClaimDrawByFiftyMoves(): boolean {
+    return this.hasSomeFlags(GameFlags.FIFTYMOVES);
+  }
 }
 
 export default InternalGame;
