@@ -5,7 +5,11 @@ import type {
   Move,
   Square,
 } from './chessgame.types.js';
-import { GameStatus, type DrawReason, type DrawClaimReason } from './chessgame.types.js';
+import {
+  GameStatus,
+  type DrawReason,
+  type DrawClaimReason,
+} from './chessgame.types.js';
 import InternalGame from './internal-game.js';
 
 class ChessGame {
@@ -85,32 +89,45 @@ class ChessGame {
   }
 
   getGameStatus(): GameStatus {
-    return this.game.getGameStatus();
+    if (this.isCheckmate())
+      return this.getTurn() === 'white'
+        ? GameStatus.BLACKWON
+        : GameStatus.WHITEWON;
+    return this.isDraw() ? GameStatus.DRAW : GameStatus.ONGOING;
   }
 
   isCheck(): boolean {
-    return (
-      this.game.getGameStatus() === GameStatus.CHECK ||
-      this.game.getGameStatus() === GameStatus.CHECKMATE
-    );
+    return this.game.isCheck();
   }
 
   isCheckmate(): boolean {
-    return this.game.getGameStatus() === GameStatus.CHECKMATE;
+    return this.game.isCheckmate();
   }
 
   isDraw(): boolean {
     return (
-      this.isStalemate() ||
-      this.isDrawByInsufficientMaterial() ||
-      this.isDrawByRepetition() ||
-      this.isDrawByFiftyMoves()
+      this.game.isStalemate() ||
+      this.game.isInsufficientMaterial() ||
+      this.game.isDrawByFivefoldRepetition() ||
+      this.game.isDrawBySeventyFiveMoves()
     );
   }
 
-  getDrawReason(): DrawReason | null;
+  getDrawReason(): DrawReason | null {
+    if (this.game.isStalemate()) return 'stalemate';
+    if (this.game.isInsufficientMaterial()) return 'insufficient material';
+    if (this.game.isDrawByFivefoldRepetition()) return 'fivefold-repetition';
+    if (this.game.isDrawBySeventyFiveMoves()) return 'seventy-five moves';
+    return null;
+  }
 
-  canClaimDraw(): DrawClaimReason[];
+  canClaimDraw(): DrawClaimReason[] {
+    const drawReasons: DrawClaimReason[] = [];
+    if (this.game.canClaimDrawByThreefoldRepetition())
+      drawReasons.push('threefold-repetition');
+    if (this.game.canClaimDrawByFiftyMoves()) drawReasons.push('fifty moves');
+    return drawReasons;
+  }
 
   isOver(): boolean {
     return this.isCheckmate() || this.isDraw();
