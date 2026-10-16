@@ -130,7 +130,7 @@ class ChessGame {
   }
 
   isOver(): boolean {
-    return this.isCheckmate() || this.isDraw();
+    return this.game.isOver();
   }
 }
 

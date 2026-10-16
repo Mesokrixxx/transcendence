@@ -760,6 +760,10 @@ class InternalGame {
   canClaimDrawByFiftyMoves(): boolean {
     return this.hasSomeFlags(GameFlags.FIFTYMOVES);
   }
+  
+  isOver(): boolean {
+    return this.hasSomeFlags(GameFlags.OVER);
+  }
 }
 
 export default InternalGame;
