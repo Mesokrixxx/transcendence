@@ -7,7 +7,7 @@ import Profile from '../pages/Profile/Profile'
 import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsOfService from '../pages/TermsOfService'
 import Rankings from '../pages/Rankings'
-import Chat from '../pages/Chat'
+import Chat from '../pages/Chat/Chat'
 
 
 function AppRoutes(){

@@ -1,7 +1,7 @@
-import Navbar from '../components/Navbar/Navbar'
-import Footer from '../components/Footer/Footer'
-import ChatBox from '../components/ChatBox/ChatBox'
-import { Page } from './Home/Home.styles'
+import Navbar from '../../components/Navbar/Navbar'
+import Footer from '../../components/Footer/Footer'
+import ChatBox from '../../components/ChatBox/ChatBox'
+import { Page } from '../Home/Home.styles'
 import { Content, Boxes } from './Chat.styles'
 
 const playerMessages = [
