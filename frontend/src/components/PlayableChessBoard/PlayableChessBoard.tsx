@@ -6,6 +6,7 @@ import type {
 } from '../../../../chessgame/src/chessgame.types'
 import { Square, Piece } from '../ChessBoard/ChessBoard.styles'
 import { GameLayout, PlayBoard, GameInfo } from './PlayableChessBoard.styles'
+import Avatar from '../Avatar/Avatar'
 import Button from '../Button/Button'
 
 function PlayableChessBoard() {
@@ -122,7 +123,12 @@ function PlayableChessBoard() {
                 })}
             </PlayBoard>
             <GameInfo aria-label="Game information">
-                <p role="status">{status}</p>
+                <div className="opponent">
+                    <Avatar username="Opponent" size={64} isOnline={true}/>
+                    <span>Opponent</span>
+                </div>
+
+                <p className="game-status" role="status">{status}</p>
                 {promotionMoves.length > 0 && (
                     <div role="group" aria-label="Choose a promotion piece">
                         <p>Promote your pawn:</p>

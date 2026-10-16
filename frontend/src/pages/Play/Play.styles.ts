@@ -3,10 +3,12 @@ import styled from 'styled-components'
 export const PlayContent = styled.main`
     flex: 1;
     width: 100%;
+    box-sizing: border-box;
     margin-inline: auto;
     padding-block: 24px;
 
     && {
+        width: 100%;
         max-width: 1600px;    
     }
 
@@ -17,8 +19,9 @@ export const PlayContent = styled.main`
 
 export const GameArea = styled.section`
     width: 100%;
-    // max-width: 640px;
-    margin: 24px;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-top: 24px;
 
     }
 `

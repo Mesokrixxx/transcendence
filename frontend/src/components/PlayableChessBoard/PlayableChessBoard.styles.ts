@@ -4,9 +4,11 @@ import { Board } from '../ChessBoard/ChessBoard.styles'
 export const GameLayout = styled.div`
     display: grid;
     grid-template-columns: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.5fr);
-    align-items: center;
+    align-items: start;
     gap: 24px;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 
     > aside {
         grid-column: 1;
@@ -41,10 +43,6 @@ export const GameInfo = styled.aside`
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
-    padding: 16px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
     overflow-wrap: anywhere;
 
     p{
@@ -52,7 +50,7 @@ export const GameInfo = styled.aside`
         color: var(--color-text-primary);
     }
 
-    > div {
+    > div[role='group']{
      display: flex;
      flex-wrap: wrap;
      gap: 12px;
@@ -65,5 +63,23 @@ export const GameInfo = styled.aside`
 
     > p[role='alert']{
         margin-top: 16px;    
+    }
+
+    .opponent {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 0 0 24px;
+        color: var(--color-text-primary);
+        font-weight: 600;
+    }
+
+    .game-status {
+        padding: 16px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+
     }
 `
