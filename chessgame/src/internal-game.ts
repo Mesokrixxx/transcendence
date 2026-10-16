@@ -735,7 +735,7 @@ class InternalGame {
   }
 
   isStalemate(): boolean {
-    return this.hasSomeFlags(GameFlags.INSUFMATERIAL);
+    return this.hasSomeFlags(GameFlags.STALEMATE);
   }
 
   isInsufficientMaterial(): boolean {
