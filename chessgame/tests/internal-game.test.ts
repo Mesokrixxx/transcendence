@@ -503,11 +503,13 @@ describe('InternalGame', () => {
     playLegalMove(game, { from: 'e3', to: 'f2' });
     playLegalMove(game, { from: 'g6', to: 'f6' });
     playLegalMove(game, { from: 'f2', to: 'e3' }); // 4
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeTruthy();
     expect(game.isDrawByFivefoldRepetition()).toBeFalsy();
     playLegalMove(game, { from: 'f6', to: 'f7' });
     playLegalMove(game, { from: 'e3', to: 'f3' });
     playLegalMove(game, { from: 'f7', to: 'f6' });
     playLegalMove(game, { from: 'f3', to: 'e3' }); // 5
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeFalsy();
     expect(game.isDrawByFivefoldRepetition()).toBeTruthy();
     expect(game.isOver()).toBeTruthy();
   });
@@ -551,7 +553,33 @@ describe('InternalGame', () => {
     expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
     expect(game.isOver()).toBeFalsy();
     playLegalMove(game, { from: 'e3', to: 'd4' });
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
     expect(game.isDrawBySeventyFiveMoves()).toBeTruthy();
+    expect(game.isOver()).toBeTruthy();
+  });
+
+  it('prioritize checkmate over seventy-five moves', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '....k...',
+        '........',
+        '..Q.K...',
+        '........',
+        '........',
+        '........',
+        '........',
+        '........',
+      ]),
+      halfMoves: 149,
+    });
+
+    expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
+    expect(game.isOver()).toBeFalsy();
+    playLegalMove(game, { from: 'c6', to: 'c8' });
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
+    expect(game.isCheckmate()).toBeTruthy();
     expect(game.isOver()).toBeTruthy();
   });
 });
