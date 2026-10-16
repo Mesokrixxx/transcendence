@@ -10,7 +10,6 @@ function Play(){
             <Navbar/>
 
             <PlayContent className="container">
-                <h1>Play</h1>
                 <GameArea aria-label="Local chess game">
                     <PlayableChessBoard />
                 </GameArea>

@@ -4,7 +4,8 @@ import type {
     Move,
     Square as SquareName
 } from '../../../../chessgame/src/chessgame.types'
-import { Board, Square, Piece } from '../ChessBoard/ChessBoard.styles'
+import { Square, Piece } from '../ChessBoard/ChessBoard.styles'
+import { GameLayout, PlayBoard, GameInfo } from './PlayableChessBoard.styles'
 import Button from '../Button/Button'
 
 function PlayableChessBoard() {
@@ -83,10 +84,8 @@ function PlayableChessBoard() {
     }
 
     return (
-        <>
-            <p role="status">{status}</p>
-
-            <Board aria-label="Playable chessboard">
+        <GameLayout>
+            <PlayBoard aria-label="Playable chessboard">
                 {Array.from({ length: 64 }, (_, index) => {
                     const row = Math.floor(index / 8)
                     const column = index % 8
@@ -121,32 +120,34 @@ function PlayableChessBoard() {
                         </Square>
                     )
                 })}
-            </Board>
+            </PlayBoard>
+            <GameInfo aria-label="Game information">
+                <p role="status">{status}</p>
+                {promotionMoves.length > 0 && (
+                    <div role="group" aria-label="Choose a promotion piece">
+                        <p>Promote your pawn:</p>
 
-            {promotionMoves.length > 0 && (
-                <div role="group" aria-label="Choose a promotion piece">
-                    <p>Promote your pawn:</p>
+                        {promotionMoves.map((move) => (
+                            <Button
+                                key={move.promotion}
+                                onClick={() => playMove(move)}
+                            >
+                                {move.promotion}
+                            </Button>
+                        ))}
 
-                    {promotionMoves.map((move) => (
                         <Button
-                            key={move.promotion}
-                            onClick={() => playMove(move)}
+                            variant="secondary"
+                            onClick={() => setPromotionMoves([])}
                         >
-                            {move.promotion}
+                            Cancel
                         </Button>
-                    ))}
+                    </div>
+                )}
 
-                    <Button
-                        variant="secondary"
-                        onClick={() => setPromotionMoves([])}
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            )}
-
-            {error && <p role="alert">{error}</p>}
-        </>
+                {error && <p role="alert">{error}</p>}
+            </GameInfo>
+        </GameLayout>
     )
 }
 
