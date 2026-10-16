@@ -756,13 +756,13 @@ class InternalGame {
   }
 
   canClaimDrawByThreefoldRepetition(): boolean {
-    return this.hasSomeFlags(GameFlags.THREEFOLDREPETITION);
+    return !this.isOver() && this.hasSomeFlags(GameFlags.THREEFOLDREPETITION);
   }
 
   canClaimDrawByFiftyMoves(): boolean {
-    return this.hasSomeFlags(GameFlags.FIFTYMOVES);
+    return !this.isOver() && this.hasSomeFlags(GameFlags.FIFTYMOVES);
   }
-  
+
   isOver(): boolean {
     return this.hasSomeFlags(GameFlags.OVER);
   }
