@@ -108,7 +108,7 @@ class InternalGame {
   private legalMoves: InternalMove[] | null = null;
 
   private hasSomeFlags(flags: GameFlags): boolean {
-    return !!(this.gameFlags &= flags);
+    return !!(this.gameFlags & flags);
   }
 
   private fileDiff(from: Square, to: Square): number {
