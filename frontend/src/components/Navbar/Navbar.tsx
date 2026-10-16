@@ -52,7 +52,7 @@ function Navbar() {
         <Navigation aria-label="Main navigation">
           <Link to="/play">Play</Link>
           <Link to="/watch">Watch</Link>
-          <Link to="/tournaments">Tournaments</Link>
+          {/* <Link to="/tournaments">Tournaments</Link> */}
           <Link to="/rankings">Rankings</Link>
         </Navigation>
 
