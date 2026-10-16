@@ -1,6 +1,5 @@
 import type { Board, Color, Move, Piece, Square } from './chessgame.types.js';
 import { boardSquares, InternalBoard } from './internal-board.js';
-import { GameStatus } from './chessgame.types.js';
 
 type CastleSide = 'queenside' | 'kingside';
 
@@ -27,7 +26,7 @@ interface Position {
   castlingRights: Record<Color, CastlingRights>;
   enPassant: Square | null;
   halfMoves: number;
-  gameFlags: GameFlags; 
+  gameFlags: GameFlags;
   hash: string;
 }
 
@@ -70,7 +69,7 @@ const kingMoves: [number, number][] = [
 ];
 
 class InternalGame {
-  constructor(position?: Partial<Omit<Position, 'gameStatus'>>) {
+  constructor(position?: Partial<Omit<Position, 'gameFlags'>>) {
     // Starts the game from unique position
     // Unsafe for invalid fields, should only be called with valid data
     if (position) {
@@ -89,7 +88,7 @@ class InternalGame {
       if (position.enPassant !== undefined) this.enPassant = position.enPassant;
       if (position.halfMoves !== undefined) this.halfMoves = position.halfMoves;
       this.getLegalMoves();
-      this.setGameStatus();
+      this.setGameFlags();
     }
   }
 
@@ -103,7 +102,7 @@ class InternalGame {
   // Draw by fifty moves when reaching 100 half moves
   private halfMoves = 0;
   private history: History = [];
-  private gameStatus: GameStatus = GameStatus.ONGOING;
+  private gameFlags: GameFlags = GameFlags.NONE;
 
   // Store legalMoves once computed for the current state
   private legalMoves: InternalMove[] | null = null;
@@ -550,7 +549,7 @@ class InternalGame {
     return positionStr;
   }
 
-  private isThreefoldRepetition(): boolean {
+  private countRepetitions(): number {
     const uniquePositions: Record<string, number> = {};
 
     for (let i = this.history.length - 1; i >= 0; i--) {
@@ -560,31 +559,27 @@ class InternalGame {
       if (position.halfMoves === 0) break;
     }
     const currentPositionStr = this.hashCurrentPosition();
-    const count = uniquePositions[currentPositionStr];
-    return count !== undefined && count >= 2;
+    const count = uniquePositions[currentPositionStr] ?? 0;
+    return count + 1;
   }
 
-  // Will be replaced by setGameFlags
-  private setGameStatus(): void {
+  private setGameFlags(): void {
+    this.gameFlags = GameFlags.NONE;
     const isAttacked = this.kingIsAttacked();
-    if (this.legalMoves === null) {
-      this.gameStatus = isAttacked ? GameStatus.CHECK : GameStatus.ONGOING;
-      return;
-    }
+    if (isAttacked) this.gameFlags = GameFlags.CHECK;
+    if (this.legalMoves === null) return;
     if (isAttacked && this.legalMoves.length === 0)
-      this.gameStatus = GameStatus.CHECKMATE;
+      this.gameFlags |= GameFlags.CHECKMATE;
     else if (this.legalMoves.length === 0)
-      this.gameStatus = GameStatus.STALEMATE;
-    else if (this.isInsufficientMaterial())
-      this.gameStatus = GameStatus.INSUFMATERIAL;
-    else if (this.isThreefoldRepetition())
-      this.gameStatus = GameStatus.REPETITION;
-    else if (isAttacked) this.gameStatus = GameStatus.CHECK;
-    else if (this.halfMoves >= 100) this.gameStatus = GameStatus.FIFTYMOVES;
-    else this.gameStatus = GameStatus.ONGOING;
+      this.gameFlags |= GameFlags.STALEMATE;
+    else if (!this.hasSufficientMaterial())
+      this.gameFlags |= GameFlags.INSUFMATERIAL;
+    const repetitions = this.countRepetitions();
+    if (repetitions >= 3) this.gameFlags |= GameFlags.THREEFOLDREPETITION;
+    if (repetitions >= 5) this.gameFlags |= GameFlags.FIVEFOLDREPETITION;
+    if (this.halfMoves >= 100) this.gameFlags |= GameFlags.FIFTYMOVES;
+    if (this.halfMoves >= 150) this.gameFlags |= GameFlags.SEVENTYFIVEMOVES;
   }
-
-  private setGameFlags(): void;
 
   private makeMove(move: InternalMove): void {
     const publicMove: Move = {
@@ -607,7 +602,7 @@ class InternalGame {
       },
       enPassant: this.enPassant,
       halfMoves: this.halfMoves,
-      gameStatus: this.gameStatus,
+      gameFlags: this.gameFlags,
       hash: this.hashCurrentPosition(),
     };
 
@@ -677,7 +672,7 @@ class InternalGame {
     if (!internalMove) throw new Error('Invalid move');
     this.makeMove(internalMove);
     this.getLegalMoves();
-    this.setGameStatus();
+    this.setGameFlags();
   }
 
   undoMove(): void {
@@ -698,7 +693,7 @@ class InternalGame {
     };
     this.enPassant = position.enPassant;
     this.halfMoves = position.halfMoves;
-    this.gameStatus = position.gameStatus;
+    this.gameFlags = position.gameFlags;
     this.legalMoves = null;
   }
 
