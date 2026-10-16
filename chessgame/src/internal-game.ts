@@ -665,6 +665,8 @@ class InternalGame {
   }
 
   move(move: Move): void {
+    if (this.isOver())
+      throw new Error('Trying to play move while game is over');
     if (!this.legalMoves) this.getLegalMoves();
     const internalMove = this.legalMoves!.find((m) => {
       return (

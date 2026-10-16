@@ -83,8 +83,6 @@ class ChessGame {
   }
   // Throws if isLegalMove(move) is false
   move(move: Move): void {
-    if (this.isOver())
-      throw new Error('Trying to play move while game is over');
     this.game.move(move);
   }
 
