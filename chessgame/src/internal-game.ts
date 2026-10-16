@@ -506,7 +506,7 @@ class InternalGame {
     return false;
   }
 
-  private isInsufficientMaterial(): boolean {
+  private hasSufficientMaterial(): boolean {
     const pieces = {
       bishop: 0,
       knight: 0,
@@ -528,15 +528,15 @@ class InternalGame {
         squareColor = squareColor === 'white' ? 'black' : 'white';
     }
 
-    if (pieceCount === 2) return true;
+    if (pieceCount === 2) return false;
     if (pieceCount === 3 && (pieces.bishop === 1 || pieces.knight === 1))
-      return true;
+      return false;
     if (
       pieceCount === 2 + pieces.bishop &&
       (lsb === 0 || lsb === pieces.bishop)
     )
-      return true;
-    return false;
+      return false;
+    return true;
   }
 
   // Hash is only accurate when legalMoves are computed for position
