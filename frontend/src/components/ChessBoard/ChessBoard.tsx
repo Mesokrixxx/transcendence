@@ -1,84 +1,128 @@
 import { useState } from 'react'
+import type {
+    Board as BoardData,
+    DeepReadonly,
+    Square as SquareName
+} from '../../../../chessgame/src/chessgame.types'
 import { Board, Square, Piece } from './ChessBoard.styles'
 
+type ChessBoardProps = {
+    board?: DeepReadonly<BoardData>
+    selectedSquare?: SquareName | null
+    onSquareClick?: (square: SquareName) => void
+    disabled?: boolean
+    readOnly?: boolean
+}
+
 const backRow = [
-  'rook',
-  'knight',
-  'bishop',
-  'queen',
-  'king',
-  'bishop',
-  'knight',
-  'rook',
+    'rook',
+    'knight',
+    'bishop',
+    'queen',
+    'king',
+    'bishop',
+    'knight',
+    'rook',
 ]
 
-function ChessBoard() {
-  const [selectedSquare, setSelectedSquare] = useState<number | null>(null)
+function ChessBoard({
+    board,
+    selectedSquare,
+    onSquareClick,
+    disabled = false,
+    readOnly = false
+}: ChessBoardProps) {
+    const [homeSelection, setHomeSelection] =
+        useState<SquareName | null>(null)
 
-  function selectPiece(index: number) {
-    if (selectedSquare === index) {
-      setSelectedSquare(null)
+    let selection
+
+    if (selectedSquare === undefined) {
+        selection = homeSelection
     } else {
-      setSelectedSquare(index)
+        selection = selectedSquare
     }
-  }
+    
+    function handleClick(square: SquareName) {
+        if (disabled || readOnly) return
 
-  return (
-    <Board className="chessboard" aria-label="Chessboard">
-      {Array.from({ length: 64 }, (_, index) => {
-        const row = Math.floor(index / 8)
-        const column = index % 8
-
-        let isLight = false
-
-        if ((row + column) % 2 === 0) {
-          isLight = true
+        if (onSquareClick) {
+            onSquareClick(square)
+        } else if (homeSelection === square) {
+            setHomeSelection(null)
+        } else {
+            setHomeSelection(square)
         }
+    }
 
-        let pieceFile = ''
+    return (
+        <Board className="chessboard" aria-label="Chessboard">
+            {Array.from({ length: 64 }, (_, index) => {
+                const row = Math.floor(index / 8)
+                const column = index % 8
+                const square =
+                    `${'abcdefgh'[column]}${8 - row}` as SquareName
 
-        if (row === 0) {
-          pieceFile = 'black_' + backRow[column]
-        } else if (row === 1) {
-          pieceFile = 'black_pawn'
-        } else if (row === 6) {
-          pieceFile = 'white_pawn'
-        } else if (row === 7) {
-          pieceFile = 'white_' + backRow[column]
-        }
+                const isLight = (row + column) % 2 === 0
+                let pieceFile = ''
 
-        let piece = null
-        let squareLabel = 'Empty square'
+                if (board) {
+                    const currentPiece = board[square]
 
-        if (pieceFile !== '') {
-          squareLabel = pieceFile.replace('_', ' ')
+                    if (currentPiece) {
+                        pieceFile =
+                            `${currentPiece.color}_${currentPiece.type}`
+                    }
+                } else {
 
-          piece = (
-            <Piece
-              src={'/pieces/kosal/' + pieceFile + '.svg'}
-              alt=""
-              draggable={true}
-            />
-          )
-        }
+                    if (row === 0) {
+                        pieceFile = 'black_' + backRow[column]
+                    } else if (row === 1) {
+                        pieceFile = 'black_pawn'
+                    } else if (row === 6) {
+                        pieceFile = 'white_pawn'
+                    } else if (row === 7) {
+                        pieceFile = 'white_' + backRow[column]
+                    }
+                }
 
-        return (
-          <Square
-            key={index}
-            type="button"
-            $isLight={isLight}
-            $selected={selectedSquare === index}
-            disabled={pieceFile === ''}
-            aria-label={squareLabel}
-            aria-pressed={selectedSquare === index}
-            onClick={() => selectPiece(index)}
-          >
-            {piece}
-          </Square>
-        )
-      })}
-    </Board>
-  )
+                let piece = null
+                let squareLabel = 'Empty square'
+
+                if (pieceFile !== '') {
+                    squareLabel = pieceFile.replace('_', ' ')
+
+                    piece = (
+                        <Piece
+                            src={'/pieces/kosal/' + pieceFile + '.svg'}
+                            alt=""
+                            draggable={false}
+                        />
+                    )
+                }
+
+                const isDisabled =
+                    disabled ||
+                    readOnly ||
+                    (!onSquareClick && pieceFile === '')
+
+                return (
+                    <Square
+                        key={square}
+                        type="button"
+                        $isLight={isLight}
+                        $selected={!readOnly && selection === square}
+                        disabled={isDisabled}
+                        aria-label={`${square}: ${squareLabel}`}
+                        aria-pressed={!readOnly && selection === square}
+                        onClick={() => handleClick(square)}
+                    >
+                        {piece}
+                    </Square>
+                )
+            })}
+        </Board>
+    )
 }
 
 export default ChessBoard
