@@ -256,9 +256,9 @@ Le crédit est également affiché dans la page Terms of Service.
 - [x] Créer le classement des joueurs (ranking).
     #### ce dont ranking a besoin cote backend
         - Une route qui envoie la liste des joeurs triee
-            format suggere : [{id, username, wins, games}]
+            format suggere : [{id, username, wins, games, avatar, rating, isOnline}]
         - classement par victoire ou par Elo (score de niveau, selon resultat et niv de l'adversaire)?
-- [ ] Intégrer le composant Avatar au ranking.
+- [x] Intégrer le composant Avatar au ranking.
 - [ ] Ajouter le chat entre joueurs.
     #### ce dont chat a besoin cote backend
         - Enregistrer les messages en base, et renvoyer l’historique a quelqu’un qui arrive dans un chat (route ou inclusion dans la reponse existante : a decider ensemble).

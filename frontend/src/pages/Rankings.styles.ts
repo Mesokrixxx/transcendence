@@ -83,3 +83,25 @@ export const PlayerCell = styled.div`
   gap: 12px;
 `
 
+export const WinRate = styled.td`
+  color: var(--color-primary);
+  font-weight: 700;
+`
+
+export const RankCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+export const MedalSlot = styled.span`
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%
+    display: block;
+  }
+`
