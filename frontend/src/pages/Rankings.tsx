@@ -26,9 +26,9 @@ type Player =  {
 //fake data, pending the backend
 //we rempace it by the response of GET /api/rankings
 const fakePlayers: Player[] = [
-    {id: 1, username: 'alice', rating: 1842, wins:42, games: 60, isOnline: true, avatar: '../../public/Avatar/queen.svg'},
-    {id: 2, username: 'bob', rating: 1755, wins: 35, games: 55, isOnline: false, avatar: '../../public/Avatar/king.svg'},
-    {id: 3, username: 'charlie', rating: 1610, wins: 20, games: 48, avatar: '../../public/Avatar/knight.svg'},
+    {id: 1, username: 'alice', rating: 1842, wins:42, games: 60, isOnline: true, avatar: '../../public/avatars/queen.svg'},
+    {id: 2, username: 'bob', rating: 1755, wins: 35, games: 55, isOnline: false, avatar: '../../public/avatars/king.svg'},
+    {id: 3, username: 'charlie', rating: 1610, wins: 20, games: 48, avatar: '../../public/avatars/knight.svg'},
     {id: 4, username: 'jack', rating: 1440, wins: 15, games: 35, isOnline: true},
     {id: 5, username: 'diana', rating: 1300, wins: 12, games: 30, isOnline: false,},
     {id: 6, username: 'sofia', rating: 1210, wins: 10, games: 25},
