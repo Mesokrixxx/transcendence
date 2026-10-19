@@ -231,6 +231,7 @@ Le crédit est également affiché dans la page Terms of Service.
 ### Échiquier et logique de jeu
 - [ ] Rendre l'échiquier responsive et adapter sa taille aux différentes résolutions d'écran (Mac et écrans de l'école).
 - [ ] Intégrer la logique du jeu d'échecs développée par Noa (`chessgame`).
+- [x] Créer le composant `GameStatus`.
 - [ ] Connecter les interactions de l'échiquier frontend aux déplacements et aux règles du jeu.
 - [ ] Synchroniser les parties entre les joueurs.
 
@@ -254,19 +255,22 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ### Classement et communication
 - [x] Créer le classement des joueurs (ranking).
-    #### ce dont ranking a besoin cote backend
-        - Une route qui envoie la liste des joeurs triee
-            format suggere : [{id, username, wins, games}]
-        - classement par victoire ou par Elo (score de niveau, selon resultat et niv de l'adversaire)?
-- [ ] Intégrer le composant Avatar au ranking.
+- [x] Intégrer le composant Avatar au ranking--> en amélioration.
+- [ ] Relier le classement aux données du backend.
 - [ ] Ajouter le chat entre joueurs.
-    #### ce dont chat a besoin cote backend
-        - Enregistrer les messages en base, et renvoyer l’historique a quelqu’un qui arrive dans un chat (route ou inclusion dans la reponse existante : a decider ensemble).
-        - Valider le format des messages (pas vide, longueur maximale).
-        - Identifier l’auteur cote serveur (via un jeton), jamais a partir d’un champ envoye par le navigateur. Cela vaut aussi pour la connexion WebSocket.
-        - Droits d’acces au chat des joueurs et a celui des spectateurs, verifies a chaque message et pas seulement a l’entree.
-        - Temps reel (WebSocket) : diffuser chaque nouveau message, aussitot enregistre, aux participants connectes a ce chat, et gerer proprement les connexions et deconnexions.
-        - Securite et finitions : limiter le debit (anti-spam, max 5 message toutes les 10 sec par user), fermer les routes qui ne doivent pas etre publiques, et decider du sort du chat e la fin d’une partie (conserve ou supprime).
+
+#### ce dont ranking a besoin cote backend
+    - Une route qui envoie la liste des joeurs triee
+        format suggere : [{id, username, wins, games}]
+    - classement par victoire ou par Elo (score de niveau, selon resultat et niv de l'adversaire)?
+
+#### ce dont chat a besoin cote backend
+    - Enregistrer les messages en base, et renvoyer l’historique a quelqu’un qui arrive dans un chat (route ou inclusion dans la reponse existante : a decider ensemble).
+    - Valider le format des messages (pas vide, longueur maximale).
+    - Identifier l’auteur cote serveur (via un jeton), jamais a partir d’un champ envoye par le navigateur. Cela vaut aussi pour la connexion WebSocket.
+    - Droits d’acces au chat des joueurs et a celui des spectateurs, verifies a chaque message et pas seulement a l’entree.
+    - Temps reel (WebSocket) : diffuser chaque nouveau message, aussitot enregistre, aux participants connectes a ce chat, et gerer proprement les connexions et deconnexions.
+    - Securite et finitions : limiter le debit (anti-spam, max 5 message toutes les 10 sec par user), fermer les routes qui ne doivent pas etre publiques, et decider du sort du chat e la fin d’une partie (conserve ou supprime).
 
 ### Communication avec le backend
 - [ ] Finaliser et tester l'utilitaire commun `fetchAPI` à partir du modèle proposé par Noa.
