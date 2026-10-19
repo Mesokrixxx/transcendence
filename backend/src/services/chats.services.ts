@@ -1,6 +1,7 @@
 import prisma from '../db/prisma.js'
 import { BackendError } from '../types/backendError.types.js';
 import * as chatPresenceService from './chatPresence.service.js';
+import { checkMessageRateLimit } from './chatRateLimit.service.js';
 
 export async function get(id: number) {
 	return await prisma.chat.findUnique({
@@ -59,6 +60,10 @@ export async function append(message: string, chatId: number, userId: number) {
 
 	if (!chat.users.some((chatUser) => chatUser.id === userId))
 		throw new BackendError(403, 'user is not a member of this chat');
+
+	const limit = checkMessageRateLimit(userId);
+	if (!limit.allowed)
+		throw new BackendError(429, `message rate limit exceeded; retry after ${limit.retryAfterSeconds} seconds`);
 
 	const createdMessage = await prisma.message.create({
 		data: {

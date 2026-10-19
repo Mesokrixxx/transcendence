@@ -4,8 +4,8 @@ import { requireAuth } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-router.get('/:id', chatController.getChat);
-router.post('/', chatController.createChat);
+router.get('/:id', requireAuth, chatController.getChat);
+router.post('/', requireAuth, chatController.createChat);
 router.put('/:id', requireAuth, chatController.appendTo);
 
 export default router;

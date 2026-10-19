@@ -1,3 +1,0 @@
-ce dont chat a besoin cote backend
- - [Identifier l’auteur cote serveur (via un jeton), jamais a partir d’un champ envoye par le navigateur]. Cela vaut aussi pour la connexion WebSocket.
- - Securite et finitions : limiter le debit (anti-spam, max 5 message toutes les 10 sec par user), fermer les routes qui ne doivent pas etre publiques, et decider du sort du chat e la fin d’une partie (conserve ou supprime).
