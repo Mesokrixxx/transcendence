@@ -255,8 +255,14 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ### Classement et communication
 - [x] Créer le classement des joueurs (ranking).
-- [x] Intégrer le composant Avatar au ranking--> en amélioration.
-- [ ] Relier le classement aux données du backend.
+
+
+    #### ce dont ranking a besoin cote backend
+        - Une route qui envoie la liste des joeurs triee
+            format suggere : [{id, username, wins, games, avatar, rating, isOnline}]
+        - classement par victoire ou par Elo (score de niveau, selon resultat et niv de l'adversaire)?
+- [x] Intégrer le composant Avatar au ranking.
+
 - [ ] Ajouter le chat entre joueurs.
 
 #### ce dont ranking a besoin cote backend
