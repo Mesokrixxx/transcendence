@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import InternalGame from '../src/internal-game';
-import { GameStatus, type Move } from '../src/chessgame.types';
+import { type Move } from '../src/chessgame.types';
 
 // This test suite is designed to test cases from specific positions
 // The InternalGame class will be instantiated with a custom board setup
@@ -53,7 +53,7 @@ describe('InternalGame', () => {
     expect(game.getTurn()).toBe('white');
     expect(game.getLegalMoves()).toHaveLength(20);
     expect(game.getMoveHistory()).toHaveLength(0);
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.isOver()).toBeFalsy();
     expect(game.getBoard().d1).toEqual({
       color: 'white',
       type: 'king',
@@ -89,7 +89,7 @@ describe('InternalGame', () => {
     const move: Move = { from: 'a7', to: 'a8', promotion: 'queen' };
     playLegalMove(game, move);
     expect(game.getTurn()).toBe('black');
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.isOver()).toBeFalsy();
     expect(game.getBoard().a7).toBeNull();
     expect(game.getBoard().a8).toEqual({
       color: 'white',
@@ -120,7 +120,7 @@ describe('InternalGame', () => {
     ];
     for (const move of moves) {
       playLegalMove(game, move);
-      expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+      expect(game.isOver()).toBeFalsy();
       expect(game.getBoard().a7).toBeNull();
       expect(game.getBoard().a8).toEqual({
         color: 'white',
@@ -285,7 +285,7 @@ describe('InternalGame', () => {
     const move: Move = { from: 'd6', to: 'd8' };
 
     playLegalMove(game, move);
-    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+    expect(game.isCheck()).toBeTruthy();
   });
 
   it('only provides non self-checking moves on check', () => {
@@ -305,7 +305,7 @@ describe('InternalGame', () => {
     const move: Move = { from: 'd6', to: 'd8' };
 
     playLegalMove(game, move);
-    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+    expect(game.isCheck()).toBeTruthy();
 
     expect(game.getLegalMoves()).toHaveLength(1);
     expect(game.getLegalMoves()).toContainEqual({ from: 'f8', to: 'g7' });
@@ -328,7 +328,7 @@ describe('InternalGame', () => {
     const move: Move = { from: 'c6', to: 'c8' };
 
     playLegalMove(game, move);
-    expect(game.getGameStatus()).toBe(GameStatus.CHECKMATE);
+    expect(game.isCheckmate()).toBeTruthy();
   });
 
   it('detects stalemate', () => {
@@ -348,7 +348,7 @@ describe('InternalGame', () => {
     const move: Move = { from: 'h6', to: 'h7' };
 
     playLegalMove(game, move);
-    expect(game.getGameStatus()).toBe(GameStatus.STALEMATE);
+    expect(game.isStalemate()).toBeTruthy();
   });
 
   it('detects insufficient material', () => {
@@ -365,12 +365,12 @@ describe('InternalGame', () => {
       ]),
     });
 
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.isOver()).toBeFalsy();
 
     playLegalMove(game, { from: 'd6', to: 'd8' }); // ??
-    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+    expect(game.isCheck()).toBeTruthy();
     playLegalMove(game, { from: 'e8', to: 'd8' });
-    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+    expect(game.isInsufficientMaterial()).toBeTruthy();
   });
 
   it('detects insufficient material for knight', () => {
@@ -387,11 +387,11 @@ describe('InternalGame', () => {
       ]),
     });
 
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.isOver()).toBeFalsy();
 
     playLegalMove(game, { from: 'f2', to: 'g2' });
     // Only one knight remaining, game is over
-    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+    expect(game.isInsufficientMaterial()).toBeTruthy();
   });
 
   it('detects insufficient material for bishops', () => {
@@ -409,19 +409,19 @@ describe('InternalGame', () => {
       turn: 'black'
     });
 
-    expect(game.getGameStatus()).toBe(GameStatus.CHECK);
+    expect(game.isCheck()).toBeTruthy();
 
     playLegalMove(game, { from: 'f6', to: 'g7' });
     // Insufficient material, bishops of same color
-    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+    expect(game.isInsufficientMaterial()).toBeTruthy();
     game.undoMove();
 
     playLegalMove(game, { from: 'f6', to: 'g6' });
     // Bishops of opposite colors, game might end up in checkmate
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.isOver()).toBeFalsy();
     playLegalMove(game, { from: 'f2', to: 'g2' });
     // Only one bishop left, game is over
-    expect(game.getGameStatus()).toBe(GameStatus.INSUFMATERIAL);
+    expect(game.isInsufficientMaterial()).toBeTruthy();
   });
 
   it('detects threefold repetition', () => {
@@ -448,7 +448,7 @@ describe('InternalGame', () => {
       }
     });
 
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeFalsy();
     playLegalMove(game, { from: 'f3', to: 'e3' }); // 1
     playLegalMove(game, { from: 'f6', to: 'e6' });
     playLegalMove(game, { from: 'e3', to: 'f2' });
@@ -457,9 +457,61 @@ describe('InternalGame', () => {
     playLegalMove(game, { from: 'f6', to: 'e6' });
     playLegalMove(game, { from: 'e3', to: 'f3' });
     playLegalMove(game, { from: 'e6', to: 'f6' });
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeFalsy();
+    expect(game.isOver()).toBeFalsy();
     playLegalMove(game, { from: 'f3', to: 'e3' }); // 3
-    expect(game.getGameStatus()).toBe(GameStatus.REPETITION);
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeTruthy();
+  });
+
+  it('detects fivefold repetition', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '.....k..',
+        '.....p..',
+        '.....P..',
+        '.....K..',
+        '........',
+        '........',
+      ]),
+      castlingRights: {
+        white: {
+          queenside: false,
+          kingside: false,
+        },
+        black: {
+          queenside: false,
+          kingside: false,
+        },
+      }
+    });
+
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeFalsy();
+    playLegalMove(game, { from: 'f3', to: 'e3' }); // 1
+    playLegalMove(game, { from: 'f6', to: 'e6' });
+    playLegalMove(game, { from: 'e3', to: 'f2' });
+    playLegalMove(game, { from: 'e6', to: 'f6' });
+    playLegalMove(game, { from: 'f2', to: 'e3' }); // 2
+    playLegalMove(game, { from: 'f6', to: 'e6' });
+    playLegalMove(game, { from: 'e3', to: 'f3' });
+    playLegalMove(game, { from: 'e6', to: 'f6' });
+    playLegalMove(game, { from: 'f3', to: 'e3' }); // 3
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeTruthy();
+    expect(game.isOver()).toBeFalsy();
+    playLegalMove(game, { from: 'f6', to: 'g6' });
+    playLegalMove(game, { from: 'e3', to: 'f2' });
+    playLegalMove(game, { from: 'g6', to: 'f6' });
+    playLegalMove(game, { from: 'f2', to: 'e3' }); // 4
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeTruthy();
+    expect(game.isDrawByFivefoldRepetition()).toBeFalsy();
+    playLegalMove(game, { from: 'f6', to: 'f7' });
+    playLegalMove(game, { from: 'e3', to: 'f3' });
+    playLegalMove(game, { from: 'f7', to: 'f6' });
+    playLegalMove(game, { from: 'f3', to: 'e3' }); // 5
+    expect(game.canClaimDrawByThreefoldRepetition()).toBeFalsy();
+    expect(game.isDrawByFivefoldRepetition()).toBeTruthy();
+    expect(game.isOver()).toBeTruthy();
   });
 
   it('handles fifty moves rule', () => {
@@ -477,8 +529,57 @@ describe('InternalGame', () => {
       halfMoves: 99,
     });
 
-    expect(game.getGameStatus()).toBe(GameStatus.ONGOING);
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
     playLegalMove(game, { from: 'e3', to: 'd4' });
-    expect(game.getGameStatus()).toBe(GameStatus.FIFTYMOVES);
+    expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
+  });
+
+  it('handles seventy-five moves rule', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '....k...',
+        '........',
+        '........',
+        '....BKN.',
+        '........',
+        '........',
+      ]),
+      halfMoves: 149,
+    });
+
+    expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
+    expect(game.isOver()).toBeFalsy();
+    playLegalMove(game, { from: 'e3', to: 'd4' });
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeTruthy();
+    expect(game.isOver()).toBeTruthy();
+  });
+
+  it('prioritize checkmate over seventy-five moves', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '....k...',
+        '........',
+        '..Q.K...',
+        '........',
+        '........',
+        '........',
+        '........',
+        '........',
+      ]),
+      halfMoves: 149,
+    });
+
+    expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
+    expect(game.isOver()).toBeFalsy();
+    playLegalMove(game, { from: 'c6', to: 'c8' });
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
+    expect(game.isDrawBySeventyFiveMoves()).toBeFalsy();
+    expect(game.isCheckmate()).toBeTruthy();
+    expect(game.isOver()).toBeTruthy();
   });
 });

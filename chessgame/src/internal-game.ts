@@ -1,10 +1,24 @@
 import type { Board, Color, Move, Piece, Square } from './chessgame.types.js';
 import { boardSquares, InternalBoard } from './internal-board.js';
-import { GameStatus } from './chessgame.types.js';
 
 type CastleSide = 'queenside' | 'kingside';
 
 type CastlingRights = Record<CastleSide, boolean>;
+
+enum GameFlags {
+  NONE = 0,
+  CHECK = 1 << 0,
+  CHECKMATE = 1 << 1,
+  STALEMATE = 1 << 2,
+  INSUFMATERIAL = 1 << 3,
+  THREEFOLDREPETITION = 1 << 4,
+  FIVEFOLDREPETITION = 1 << 5,
+  FIFTYMOVES = 1 << 6,
+  SEVENTYFIVEMOVES = 1 << 7,
+  DRAW_AUTO = STALEMATE | INSUFMATERIAL | FIVEFOLDREPETITION | SEVENTYFIVEMOVES,
+  DRAW_CLAIM = THREEFOLDREPETITION | FIFTYMOVES,
+  OVER = CHECKMATE | DRAW_AUTO,
+}
 
 interface Position {
   board: string;
@@ -12,7 +26,8 @@ interface Position {
   castlingRights: Record<Color, CastlingRights>;
   enPassant: Square | null;
   halfMoves: number;
-  gameStatus: GameStatus;
+  gameFlags: GameFlags;
+  hash: string;
 }
 
 interface InternalMove extends Move {
@@ -54,7 +69,7 @@ const kingMoves: [number, number][] = [
 ];
 
 class InternalGame {
-  constructor(position?: Partial<Omit<Position, 'gameStatus'>>) {
+  constructor(position?: Partial<Omit<Position, 'gameFlags'>>) {
     // Starts the game from unique position
     // Unsafe for invalid fields, should only be called with valid data
     if (position) {
@@ -73,7 +88,7 @@ class InternalGame {
       if (position.enPassant !== undefined) this.enPassant = position.enPassant;
       if (position.halfMoves !== undefined) this.halfMoves = position.halfMoves;
       this.getLegalMoves();
-      this.setGameStatus();
+      this.setGameFlags();
     }
   }
 
@@ -87,10 +102,14 @@ class InternalGame {
   // Draw by fifty moves when reaching 100 half moves
   private halfMoves = 0;
   private history: History = [];
-  private gameStatus: GameStatus = GameStatus.ONGOING;
+  private gameFlags: GameFlags = GameFlags.NONE;
 
   // Store legalMoves once computed for the current state
   private legalMoves: InternalMove[] | null = null;
+
+  private hasSomeFlags(flags: GameFlags): boolean {
+    return !!(this.gameFlags & flags);
+  }
 
   private fileDiff(from: Square, to: Square): number {
     return to.charCodeAt(0) - from.charCodeAt(0);
@@ -487,7 +506,7 @@ class InternalGame {
     return false;
   }
 
-  private isInsufficientMaterial(): boolean {
+  private hasSufficientMaterial(): boolean {
     const pieces = {
       bishop: 0,
       knight: 0,
@@ -509,67 +528,61 @@ class InternalGame {
         squareColor = squareColor === 'white' ? 'black' : 'white';
     }
 
-    if (pieceCount === 2) return true;
+    if (pieceCount === 2) return false;
     if (pieceCount === 3 && (pieces.bishop === 1 || pieces.knight === 1))
-      return true;
+      return false;
     if (
       pieceCount === 2 + pieces.bishop &&
       (lsb === 0 || lsb === pieces.bishop)
     )
-      return true;
-    return false;
+      return false;
+    return true;
   }
 
-  private hashPosition(position: Position): string {
-    let positionStr = position.board;
-    positionStr += position.turn === 'white' ? 'w' : 'b';
-    positionStr += position.castlingRights.white.queenside === true ? 'Q' : 'x';
-    positionStr += position.castlingRights.white.kingside === true ? 'K' : 'x';
-    positionStr += position.castlingRights.black.queenside === true ? 'q' : 'x';
-    positionStr += position.castlingRights.black.kingside === true ? 'k' : 'x';
-    positionStr += position.enPassant ?? 'xx';
+  // Hash is only accurate when legalMoves are computed for position
+  private hashCurrentPosition(): string {
+    let positionStr = this.board.toString();
+    positionStr += this.turn === 'white' ? 'w' : 'b';
+    positionStr += this.castlingRights.white.queenside === true ? 'Q' : 'x';
+    positionStr += this.castlingRights.white.kingside === true ? 'K' : 'x';
+    positionStr += this.castlingRights.black.queenside === true ? 'q' : 'x';
+    positionStr += this.castlingRights.black.kingside === true ? 'k' : 'x';
+    if (this.legalMoves !== null && this.legalMoves.some((m) => m.isEnPassant))
+      positionStr += this.enPassant;
+    else positionStr += 'xx';
     return positionStr;
   }
 
-  private isThreefoldRepetition(): boolean {
+  private countRepetitions(): number {
     const uniquePositions: Record<string, number> = {};
 
     for (let i = this.history.length - 1; i >= 0; i--) {
-      const h = this.history[i]!;
-      const positionStr = this.hashPosition(h.position);
-      if (uniquePositions[positionStr]) uniquePositions[positionStr]++;
-      else uniquePositions[positionStr] = 1;
-      if (h.position.halfMoves === 0) break;
+      const position = this.history[i]!.position;
+      if (uniquePositions[position.hash]) uniquePositions[position.hash]!++;
+      else uniquePositions[position.hash] = 1;
+      if (position.halfMoves === 0) break;
     }
-    const currentPositionStr = this.hashPosition({
-      board: this.board.toString(),
-      turn: this.turn,
-      castlingRights: this.castlingRights,
-      enPassant: this.enPassant,
-      halfMoves: this.halfMoves,
-      gameStatus: this.gameStatus,
-    });
-    const count = uniquePositions[currentPositionStr];
-    return count !== undefined && count >= 2;
+    const currentPositionStr = this.hashCurrentPosition();
+    const count = uniquePositions[currentPositionStr] ?? 0;
+    return count + 1;
   }
 
-  private setGameStatus(): void {
+  private setGameFlags(): void {
+    this.gameFlags = GameFlags.NONE;
     const isAttacked = this.kingIsAttacked();
-    if (this.legalMoves === null) {
-      this.gameStatus = isAttacked ? GameStatus.CHECK : GameStatus.ONGOING;
-      return;
-    }
+    if (isAttacked) this.gameFlags = GameFlags.CHECK;
+    if (this.legalMoves === null) return;
     if (isAttacked && this.legalMoves.length === 0)
-      this.gameStatus = GameStatus.CHECKMATE;
+      this.gameFlags |= GameFlags.CHECKMATE;
     else if (this.legalMoves.length === 0)
-      this.gameStatus = GameStatus.STALEMATE;
-    else if (this.isInsufficientMaterial())
-      this.gameStatus = GameStatus.INSUFMATERIAL;
-    else if (this.isThreefoldRepetition())
-      this.gameStatus = GameStatus.REPETITION;
-    else if (isAttacked) this.gameStatus = GameStatus.CHECK;
-    else if (this.halfMoves >= 100) this.gameStatus = GameStatus.FIFTYMOVES;
-    else this.gameStatus = GameStatus.ONGOING;
+      this.gameFlags |= GameFlags.STALEMATE;
+    else if (!this.hasSufficientMaterial())
+      this.gameFlags |= GameFlags.INSUFMATERIAL;
+    const repetitions = this.countRepetitions();
+    if (repetitions >= 3) this.gameFlags |= GameFlags.THREEFOLDREPETITION;
+    if (repetitions >= 5) this.gameFlags |= GameFlags.FIVEFOLDREPETITION;
+    if (this.halfMoves >= 100) this.gameFlags |= GameFlags.FIFTYMOVES;
+    if (this.halfMoves >= 150) this.gameFlags |= GameFlags.SEVENTYFIVEMOVES;
   }
 
   private makeMove(move: InternalMove): void {
@@ -578,24 +591,27 @@ class InternalGame {
       to: move.to,
     };
     if (move.promotion) publicMove.promotion = move.promotion;
-    this.history.push({
-      position: {
-        board: this.board.toString(),
-        turn: this.turn,
-        castlingRights: {
-          white: {
-            queenside: this.castlingRights.white.queenside,
-            kingside: this.castlingRights.white.kingside,
-          },
-          black: {
-            queenside: this.castlingRights.black.queenside,
-            kingside: this.castlingRights.black.kingside,
-          },
+    const position: Position = {
+      board: this.board.toString(),
+      turn: this.turn,
+      castlingRights: {
+        white: {
+          queenside: this.castlingRights.white.queenside,
+          kingside: this.castlingRights.white.kingside,
         },
-        enPassant: this.enPassant,
-        halfMoves: this.halfMoves,
-        gameStatus: this.gameStatus,
+        black: {
+          queenside: this.castlingRights.black.queenside,
+          kingside: this.castlingRights.black.kingside,
+        },
       },
+      enPassant: this.enPassant,
+      halfMoves: this.halfMoves,
+      gameFlags: this.gameFlags,
+      hash: this.hashCurrentPosition(),
+    };
+
+    this.history.push({
+      position: position,
       move: publicMove,
     });
 
@@ -649,6 +665,8 @@ class InternalGame {
   }
 
   move(move: Move): void {
+    if (this.isOver())
+      throw new Error('Trying to play move while game is over');
     if (!this.legalMoves) this.getLegalMoves();
     const internalMove = this.legalMoves!.find((m) => {
       return (
@@ -660,7 +678,7 @@ class InternalGame {
     if (!internalMove) throw new Error('Invalid move');
     this.makeMove(internalMove);
     this.getLegalMoves();
-    this.setGameStatus();
+    this.setGameFlags();
   }
 
   undoMove(): void {
@@ -681,7 +699,7 @@ class InternalGame {
     };
     this.enPassant = position.enPassant;
     this.halfMoves = position.halfMoves;
-    this.gameStatus = position.gameStatus;
+    this.gameFlags = position.gameFlags;
     this.legalMoves = null;
   }
 
@@ -701,14 +719,52 @@ class InternalGame {
     }
     return board;
   }
+
   getTurn(): Color {
     return this.turn;
   }
+
   getMoveHistory(): Move[] {
     return this.history.map((h) => h.move);
   }
-  getGameStatus(): GameStatus {
-    return this.gameStatus;
+
+  isCheck(): boolean {
+    return this.hasSomeFlags(GameFlags.CHECK | GameFlags.CHECKMATE);
+  }
+
+  isCheckmate(): boolean {
+    return this.hasSomeFlags(GameFlags.CHECKMATE);
+  }
+
+  isStalemate(): boolean {
+    return this.hasSomeFlags(GameFlags.STALEMATE);
+  }
+
+  isInsufficientMaterial(): boolean {
+    return this.hasSomeFlags(GameFlags.INSUFMATERIAL);
+  }
+
+  isDrawByFivefoldRepetition(): boolean {
+    return this.hasSomeFlags(GameFlags.FIVEFOLDREPETITION);
+  }
+
+  isDrawBySeventyFiveMoves(): boolean {
+    return (
+      !this.hasSomeFlags(GameFlags.CHECKMATE) &&
+      this.hasSomeFlags(GameFlags.SEVENTYFIVEMOVES)
+    );
+  }
+
+  canClaimDrawByThreefoldRepetition(): boolean {
+    return !this.isOver() && this.hasSomeFlags(GameFlags.THREEFOLDREPETITION);
+  }
+
+  canClaimDrawByFiftyMoves(): boolean {
+    return !this.isOver() && this.hasSomeFlags(GameFlags.FIFTYMOVES);
+  }
+
+  isOver(): boolean {
+    return this.hasSomeFlags(GameFlags.OVER);
   }
 }
 
