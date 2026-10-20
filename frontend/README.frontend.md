@@ -228,12 +228,19 @@ Le crédit est également affiché dans la page Terms of Service.
 - [x] Bloquer l'inscription si les critères du mot de passe ne sont pas respectés.
 - [ ] Relier les formulaires d'inscription et de connexion au backend via `fetchAPI`, et gérer les messages d'erreur ou de confirmation.
 
+
 ### Échiquier et logique de jeu
+
 - [ ] Rendre l'échiquier responsive et adapter sa taille aux différentes résolutions d'écran (Mac et écrans de l'école).
-- [ ] Intégrer la logique du jeu d'échecs développée par Noa (`chessgame`).
+- [x] Intégrer la logique du jeu d'échecs développée par Noa (`chessgame`).
 - [x] Créer le composant `GameStatus`.
-- [ ] Connecter les interactions de l'échiquier frontend aux déplacements et aux règles du jeu.
+- [x] Connecter les interactions de l'échiquier frontend aux déplacements et aux règles du jeu.
+- [x] Adapter l'orientation de l'échiquier selon le tour du joueur en mode local.
+- [x] Ajouter un délai de 700 ms avant le changement d'orientation.
+- [ ] Adapter l'orientation fixe de l'échiquier selon la couleur attribuée au joueur connecté (`playerColor`).
+- [ ] Permettre aux spectateurs d'inverser l'orientation de l'échiquier dans `Watch`.
 - [ ] Synchroniser les parties entre les joueurs.
+
 
 ### Espace joueur
 - [ ] Finaliser l'espace joueur.

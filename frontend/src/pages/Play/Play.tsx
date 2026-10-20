@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ChessGame from '../../../../chessgame/src/chessgame'
 import type {
     Move,
@@ -15,6 +15,8 @@ import { PlayContent, GameArea, GameInfo } from './Play.styles'
 
 function Play() {
     const [game, setGame] = useState(() => new ChessGame())
+    const [orientation, setOrientation] = useState<'white' | 'black'>('white')
+    const [isRotating, setIsRotating] = useState(false)
     const [selectedSquare, setSelectedSquare] =
         useState<SquareName | null>(null)
     const [promotionMoves, setPromotionMoves] = useState<Move[]>([])
@@ -22,11 +24,23 @@ function Play() {
 
     const board = game.getBoard()
 
+    useEffect(()=> {
+        if(orientation === game.getTurn())
+            return
+        const timer = setTimeout(()=>{
+            setOrientation(game.getTurn())
+            setIsRotating(false)
+        },700)
+
+        return()=> clearTimeout(timer)
+    }, [game, orientation])
+
     function playMove(move: Move) {
         try {
             const nextGame = new ChessGame([...game.getHistory(), move])
 
             setGame(nextGame)
+            setIsRotating(true)
             setSelectedSquare(null)
             setPromotionMoves([])
             setError('')
@@ -40,7 +54,7 @@ function Play() {
     }
 
     function handleSquareClick(square: SquareName) {
-        if (game.isOver() || promotionMoves.length > 0) return
+        if (game.isOver() || promotionMoves.length > 0 || isRotating) return
 
         setError('')
 
@@ -145,11 +159,12 @@ function Play() {
 
                     <ChessBoard
                         board={board}
-                        orientation={game.getTurn()}
+                        orientation={orientation}
+                        // orientation={playerColor}
                         selectedSquare={selectedSquare}
                         onSquareClick={handleSquareClick}
                         disabled={
-                            game.isOver() || promotionMoves.length > 0
+                            game.isOver() || promotionMoves.length > 0 || isRotating
                         }
                     />
                 </GameArea>
