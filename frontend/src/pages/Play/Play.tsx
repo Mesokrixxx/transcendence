@@ -145,6 +145,7 @@ function Play() {
 
                     <ChessBoard
                         board={board}
+                        orientation={game.getTurn()}
                         selectedSquare={selectedSquare}
                         onSquareClick={handleSquareClick}
                         disabled={

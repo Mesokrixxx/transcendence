@@ -12,6 +12,7 @@ type ChessBoardProps = {
     onSquareClick?: (square: SquareName) => void
     disabled?: boolean
     readOnly?: boolean
+    orientation?: 'white' | 'black'
 }
 
 const backRow = [
@@ -30,7 +31,8 @@ function ChessBoard({
     selectedSquare,
     onSquareClick,
     disabled = false,
-    readOnly = false
+    readOnly = false,
+    orientation = 'white'
 }: ChessBoardProps) {
     const [homeSelection, setHomeSelection] =
         useState<SquareName | null>(null)
@@ -60,8 +62,11 @@ function ChessBoard({
             {Array.from({ length: 64 }, (_, index) => {
                 const row = Math.floor(index / 8)
                 const column = index % 8
-                const square =
-                    `${'abcdefgh'[column]}${8 - row}` as SquareName
+
+                const file = orientation === 'white' ? 'abcdefgh'[column]: 'hgfedcba'[column]
+
+                const rank = orientation === 'white' ? 8- row : row +1
+                const square = `${file}${rank}` as SquareName
 
                 const isLight = (row + column) % 2 === 0
                 let pieceFile = ''
