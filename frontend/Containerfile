@@ -1,13 +1,18 @@
 FROM node:bookworm
 
-WORKDIR /app
+WORKDIR /app/frontend
 
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
 
-COPY . .
+WORKDIR /app
 
-RUN npm run build 
+COPY frontend ./frontend
+COPY chessgame ./chessgame
+
+WORKDIR /app/frontend
+
+RUN npm run build
 
 EXPOSE 4173
 
