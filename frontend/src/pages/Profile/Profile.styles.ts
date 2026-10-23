@@ -28,6 +28,18 @@ export const ProfileHeader = styled.div`
         margin: 8px 0 0;
         color: var(--color-text-secondary);
     }
+
+    @media (max-width: 600px){
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+
+        .profile-info {
+            flex: none;
+            width: 100%;
+            text-aligne: center;
+        }
+    }
 `
 
 export const AvatarUpload = styled.div`

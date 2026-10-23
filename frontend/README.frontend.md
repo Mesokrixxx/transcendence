@@ -293,3 +293,4 @@ Le crédit est également affiché dans la page Terms of Service.
 
 ### Si le temps le permet
 - [ ] Ajouter le parcours « Mot de passe oublié », avec le backend.
+
