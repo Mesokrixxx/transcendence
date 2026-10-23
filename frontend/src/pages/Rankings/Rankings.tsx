@@ -1,6 +1,6 @@
-import Navbar from '../components/Navbar/Navbar';
-import Footer from '../components/Footer/Footer'
-import {Page} from './Home/Home.styles'
+import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Footer/Footer'
+import { Page } from '../Home/Home.styles'
 import {
     Content,
     Header,
@@ -11,7 +11,7 @@ import {
     WinRate,
     RankCell,
     MedalSlot } from './Rankings.styles'
-import Avatar from '../components/Avatar/Avatar'
+import Avatar from '../../components/Avatar/Avatar'
 
 type Player =  {
     id: number

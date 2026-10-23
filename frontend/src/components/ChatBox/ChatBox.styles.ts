@@ -19,6 +19,7 @@ export const Title = styled.h2`
 
 export const MessageList = styled.ul`
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -30,6 +31,7 @@ export const MessageList = styled.ul`
 export const MessageItem = styled.li`
   p {
     margin-top: 2px;
+    overflow-wrap: anywhere;
   }
 `
 
@@ -41,13 +43,17 @@ export const Author = styled.span`
 
 export const Form = styled.form`
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  min-width:0;
   padding: 12px;
   border-top: 1px solid var(--color-border);
 `
 
 export const Input = styled.input`
   flex: 1;
+  min-width: 0;
+  width: 100%;
   padding: 10px 12px;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);

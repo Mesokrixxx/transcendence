@@ -12,7 +12,7 @@ function Home() {
       <Content className="container">
         <Intro>
           <h1>Make your <span>move!</span></h1>
-          <Button to="\play" variant="accent">GET STARTED</Button>
+          <Button to="/play" variant="accent">GET STARTED</Button>
         </Intro>
 
         <ChessBoard />

@@ -2,6 +2,8 @@ import styled from 'styled-components'
 
 export const PlayContent = styled.main`
     flex: 1;
+    display: grid;
+    align-items: center;
     min-width: 0;
     box-sizing: border-box;
     margin-inline: auto;
@@ -23,24 +25,26 @@ export const GameArea = styled.section`
         minmax(0, 0.5fr)
         minmax(0, 2fr)
         minmax(0, 0.5fr);
-    grid-template-areas: 'info board .';
+    grid-template-areas: 'info board chat';
     align-items: start;
     gap: 24px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    margin-top: 24px;
+    // margin-top: 24px;
 
     > .chessboard {
         grid-area: board;
         justify-self: center;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
             'info'
-            'board';
+            'board'
+            'chat';
+        justify-items: center;
         gap: 32px;
     }
 `
@@ -94,10 +98,22 @@ export const GameInfo = styled.aside`
         transform: translateY(-50%);
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
         > [role='status'] {
             position: static;
             transform: none;
         }
+    }
+`
+export const GameChat = styled.aside`
+    grid-area: chat;
+    align-self: end;
+    width: 100%;
+    min-width: 0;
+    max-width: 440px;
+
+    > section {
+        width: 100%;
+        min-width: 0;
     }
 `

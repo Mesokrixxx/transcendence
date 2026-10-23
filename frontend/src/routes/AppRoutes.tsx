@@ -6,7 +6,7 @@ import Login from '../pages/Login/Login'
 import Profile from '../pages/Profile/Profile'
 import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsOfService from '../pages/TermsOfService'
-import Rankings from '../pages/Rankings'
+import Rankings from '../pages/Rankings/Rankings'
 import Chat from '../pages/Chat/Chat'
 
 

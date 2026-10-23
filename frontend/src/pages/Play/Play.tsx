@@ -9,9 +9,10 @@ import Footer from '../../components/Footer/Footer'
 import ChessBoard from '../../components/ChessBoard/ChessBoard'
 import Avatar from '../../components/Avatar/Avatar'
 import GameStatus from '../../components/GameStatus/GameStatus'
+import ChatBox from '../../components/ChatBox/ChatBox'
 import Button from '../../components/Button/Button'
 import { Page } from '../Home/Home.styles'
-import { PlayContent, GameArea, GameInfo } from './Play.styles'
+import { PlayContent, GameArea, GameInfo, GameChat } from './Play.styles'
 
 function Play() {
     const [game, setGame] = useState(() => new ChessGame())
@@ -167,6 +168,9 @@ function Play() {
                             game.isOver() || promotionMoves.length > 0 || isRotating
                         }
                     />
+                    <GameChat aria-label="Game chat">
+                        <ChatBox title="Game chat" />
+                    </GameChat>
                 </GameArea>
             </PlayContent>
 
