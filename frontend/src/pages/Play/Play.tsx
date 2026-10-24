@@ -91,26 +91,6 @@ function Play() {
         }
     }
 
-    let currentColor
-    let winner
-
-    if (game.getTurn() === 'white') {
-        currentColor = 'White'
-        winner = 'Black'
-    } else {
-        currentColor = 'Black'
-        winner = 'White'
-    }
-
-    let status = currentColor + ' to move'
-
-    if (game.isCheckmate()) {
-        status = 'Checkmate — ' + winner + ' wins'
-    } else if (game.isDraw()) {
-        status = 'Draw'
-    } else if (game.isCheck()) {
-        status += ' — Check'
-    }
 
     return (
         <Page>
@@ -128,7 +108,7 @@ function Play() {
                             <span>Opponent</span>
                         </div>
 
-                        <GameStatus status={status} />
+                        <GameStatus game={game} />
 
                         {promotionMoves.length > 0 && (
                             <div
