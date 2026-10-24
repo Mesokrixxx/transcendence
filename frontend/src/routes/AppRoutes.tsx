@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Home from '../pages/Home/Home'
 import Play from '../pages/Play/Play'
-import Watch from '../pages/Watch/Watch'
 import Register from '../pages/Register'
 import Login from '../pages/Login/Login'
 import Profile from '../pages/Profile/Profile'
@@ -9,6 +8,8 @@ import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsOfService from '../pages/TermsOfService'
 import Rankings from '../pages/Rankings/Rankings'
 import Chat from '../pages/Chat/Chat'
+import WatchGame from '../pages/Watch/WatchGame'
+import Watch from '../pages/Watch/Watch'
 
 
 function AppRoutes(){
@@ -17,6 +18,8 @@ function AppRoutes(){
             <Route path="/" element={<Home />} />
             <Route path="/play" element={<Play />} />
             <Route path="/watch" element={<Watch />} />
+            <Route path="/watch/:gameId" element={<WatchGame />} />
+            //http://localhost:4173/watch/1
             <Route path="/rankings" element={<Rankings />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
