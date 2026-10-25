@@ -2,9 +2,10 @@ import { useState } from 'react'
 import type {
     Board as BoardData,
     DeepReadonly,
+    Move,
     Square as SquareName
 } from '../../../../chessgame/src/chessgame.types'
-import { Board, Square, Piece } from './ChessBoard.styles'
+import { Board, Square, Piece, MoveIndicator } from './ChessBoard.styles'
 
 type ChessBoardProps = {
     board?: DeepReadonly<BoardData>
@@ -13,6 +14,7 @@ type ChessBoardProps = {
     disabled?: boolean
     readOnly?: boolean
     orientation?: 'white' | 'black'
+    legalMoves?: DeepReadonly<Move[]>
 }
 
 const backRow = [
@@ -32,7 +34,8 @@ function ChessBoard({
     onSquareClick,
     disabled = false,
     readOnly = false,
-    orientation = 'white'
+    orientation = 'white',
+    legalMoves = []
 }: ChessBoardProps) {
     const [homeSelection, setHomeSelection] =
         useState<SquareName | null>(null)
@@ -105,6 +108,35 @@ function ChessBoard({
                         />
                     )
                 }
+                const isLegalDestination =
+                    !readOnly &&
+                    !disabled &&
+                    legalMoves.some((move) => move.to === square)
+
+                let isCapture = false
+
+                if (isLegalDestination && board && selection) {
+                    const selectedPiece = board[selection]
+
+                    if (board[square]) {
+                        isCapture = true
+                    } else if (
+                        selectedPiece &&
+                        selectedPiece.type === 'pawn' &&
+                        selection[0] !== square[0]
+                    ) {
+                        // Prise en passant.
+                        isCapture = true
+                    }
+                }
+
+                if (isLegalDestination) {
+                    if (isCapture) {
+                        squareLabel += ' — legal capture'
+                    } else {
+                        squareLabel += ' — legal move'
+                    }
+                }
 
                 const isDisabled =
                     disabled ||
@@ -123,6 +155,12 @@ function ChessBoard({
                         onClick={() => handleClick(square)}
                     >
                         {piece}
+                        {isLegalDestination && (
+                            <MoveIndicator
+                                $capture={isCapture}
+                                aria-hidden="true"
+                            />
+                        )}
                     </Square>
                 )
             })}

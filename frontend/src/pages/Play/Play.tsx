@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ChessGame from '../../../../chessgame/src/chessgame'
 import type {
     Move,
+    DeepReadonly,
     Square as SquareName
 } from '../../../../chessgame/src/chessgame.types'
 import Navbar from '../../components/Navbar/Navbar'
@@ -24,6 +25,12 @@ function Play() {
     const [error, setError] = useState('')
 
     const board = game.getBoard()
+
+    let legalMoves: DeepReadonly<Move[]> = []
+    if(selectedSquare && !isRotating && promotionMoves.length === 0)
+    {
+        legalMoves = game.getMoves(selectedSquare)
+    }
 
     useEffect(()=> {
         if(orientation === game.getTurn())
@@ -144,6 +151,7 @@ function Play() {
                         // orientation={playerColor}
                         selectedSquare={selectedSquare}
                         onSquareClick={handleSquareClick}
+                        legalMoves={legalMoves}
                         disabled={
                             game.isOver() || promotionMoves.length > 0 || isRotating
                         }

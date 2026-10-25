@@ -31,6 +31,7 @@ type SquareProps = {
 
 export const Square = styled.button<SquareProps>`
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: center;
   min-width: 0;
@@ -89,4 +90,43 @@ export const Piece = styled.img`
   object-fit: contain;
   user-select: none;
   transition: transform 150ms ease;
+`
+
+export const MoveIndicator = styled.span<{ $capture: boolean }>`
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 50%;
+    border-sizing: border-box;
+    color: var(--color-background);
+
+    width: ${({ $capture })=>{
+      if($capture)
+        return '88%'
+      return'24%'
+    }};
+
+    height: ${({ $capture })=>{
+      if($capture)
+        return '88%'
+      return'24%'
+    }};
+
+    background: ${({ $capture }) => {
+        if ($capture) 
+          return 'transparent'
+        return 'currentColor'
+    }};
+
+    border: ${({ $capture }) => {
+        if ($capture) 
+          return '4px solid currentColor'
+        return 'none'
+    }};
+
+    opacity: ${({ $capture }) => {
+        if ($capture) 
+          return 0.55
+        return 0.35
+    }};
 `
