@@ -1,6 +1,37 @@
+// Types adaptés du modèle de Noa aux réponses du backend.
 
- // Types proposés par Noa pour les futurs appels API.
- // À activer et adapter lors de l'intégration du backend.
+ export type Method = 'get' | 'post' | 'put' | 'delete'
+
+export interface RequestOptions {
+    body: string | null
+    credentials: 'include'
+    headers: {
+        [key: string]: string
+    }
+    method: Method
+    mode: 'cors'
+}
+
+export type APIError =
+    | string
+    | {
+        error: string
+        details?: unknown[]
+    }
+
+export type APIResponse<Data> =
+    | SuccessfulResponse<Data>
+    | ErrorResponse
+
+export interface SuccessfulResponse<Data> {
+    result: Data
+    error: false
+}
+
+export interface ErrorResponse {
+    result: APIError
+    error: true
+}
 
  // type Method = 'get' | 'post' | 'put' | 'delete';
 

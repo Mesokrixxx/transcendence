@@ -10,6 +10,7 @@ import Rankings from '../pages/Rankings/Rankings'
 import Chat from '../pages/Chat/Chat'
 import WatchGame from '../pages/Watch/WatchGame'
 import Watch from '../pages/Watch/Watch'
+import ApiTest from '../pages/ApiTest'
 
 
 function AppRoutes(){
@@ -19,7 +20,6 @@ function AppRoutes(){
             <Route path="/play" element={<Play />} />
             <Route path="/watch" element={<Watch />} />
             <Route path="/watch/:gameId" element={<WatchGame />} />
-            //http://localhost:4173/watch/1
             <Route path="/rankings" element={<Rankings />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
@@ -27,6 +27,7 @@ function AppRoutes(){
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/test-api" element={<ApiTest />} />
         </Routes>
     )
 }
