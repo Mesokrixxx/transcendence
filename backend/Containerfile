@@ -1,14 +1,16 @@
 FROM node:bookworm
 
-WORKDIR /app
+WORKDIR /app/backend
 
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm ci
+RUN ln -s /app/backend/node_modules /app/node_modules
 
-COPY tsconfig.json ./
-COPY prisma7.config.ts ./
-COPY prisma ./prisma
-COPY src ./src
+COPY backend/tsconfig.json ./
+COPY backend/prisma7.config.ts ./
+COPY backend/prisma ./prisma
+COPY backend/src ./src
+COPY chessgame /app/chessgame
 
 RUN npx prisma generate
 RUN npm run build

@@ -9,3 +9,14 @@ export type CreateUserBody = {
 	email: string;
 	password: string;
 };
+
+export type AuthUserBody = {
+	email: string;
+	password: string;
+};
+
+export type UpdateUserBody = {
+	username?: string;
+	password?: string;
+	currentPassword?: string;
+};

@@ -4,8 +4,8 @@
     "moduleResolution": "nodenext",
     "target": "esnext",
 
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "..",
+    "outDir": "../dist",
 
     "sourceMap": true,
     // "declaration": true,

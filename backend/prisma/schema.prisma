@@ -23,21 +23,25 @@ enum GameEndType {
   CHECKMATE
   FORFEIT
   TIMEFORFEIT
-  AGREEDDRAW
   STALEMATE
   INSUFMATERIAL
   TRIPLEREPETITION
   FIFTYMOVE
 }
 
-// Tournament and Gamification should have their own models and/or fields.
+// Tournament should have its own models and/or fields.
 
 model User {
-  id         Int      @id @default(autoincrement())
-  username   String   @unique
-  email      String   @unique
-  password   String? // Possibly no password if User only uses OAuth 2.0
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  password String? // Possibly no password if User only uses OAuth 2.0
   // OAuth 2.0 should have its own field. Would be clearer.
+
+  elo         Int @default(1400)
+  gamesPlayed Int @default(0)
+  maxElo      Int @default(1400)
+
   profile    Profile? // To avoid mutual dependency, but User will have a profile after creation
   whiteGames Game[]   @relation("WhiteGames")
   blackGames Game[]   @relation("BlackGames")
@@ -50,14 +54,30 @@ model User {
 
   chats    Chat[]
   messages Message[]
+  sessions Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Profile {
   avatar       String?
   displayName  String?
-  creationDate DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       Int      @unique
+  creationDate DateTime          @default(now())
+  user         User              @relation(fields: [userId], references: [id])
+  userId       Int               @unique
+  level        Int               @default(0)
+  xp           Int               @default(0)
+  badges       BadgesOnProfile[]
 }
 
 model Game {
@@ -97,4 +117,22 @@ model Message {
   userId       Int
   chat         Chat     @relation(fields: [chatId], references: [id])
   chatId       Int
+}
+
+model Badge {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String
+  ownedBy     BadgesOnProfile[]
+}
+
+// Explicit many-to-many relationship -- Needed due to Profile model id/unique usage
+model BadgesOnProfile {
+  profile    Profile  @relation(fields: [profileUserId], references: [userId])
+  profileUserId Int
+  badge      Badge    @relation(fields: [badgeId], references: [id])
+  badgeId    Int
+  assignedAt DateTime @default(now())
+
+  @@unique([profileUserId, badgeId])
 }
