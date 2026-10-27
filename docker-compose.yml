@@ -35,8 +35,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Containerfile
+      context: .
+      dockerfile: frontend/Containerfile
     container_name: transcendence-frontend
     restart: unless-stopped
     depends_on: 
