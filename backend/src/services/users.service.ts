@@ -40,11 +40,15 @@ export async function auth(email: string, password: string) {
 	if (!user)
 		return null;
 
-	if (user.password)
-		if (!await bcrypt.compare(password, user.password))
-			return null;
-	else
-		return null; // TODO handle oauth 2.0
+	if (!user.password) {
+    return null; // TODO handle OAuth 2.0
+	}
+
+	const passwordMatches = await bcrypt.compare(password, user.password);
+
+	if (!passwordMatches) {
+		return null;
+	}
 
 	return {
 		id: user.id,
