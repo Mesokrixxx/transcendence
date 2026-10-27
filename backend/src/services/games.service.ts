@@ -3,9 +3,10 @@ import { BackendError } from '../types/backendError.types.js';
 import ChessGame from '../../../chessgame/src/chessgame.js';
 import type { Move } from '../../../chessgame/src/chessgame.types.js';
 
-function readMoves(moves: string): Move[] {
+function readMoves(moves: unknown): Move[] {
 	try {
-		const parsed: unknown = JSON.parse(moves);
+		const parsed: unknown =
+			typeof moves === 'string' ? JSON.parse(moves) : moves;
 		if (!Array.isArray(parsed)) throw new Error('moves are not an array');
 		return parsed as Move[];
 	} catch {
@@ -23,7 +24,7 @@ function gameView(game: {
 	endedAt: Date | null;
 	whiteId: number;
 	blackId: number;
-	moves: string;
+	moves: unknown;
 }) {
 	const engine = new ChessGame(readMoves(game.moves));
 	return {
@@ -91,6 +92,7 @@ export async function create(whiteId: number, blackId: number) {
 				blackId: blackId,
 				chatId: gameChat.id,
 				specChatId: specChat.id,
+				moves: [],
 			},
 		});
 	});
