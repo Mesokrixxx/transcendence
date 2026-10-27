@@ -36,3 +36,23 @@ export const PasswordHelp = styled.p`
   color: var(--color-text-secondary);
   font-size: 13px;
 `
+
+export const AuthSuccess = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    text-align: center;
+
+    h2 {
+      margin: 0;
+      color: var(--color-primary);
+    }
+
+    p {
+        margin: 0;
+        color: var(--color-text-primary);;
+    }
+`

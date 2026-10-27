@@ -1,4 +1,6 @@
 import type { SubmitEvent } from 'react'
+import fetchAPI from '../services/fetchAPI'
+import type { AuthUser } from '../types/auth'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import Navbar from '../components/Navbar/Navbar'
@@ -8,19 +10,32 @@ import Button from '../components/Button/Button'
 import PasswordRequirements from '../components/PasswordRequirements/PasswordRequirements'
 import Footer from '../components/Footer/Footer'
 import { Page } from './Home/Home.styles'
-import { AuthContent, AuthPanel, AuthHint} from './Login/Auth.styles'
+import { AuthContent, AuthPanel, AuthHint, AuthSuccess} from './Login/Auth.styles'
 import {validatePassword, PASSWORD_PATTERN, PASSWORD_MESSAGE, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,} from '../services/passwordValidation'
 
 function Register(){
     const [password, setPassord] = useState('')
-    function handleSubmit(event: SubmitEvent<HTMLFormElement>){
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const[success, setSuccess] = useState('')
+
+
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>){
         event.preventDefault()
+        
+        if (isLoading)
+            return
 
-    const form = event.currentTarget
-    const data = new FormData(form)
+        setError('')
+        setSuccess('')
 
-    const password = String(data.get('password')?? '') 
-    const confirmation = String(data.get('confirmPassword')?? '')
+        const form = event.currentTarget
+        const data = new FormData(form)
+
+        const username = String(data.get('username')?? '').trim()
+        const email = String(data.get('email')?? '').trim()
+        const submittedPassword = String(data.get('password')?? '') 
+        const confirmation = String(data.get('confirmPassword')?? '')
 
     const passwordInput = form.elements.namedItem(
         'password'
@@ -33,13 +48,13 @@ function Register(){
     passwordInput.setCustomValidity('')
     confirmationInput.setCustomValidity('')
 
-    const validation = validatePassword(password)
+    const validation = validatePassword(submittedPassword)
 
     if (!validation.isValid) {
     passwordInput.setCustomValidity(PASSWORD_MESSAGE)
 }
 
-    if (password !== confirmation){
+    if (submittedPassword !== confirmation){
         confirmationInput.setCustomValidity('Passwords do not match.')
     }
 
@@ -47,7 +62,49 @@ function Register(){
         return
     }
 
-    //back
+    if (username === ''){
+        setError('Please enter a username.')
+        return
+    }
+
+    setIsLoading(true)
+
+    try {
+        const response = await fetchAPI<AuthUser>({
+            path: '/users',
+            method: 'post',
+            body: {
+                username,
+                email,
+                password: submittedPassword
+            }
+    })
+
+    if (response.error === true) {
+            let message
+
+            if (typeof response.result === 'string') {
+                message = response.result
+            } else {
+                message = response.result.error
+            }
+
+            if (message === 'value(s) already exists') {
+                setError('This username or email is already in use.')
+            } else {
+                setError(message)
+            }
+
+            return
+        }
+        setSuccess('Account created. You can now log in. ')
+        form.reset()
+        setPassord('')
+    }
+    finally
+    {
+        setIsLoading(false)
+    }
 
     }
 
@@ -59,7 +116,16 @@ function Register(){
                 <AuthPanel>
                     <h1>Create your account</h1>
 
-                    <Form onSubmit={handleSubmit}>
+                    {success && (
+                        <AuthSuccess role="status">
+                            <h2>Account created!</h2>
+                            <p>You can now log in and start playing.</p>
+                            <Button to="/login">Log in</Button>
+                        </AuthSuccess>
+                    )}
+
+                    {!success && (
+                        <Form onSubmit={handleSubmit}>
                         <Input
                             id="register-username"
                             name="username"
@@ -113,11 +179,24 @@ function Register(){
                         />
 
                         <Button type="submit">Create account</Button>
-                    </Form>
 
-                    <AuthHint>
-                        Already have an account? <Link to="/login">Log in</Link>
-                    </AuthHint>
+                        {isLoading && (
+                            <p role="status">Creating account...</p>
+                        )}
+
+                        {error && (
+                            <p role="alert">{error}</p>
+                        )}
+
+                    </Form>
+                    )}
+                    
+                    {!success && (
+                         <AuthHint>
+                            Already have an account? <Link to="/login">Log in</Link>
+                        </AuthHint>
+                    )}
+
                 </AuthPanel>
             </AuthContent>
             <Footer/>
