@@ -75,12 +75,47 @@ export const Table = styled.table`
     background-color: color-mix(in srgb, var(--color-primary) 18%, transparent);
     font-weight: 700;
   }
+
+  @media (max-width: 700px){
+    th,
+    td {
+      padding : 10px 8px
+    }
+
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(5) {
+      display: none;
+    }
+
+  }
 `
 
 export const PlayerCell = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+
+  span {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media(max-width: 700px) {
+    gap: 8px;
+
+    > div {
+      width: 40px;
+      height: 40px; 
+    }
+
+    span {
+      max-width: 90px;
+    }
+  }
 `
 
 export const WinRate = styled.td`
