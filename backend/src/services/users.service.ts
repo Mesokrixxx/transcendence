@@ -28,7 +28,7 @@ export async function create(name: string, email: string, password: string) {
 
 export async function auth(email: string, password: string) {
 	const user = await prisma.user.findUnique({
-		where: { email },
+		where: { email: email },
 		select: {
 			id: true,
 			username: true,
@@ -37,23 +37,14 @@ export async function auth(email: string, password: string) {
 		}
 	});
 
-	if (!user || !user.password){
+	if (!user)
 		return null;
-	}
 
-	const passwordMatch = await bcrypt.compare(password, user.password);
-
-	if (!passwordMatch) {
-		return null;
-	}
-
-	// if (user.password)
-	// 	return null; // TODO handle oauth 2.0
-
-	// if (!await bcrypt.compare(password, user.password))
-	// 		return null;
-	
-		
+	if (user.password)
+		if (!await bcrypt.compare(password, user.password))
+			return null;
+	else
+		return null; // TODO handle oauth 2.0
 
 	return {
 		id: user.id,

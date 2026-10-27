@@ -1,0 +1,9 @@
+FROM docker.io/library/nginx:bookworm
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY entrypoint.sh /etc/nginx/entrypoint.sh
+
+RUN chmod 755 /etc/nginx/entrypoint.sh \
+    && mkdir -p /etc/nginx/certs
+
+CMD ["/etc/nginx/entrypoint.sh"]

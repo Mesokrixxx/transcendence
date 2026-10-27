@@ -6,5 +6,6 @@ const router = Router();
 
 router.get('/:id', requireAuth, chatController.getChat);
 router.post('/', requireAuth, chatController.createChat);
+router.put('/:id', requireAuth, chatController.appendTo);
 
 export default router;

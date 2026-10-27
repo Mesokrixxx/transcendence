@@ -23,7 +23,6 @@ enum GameEndType {
   CHECKMATE
   FORFEIT
   TIMEFORFEIT
-  AGREEDDRAW
   STALEMATE
   INSUFMATERIAL
   TRIPLEREPETITION
@@ -33,11 +32,16 @@ enum GameEndType {
 // Tournament should have its own models and/or fields.
 
 model User {
-  id         Int      @id @default(autoincrement())
-  username   String   @unique
-  email      String   @unique
-  password   String? // Possibly no password if User only uses OAuth 2.0
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  password String? // Possibly no password if User only uses OAuth 2.0
   // OAuth 2.0 should have its own field. Would be clearer.
+
+  elo         Int @default(1400)
+  gamesPlayed Int @default(0)
+  maxElo      Int @default(1400)
+
   profile    Profile? // To avoid mutual dependency, but User will have a profile after creation
   whiteGames Game[]   @relation("WhiteGames")
   blackGames Game[]   @relation("BlackGames")
@@ -84,7 +88,7 @@ model Game {
   createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
-  moves      String       @default("") // Simple string to split -- Ex: f3 e5 g4 Qh4
+  moves      Json
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
   black      User         @relation("BlackGames", fields: [blackId], references: [id])

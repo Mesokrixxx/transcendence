@@ -5,7 +5,7 @@ IMAGE = localhost/transcendence_backend:latest
 all: up db
 
 up:
-	$(COMPOSE) up --build -d
+	$(COMPOSE) up --build --force-recreate -d
 
 db:
 	$(COMPOSE) exec backend npx prisma db push

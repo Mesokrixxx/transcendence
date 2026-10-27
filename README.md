@@ -24,7 +24,7 @@ Users have a profile page displaying their information
 - jeu web complet multijoueur
 - joueurs distants sur deux ordinateurs
 
-Minor (9):
+# Minor (9):
 - ORM (Object-Relational Mapping) : Prisma
 - design system personnalisé avec minimum 10 composants
 - statistiques de jeu + historique des matchs
