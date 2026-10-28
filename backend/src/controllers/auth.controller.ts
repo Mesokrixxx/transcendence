@@ -66,3 +66,10 @@ export async function logout(req: Request, res: Response) {
 	res.setHeader('Set-Cookie', sessionCookie('', 0));
 	return res.status(204).send();
 }
+
+export function getCurrentUser(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	return res.status(200).json(req.user);
+}
