@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { SubmitEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate} from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import Navbar from '../../components/Navbar/Navbar'
 import Form from '../../components/Form/Form'
 import Input from '../../components/Input/Input'
@@ -14,7 +15,8 @@ import { AuthContent, AuthPanel, AuthHint } from './Auth.styles'
 function Login(){
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
-    const [user, setUser] = useState<AuthUser | null>(null)
+    const { setUser }= useAuth()
+    const navigate = useNavigate()
 
     async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -27,7 +29,6 @@ function Login(){
         const password = formData.get('password')
 
         setError('')
-        setUser(null)
         
         if (
             typeof email !== 'string' || typeof password !== 'string'
@@ -59,6 +60,7 @@ function Login(){
                 return
             }
             setUser(response.result)
+            navigate('/Profile', { replace: true })
         }
         finally{
             setIsLoading(false)
@@ -100,11 +102,6 @@ function Login(){
                             <p role="alert">{error}</p>
                         )}
 
-                        {user && (
-                            <p role="status">
-                                logged in as {user.username}
-                            </p>
-                        )}
                     </Form>
 
                     <AuthHint>

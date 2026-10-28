@@ -117,11 +117,10 @@ function Register(){
 
             <AuthContent className="container">
                 <AuthPanel>
-                    <h1>Create your account</h1>
+                    <h1>{success ? 'Account created!' : 'Create your account'}</h1>
 
                     {success && (
                         <AuthSuccess role="status">
-                            <h2>Account created!</h2>
                             <p>You can now log in and start playing.</p>
                             <Button to="/login">Log in</Button>
                         </AuthSuccess>

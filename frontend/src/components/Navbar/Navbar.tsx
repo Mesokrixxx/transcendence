@@ -1,5 +1,7 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useId, useRef, useState } from 'react'
+import { useAuth } from '../../context/AuthContext'
+import fetchAPI from '../../services/fetchAPI'
 import Button from '../Button/Button'
 import {
   Header,
@@ -16,6 +18,11 @@ import {
 } from './Navbar.styles'
 
 function Navbar() {
+  const { user, setUser } = useAuth()
+  const navigate = useNavigate()
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
   const [showMenu, setShowMenu] = useState(false)
   const [showLanguages, setShowLanguages] = useState(false)
 
@@ -32,12 +39,14 @@ function Navbar() {
   }
 
   useEffect(() => {
-    if (!showMenu && !showLanguages) 
+    if (!showMenu && !showLanguages) {
       return
+    }
 
     function handleClickOutside(event: PointerEvent) {
-      if (!(event.target instanceof Node)) 
+      if (!(event.target instanceof Node)) {
         return
+      }
 
       if (
         headerRef.current &&
@@ -54,20 +63,17 @@ function Navbar() {
     }
 
     function handleEscape(event: KeyboardEvent) {
-      if (event.key !== 'Escape') 
+      if (event.key !== 'Escape') {
         return
+      }
 
       if (showLanguages) {
         setShowLanguages(false)
 
-        if (languageMenuRef.current) {
-          const button = languageMenuRef.current.querySelector('button')
+        const button =
+          languageMenuRef.current?.querySelector('button')
 
-          if (button) {
-            button.focus()
-          }
-        }
-
+        button?.focus()
       } else {
         setShowMenu(false)
         burgerRef.current?.focus()
@@ -82,6 +88,38 @@ function Navbar() {
       document.removeEventListener('keydown', handleEscape)
     }
   }, [showMenu, showLanguages])
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return
+    }
+
+    setIsLoggingOut(true)
+    setLogoutError('')
+
+    try {
+      const response = await fetchAPI<void>({
+        path: '/auth/logout',
+        method: 'post'
+      })
+
+      if (response.error === true) {
+        if (typeof response.result === 'string') {
+          setLogoutError(response.result)
+        } else {
+          setLogoutError(response.result.error)
+        }
+
+        return
+      }
+
+      setUser(null)
+      closeMenus()
+      navigate('/login', { replace: true })
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <Header ref={headerRef}>
@@ -102,7 +140,9 @@ function Navbar() {
             setShowLanguages(false)
           }}
         >
-          <span aria-hidden="true">{showMenu ? '✕' : '☰'}</span>
+          <span aria-hidden="true">
+            {showMenu ? '✕' : '☰'}
+          </span>
         </BurgerButton>
 
         <MenuContent
@@ -120,18 +160,37 @@ function Navbar() {
           <Navigation aria-label="Main navigation">
             <Link to="/play">Play</Link>
             <Link to="/watch">Watch</Link>
-            {/* <Link to="/tournaments">Tournaments</Link> */}
             <Link to="/rankings">Rankings</Link>
           </Navigation>
 
           <Auth>
-            <Button to="/login" variant="secondary">
-              Log in
-            </Button>
+            {user ? (
+              <>
+                <span>{user.username}</span>
 
-            <Button to="/register" variant="primary">
-              Sign Up
-            </Button>
+                <Button to="/Profile" variant="secondary">
+                  Profile
+                </Button>
+
+                <Button onClick={handleLogout} variant="primary">
+                  {isLoggingOut ? 'Logging out...' : 'Log out'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button to="/login" variant="secondary">
+                  Log in
+                </Button>
+
+                <Button to="/register" variant="primary">
+                  Sign Up
+                </Button>
+              </>
+            )}
+
+            {logoutError && (
+              <p role="alert">{logoutError}</p>
+            )}
 
             <LanguageMenu ref={languageMenuRef}>
               <LanguageButton
@@ -155,6 +214,7 @@ function Navbar() {
                       Français
                     </button>
                   </li>
+
                   <li>
                     <button
                       type="button"
@@ -164,6 +224,7 @@ function Navbar() {
                       Español
                     </button>
                   </li>
+
                   <li>
                     <button
                       type="button"
