@@ -13,6 +13,7 @@ import {
   MedalSlot,
 } from './Rankings.styles';
 import Avatar from '../../components/Avatar/Avatar';
+import { useTranslation, Trans } from 'react-i18next';
 
 type Player = {
   id: number;
@@ -79,22 +80,24 @@ function getWinRate(wins: number, games: number): number {
 
 type Medal = {
   src: string;
-  label: string;
+  labelKey:
+    'rankings:firstPlace' | 'rankings:secondPlace' | 'rankings:thirdPlace';
 };
 
 const medals: Record<number, Medal | undefined> = {
-  1: { src: '/medals/gold.svg', label: 'First place' },
-  2: { src: '/medals/silver.svg', label: 'Second place' },
-  3: { src: '/medals/bronze.svg', label: 'Third place' },
+  1: { src: '/medals/gold.svg', labelKey: 'rankings:firstPlace' },
+  2: { src: '/medals/silver.svg', labelKey: 'rankings:secondPlace' },
+  3: { src: '/medals/bronze.svg', labelKey: 'rankings:thirdPlace' },
 };
 
 function RankBadge({ rank }: { rank: number }) {
+  const { t } = useTranslation();
   const medal = medals[rank];
 
   return (
     <RankCell>
       <MedalSlot>
-        {medal && <img src={medal.src} alt={medal.label} />}
+        {medal && <img src={medal.src} alt={t(medal.labelKey)} />}
       </MedalSlot>
       <span>{rank}</span>
     </RankCell>
@@ -102,17 +105,20 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 function Rankings() {
+  const { t } = useTranslation();
   return (
     <Page>
       <Navbar />
 
       <Content className="container">
         <Header>
-          <Eyebrow>Competitive play</Eyebrow>
+          <Eyebrow>{t('rankings:competitivePlay')}</Eyebrow>
           <h1>
-            Player <span>Rankings</span>
+            <Trans i18nKey="rankings:playerRankingsTitle">
+              Player <span>Rankings</span>
+            </Trans>
           </h1>
-          <p>See how the community is climbing the leaderboard.</p>
+          <p>{t('rankings:communityLeaderboardDescription')}</p>
         </Header>
 
         <TableWrapper>
@@ -120,11 +126,11 @@ function Rankings() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Player</th>
-                <th>Rating</th>
-                <th>Wins</th>
-                <th>Games</th>
-                <th>Win rate</th>
+                <th>{t('rankings:player')}</th>
+                <th>{t('rankings:rating')}</th>
+                <th>{t('rankings:wins')}</th>
+                <th>{t('rankings:games')}</th>
+                <th>{t('rankings:winRate')}</th>
               </tr>
             </thead>
             <tbody>

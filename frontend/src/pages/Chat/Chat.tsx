@@ -3,6 +3,7 @@ import Footer from '../../components/Footer/Footer';
 import ChatBox from '../../components/ChatBox/ChatBox';
 import { Page } from '../Home/Home.styles';
 import { Content, Boxes } from './Chat.styles';
+import { useTranslation } from 'react-i18next';
 
 const playerMessages = [
   { id: 1, author: 'alice', content: 'Good luck!' },
@@ -14,16 +15,20 @@ const spectatorMessages = [
 ];
 
 function Chat() {
+  const { t } = useTranslation();
   return (
     <Page>
       <Navbar />
 
       <Content className="container">
-        <h1>Chat</h1>
+        <h1>{t('chat:chat')}</h1>
 
         <Boxes>
-          <ChatBox title="Players" initialMessages={playerMessages} />
-          <ChatBox title="Spectators" initialMessages={spectatorMessages} />
+          <ChatBox title={t('chat:players')} initialMessages={playerMessages} />
+          <ChatBox
+            title={t('chat:spectators')}
+            initialMessages={spectatorMessages}
+          />
         </Boxes>
       </Content>
 

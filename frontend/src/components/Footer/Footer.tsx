@@ -1,16 +1,19 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Links } from './Footer.styles';
 
 function Footer() {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
+
   return (
     <footer>
       <Links className="container">
-        <span>© {year} Chessmove</span>
+        <span>{t('common:copyright', { year })}</span>
         <span aria-hidden="true">|</span>
-        <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/privacy">{t('legal:privacyPolicy')}</Link>
         <span aria-hidden="true">|</span>
-        <Link to="/terms">Terms of Service</Link>
+        <Link to="/terms">{t('legal:termsOfService')}</Link>
       </Links>
     </footer>
   );

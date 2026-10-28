@@ -6,14 +6,16 @@ import { Page } from '../Home/Home.styles';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
 import Button from '../../components/Button/Button';
 import { GameList, GameRow, MiniBoard } from './Watch.styles';
+import { useTranslation } from 'react-i18next';
 
 function Watch() {
+  const { t } = useTranslation();
   const [game] = useState(() => new ChessGame());
   return (
     <Page>
       <Navbar />
       <main className="container">
-        <h1>Game in progress</h1>
+        <h1>{t('chess:gameInProgress')}</h1>
 
         <GameList>
           <GameRow>
@@ -22,11 +24,11 @@ function Watch() {
             </MiniBoard>
 
             <div>
-              <h2>Player White VS Player Black</h2>
-              <p>Demo game</p>
+              <h2>{t('chess:playerWhiteVsPlayerBlack')}</h2>
+              <p>{t('chess:demoGame')}</p>
             </div>
 
-            <Button to="/watch/1">Watch game</Button>
+            <Button to="/watch/1">{t('chess:watchGame')}</Button>
           </GameRow>
         </GameList>
       </main>

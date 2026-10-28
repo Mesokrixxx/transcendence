@@ -6,8 +6,10 @@ import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
 import { ProfilePanel, ProfileHeader, AvatarUpload } from './Profile.styles';
+import { useTranslation } from 'react-i18next';
 
 function Profile() {
+  const { t } = useTranslation();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string>();
   const [avatarError, setAvatarError] = useState('');
@@ -31,12 +33,12 @@ function Profile() {
 
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setAvatarError('Please choose a JPG, PNG or WebP image.');
+      setAvatarError('chooseImageFormat');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      setAvatarError('The image must be no larger than 2MB.');
+      setAvatarError('imageTooLarge');
       return;
     }
 
@@ -64,7 +66,7 @@ function Profile() {
                 <p>{[firstName, lastName].filter(Boolean).join(' ')}</p>
               )}
 
-              <p>Online</p>
+              <p>{t('common:online')}</p>
             </div>
 
             <Button
@@ -74,14 +76,16 @@ function Profile() {
               aria-expanded={isEditing}
               aria-controls="profile-edit"
             >
-              {isEditing ? 'Close' : 'Edit profile'}
+              {isEditing ? t('common:close') : t('profile:editProfile')}
             </Button>
           </ProfileHeader>
 
           {isEditing && (
             <AvatarUpload id="profile-edit">
-              <label htmlFor="profile-avatar">Change avatar</label>
-              <label htmlFor="profile-username">Username</label>
+              <label htmlFor="profile-avatar">
+                {t('profile:changeAvatar')}
+              </label>
+              <label htmlFor="profile-username">{t('auth:username')}</label>
               <input
                 id="profile-username"
                 type="text"
@@ -91,7 +95,9 @@ function Profile() {
                 required
               />
 
-              <label htmlFor="profile-firstname">First name (optional)</label>
+              <label htmlFor="profile-firstname">
+                {t('profile:firstNameOptional')}
+              </label>
               <input
                 id="profile-firstname"
                 type="text"
@@ -100,7 +106,9 @@ function Profile() {
                 autoComplete="given-name"
               />
 
-              <label htmlFor="profile-lastname">Last name (optional)</label>
+              <label htmlFor="profile-lastname">
+                {t('profile:lastNameOptional')}
+              </label>
               <input
                 id="profile-lastname"
                 type="text"
@@ -117,10 +125,10 @@ function Profile() {
                 aria-describedby="avatar-help avatar-error"
               />
 
-              <p id="avatar-help">JPG, PNG or WebP. Maximum 2 MB.</p>
+              <p id="avatar-help">{t('profile:jpgPngOrWebpMaximum2Mb')}</p>
 
               <p id="avatar-error" role="alert">
-                {avatarError}
+                {avatarError ? t(`profile:${avatarError}`) : ''}
               </p>
             </AvatarUpload>
           )}

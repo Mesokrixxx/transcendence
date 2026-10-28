@@ -3,8 +3,10 @@ import Footer from '../../components/Footer/Footer';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
 import Button from '../../components/Button/Button';
 import { Page, Content, Intro, Aside } from './../Home/Home.styles';
+import { useTranslation, Trans } from 'react-i18next';
 
 function Home() {
+  const { t } = useTranslation();
   return (
     <Page>
       <Navbar />
@@ -12,10 +14,12 @@ function Home() {
       <Content className="container">
         <Intro>
           <h1>
-            Make your <span>move!</span>
+            <Trans i18nKey="home:heroTitle">
+              Make your <span>move!</span>
+            </Trans>
           </h1>
           <Button to="/play" variant="accent">
-            GET STARTED
+            {t('home:getStarted')}
           </Button>
         </Intro>
 

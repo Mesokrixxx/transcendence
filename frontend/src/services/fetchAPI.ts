@@ -4,6 +4,7 @@ import type {
   Method,
   RequestOptions,
 } from '../types/fetch';
+import i18next from 'i18next';
 
 const getURL = () => {
   return '/api';
@@ -54,7 +55,7 @@ const fetchAPI = async <Data = unknown>({
       } catch {
         return {
           result: {
-            error: 'The server returned an invalid JSON response.',
+            error: i18next.t('common:invalidJSONResponse'),
           },
           error: true,
         };
@@ -63,7 +64,7 @@ const fetchAPI = async <Data = unknown>({
 
     if (!response.ok) {
       let apiError: APIError = {
-        error: 'The request failed.',
+        error: i18next.t('common:requestFailed'),
       };
 
       if (typeof result === 'string') {
@@ -97,7 +98,7 @@ const fetchAPI = async <Data = unknown>({
   } catch {
     return {
       result: {
-        error: 'Unable to reach the server.',
+        error: i18next.t('common:unableToReachServer'),
       },
       error: true,
     };

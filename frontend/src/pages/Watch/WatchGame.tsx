@@ -15,6 +15,7 @@ import {
   GameInfo,
   GameChat,
 } from '../Play/Play.styles';
+import { useTranslation } from 'react-i18next';
 
 // en attendant les donnees du back
 const demoMoves: Move[] = [
@@ -25,6 +26,7 @@ const demoMoves: Move[] = [
 ];
 
 function Watch() {
+  const { t } = useTranslation();
   const [game] = useState(() => new ChessGame(demoMoves));
   const [orientation, setOrientation] = useState<'white' | 'black'>('white');
 
@@ -41,22 +43,22 @@ function Watch() {
       <Navbar />
 
       <WatchContent className="container">
-        <GameArea aria-label="Demo game for spectators">
-          <GameInfo aria-label="Game information">
+        <GameArea aria-label={t('chess:demoGameForSpectators')}>
+          <GameInfo aria-label={t('chess:gameInformation')}>
             <div className="opponent">
-              <Avatar username="Player White" size={48} />
-              <span>Player White — White</span>
+              <Avatar username={t('chess:playerWhite')} size={48} />
+              <span>{t('chess:playerWhite')}</span>
             </div>
 
             <div className="opponent">
-              <Avatar username="Player Black" size={48} />
-              <span>Player Black — Black</span>
+              <Avatar username={t('chess:playerBlack')} size={48} />
+              <span>{t('chess:playerBlack')}</span>
             </div>
 
-            <p>Demo game</p>
+            <p>{t('chess:demoGame')}</p>
 
             <Button variant="secondary" onClick={flipBoard}>
-              Flip board
+              {t('chess:flipBoard')}
             </Button>
 
             <GameStatus game={game} />
@@ -68,8 +70,8 @@ function Watch() {
             readOnly
           />
 
-          <GameChat aria-label="Spectator chat">
-            <ChatBox title="Spectator chat" />
+          <GameChat aria-label={t('chat:spectatorChat')}>
+            <ChatBox title={t('chat:spectatorChat')} />
           </GameChat>
         </GameArea>
       </WatchContent>

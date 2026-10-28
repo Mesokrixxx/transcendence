@@ -10,8 +10,10 @@ import fetchAPI from '../../services/fetchAPI';
 import type { AuthUser } from '../../types/auth';
 import { Page } from '../Home/Home.styles';
 import { AuthContent, AuthPanel, AuthHint } from './Auth.styles';
+import { useTranslation } from 'react-i18next';
 
 function Login() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -29,7 +31,7 @@ function Login() {
     setUser(null);
 
     if (typeof email !== 'string' || typeof password !== 'string') {
-      setError('Please enter your email and password.');
+      setError(t('auth:enterEmailAndPassword'));
       return;
     }
 
@@ -65,14 +67,14 @@ function Login() {
 
       <AuthContent className="container">
         <AuthPanel>
-          <h1>Welcome Back!</h1>
+          <h1>{t('auth:welcomeBack')}</h1>
           <Form onSubmit={handleSubmit}>
             <Input
               id="login-email"
               name="email"
-              label="Email"
+              label={t('auth:email')}
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('auth:emailPlaceholder')}
               autoComplete="email"
               required
             />
@@ -80,24 +82,29 @@ function Login() {
             <Input
               id="login-password"
               name="password"
-              label="Password"
+              label={t('auth:password')}
               type="password"
-              placeholder="Your password"
+              placeholder={t('auth:yourPassword')}
               autoComplete="current-password"
               required
             />
 
-            <Button type="submit">Log in</Button>
+            <Button type="submit">{t('auth:logIn')}</Button>
 
-            {isLoading && <p role="status">logging in ...</p>}
+            {isLoading && <p role="status">{t('auth:loggingIn')}</p>}
 
             {error && <p role="alert">{error}</p>}
 
-            {user && <p role="status">logged in as {user.username}</p>}
+            {user && (
+              <p role="status">
+                {t('auth:loggedInAs', { username: user.username })}
+              </p>
+            )}
           </Form>
 
           <AuthHint>
-            No account yet ? <Link to="/register">Sign up</Link>
+            {t('auth:noAccountYet')}{' '}
+            <Link to="/register">{t('auth:signUp')}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

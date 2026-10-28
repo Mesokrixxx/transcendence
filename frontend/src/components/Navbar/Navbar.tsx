@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useId, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import Button from '../Button/Button';
+import i18n from '../../services/i18n';
 import {
   Header,
   Content,
@@ -16,6 +18,7 @@ import {
 } from './Navbar.styles';
 
 function Navbar() {
+  const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
 
@@ -53,14 +56,7 @@ function Navbar() {
 
       if (showLanguages) {
         setShowLanguages(false);
-
-        if (languageMenuRef.current) {
-          const button = languageMenuRef.current.querySelector('button');
-
-          if (button) {
-            button.focus();
-          }
-        }
+        languageMenuRef.current?.querySelector('button')?.focus();
       } else {
         setShowMenu(false);
         burgerRef.current?.focus();
@@ -69,7 +65,6 @@ function Navbar() {
 
     document.addEventListener('pointerdown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('pointerdown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
@@ -81,13 +76,17 @@ function Navbar() {
       <Content className="container">
         <Brand to="/" onClick={closeMenus}>
           <Icon src="/icons/rook-solid-full.svg" alt="" />
-          Chess<span>Move</span>
+          <Trans i18nKey="home:chessMoveBrand">
+            Chess<span>Move</span>
+          </Trans>
         </Brand>
 
         <BurgerButton
           ref={burgerRef}
           type="button"
-          aria-label={showMenu ? 'Close navigation' : 'Open navigation'}
+          aria-label={
+            showMenu ? t('common:closeNavigation') : t('common:openNavigation')
+          }
           aria-expanded={showMenu}
           aria-controls={menuId}
           onClick={() => {
@@ -102,31 +101,28 @@ function Navbar() {
           id={menuId}
           $open={showMenu}
           onClick={(event) => {
-            if (event.target instanceof Element && event.target.closest('a')) {
+            if (event.target instanceof Element && event.target.closest('a'))
               closeMenus();
-            }
           }}
         >
-          <Navigation aria-label="Main navigation">
-            <Link to="/play">Play</Link>
-            <Link to="/watch">Watch</Link>
-            {/* <Link to="/tournaments">Tournaments</Link> */}
-            <Link to="/rankings">Rankings</Link>
+          <Navigation aria-label={t('common:mainNavigation')}>
+            <Link to="/play">{t('navigation:play')}</Link>
+            <Link to="/watch">{t('navigation:watch')}</Link>
+            <Link to="/rankings">{t('navigation:rankings')}</Link>
           </Navigation>
 
           <Auth>
             <Button to="/login" variant="secondary">
-              Log in
+              {t('auth:logIn')}
             </Button>
-
             <Button to="/register" variant="primary">
-              Sign Up
+              {t('auth:signUp')}
             </Button>
 
             <LanguageMenu ref={languageMenuRef}>
               <LanguageButton
                 type="button"
-                aria-label="Change language"
+                aria-label={t('common:changeLanguage')}
                 aria-expanded={showLanguages}
                 aria-controls={languageId}
                 onClick={() => setShowLanguages((open) => !open)}
@@ -137,18 +133,30 @@ function Navbar() {
               {showLanguages && (
                 <LanguageOptions id={languageId}>
                   <li>
-                    <button type="button" lang="fr" onClick={closeMenus}>
-                      Français
+                    <button
+                      type="button"
+                      lang="fr"
+                      aria-current={i18n.language === 'fr' ? 'true' : undefined}
+                    >
+                      {t('navigation:french')}
                     </button>
                   </li>
                   <li>
-                    <button type="button" lang="es" onClick={closeMenus}>
-                      Español
+                    <button
+                      type="button"
+                      lang="es"
+                      aria-current={i18n.language === 'es' ? 'true' : undefined}
+                    >
+                      {t('navigation:spanish')}
                     </button>
                   </li>
                   <li>
-                    <button type="button" lang="en" onClick={closeMenus}>
-                      English
+                    <button
+                      type="button"
+                      lang="en"
+                      aria-current={i18n.language === 'en' ? 'true' : undefined}
+                    >
+                      {t('navigation:english')}
                     </button>
                   </li>
                 </LanguageOptions>

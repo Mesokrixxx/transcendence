@@ -1,64 +1,39 @@
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar/Navbar';
-import { Page } from './Home/Home.styles';
 import Footer from '../components/Footer/Footer';
+import { Page } from './Home/Home.styles';
 
 function TermsOfService() {
+  const { t } = useTranslation();
   return (
     <Page>
       <Navbar />
       <main className="container" style={{ flex: 1 }}>
-        <h1>Terms of Service</h1>
-
+        <h1>{t('legal:termsOfService')}</h1>
+        <p>{t('legal:termsIntro')}</p>
+        <h2>{t('legal:applicationUse')}</h2>
+        <p>{t('legal:usersMust')}</p>
+        <h2>{t('legal:userAccounts')}</h2>
+        <p>{t('legal:usersAreResponsibleFor')}</p>
+        <h2>{t('legal:fairPlay')}</h2>
+        <p>{t('legal:usersMustNot')}</p>
+        <h2>{t('legal:accountRestrictions')}</h2>
+        <p>{t('legal:accountsMayBe')}</p>
+        <h2>{t('legal:availability')}</h2>
+        <p>{t('legal:thisIsAStudentProject')}</p>
+        <h2>{t('legal:disclaimer')}</h2>
+        <p>{t('legal:educationalPurposes')}</p>
+        <h2>{t('legal:credits')}</h2>
         <p>
-          Chess Move is a student project developed as part of the 42
-          curriculum. By using this application, you agree to follow the rules
-          described below.
-        </p>
-
-        <h2>Use of the application</h2>
-        <p>
-          Users must use the application responsibly and must not attempt to
-          disrupt, damage, or misuse the service.
-        </p>
-
-        <h2>User accounts</h2>
-        <p>
-          Users are responsible for the information associated with their
-          account and for keeping their credentials secure.
-        </p>
-
-        <h2>Fair play</h2>
-        <p>
-          Users must not cheat, exploit bugs, harass other players, or use the
-          application in a way that negatively affects other users.
-        </p>
-
-        <h2>Account restrictions</h2>
-        <p>
-          Accounts may be restricted or removed in cases of abusive behaviour,
-          cheating, or misuse of the platform.
-        </p>
-
-        <h2>Availability</h2>
-        <p>
-          As this is a student project, the service may be modified,
-          interrupted, or unavailable without notice.
-        </p>
-
-        <h2>Disclaimer</h2>
-        <p>
-          This project is provided for educational purposes and is not a
-          commercial service.
-        </p>
-        <h2>Credits</h2>
-        <p>
-          Chess piece artwork:{' '}
-          <a href="https://github.com/philatype/kosal">Kosal by Philatype</a>
-          {', licensed under '}
-          <a href="https://creativecommons.org/licenses/by/4.0/">
-            Creative Commons Attribution 4.0
+          {t('legal:chessPieceArtwork')}{' '}
+          <a href="https://github.com/philatype/kosal">
+            {t('legal:kosalByPhilatype')}
           </a>
-          {'.'}
+          {t('legal:licensedUnder')}{' '}
+          <a href="https://creativecommons.org/licenses/by/4.0/">
+            {t('legal:creativeCommonsAttribution')}
+          </a>
+          .
         </p>
       </main>
       <Footer />

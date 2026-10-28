@@ -9,6 +9,7 @@ import {
   Input,
   SendButton,
 } from './ChatBox.styles';
+import { useTranslation } from 'react-i18next';
 
 type Message = {
   id: number;
@@ -22,6 +23,7 @@ type ChatBoxProps = {
 };
 
 function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [draft, setDraft] = useState('');
 
@@ -43,7 +45,9 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
       <MessageList>
         {messages.map((message) => (
           <MessageItem key={message.id}>
-            <Author>{message.author}</Author>
+            <Author>
+              {message.author === 'me' ? t('common:you') : message.author}
+            </Author>
             <p>{message.content}</p>
           </MessageItem>
         ))}
@@ -54,9 +58,9 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
           type="text"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Write a message..."
+          placeholder={t('chat:writeAMessage')}
         />
-        <SendButton type="submit">Send</SendButton>
+        <SendButton type="submit">{t('common:send')}</SendButton>
       </Form>
     </Box>
   );

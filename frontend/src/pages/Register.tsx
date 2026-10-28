@@ -12,12 +12,13 @@ import { AuthContent, AuthPanel, AuthHint } from './Login/Auth.styles';
 import {
   validatePassword,
   PASSWORD_PATTERN,
-  PASSWORD_MESSAGE,
   PASSWORD_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,
 } from '../services/passwordValidation';
+import { useTranslation } from 'react-i18next';
 
 function Register() {
+  const { t } = useTranslation();
   const [password, setPassord] = useState('');
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,11 +43,11 @@ function Register() {
     const validation = validatePassword(password);
 
     if (!validation.isValid) {
-      passwordInput.setCustomValidity(PASSWORD_MESSAGE);
+      passwordInput.setCustomValidity(t('auth:passwordPatternMessage'));
     }
 
     if (password !== confirmation) {
-      confirmationInput.setCustomValidity('Passwords do not match.');
+      confirmationInput.setCustomValidity(t('auth:passwordsDoNotMatch'));
     }
 
     if (!form.reportValidity()) {
@@ -62,16 +63,16 @@ function Register() {
 
       <AuthContent className="container">
         <AuthPanel>
-          <h1>Create your account</h1>
+          <h1>{t('auth:createYourAccount')}</h1>
 
           <Form onSubmit={handleSubmit}>
             <Input
               id="register-username"
               name="username"
-              label="Username"
+              label={t('auth:username')}
               type="text"
               autoComplete="username"
-              placeholder="Your username"
+              placeholder={t('auth:yourUsername')}
               maxLength={32}
               required
             />
@@ -79,23 +80,23 @@ function Register() {
             <Input
               id="register-email"
               name="email"
-              label="Email"
+              label={t('auth:email')}
               type="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder={t('auth:emailPlaceholder')}
               required
             />
 
             <Input
               id="register-password"
               name="password"
-              label="Password"
+              label={t('auth:password')}
               type="password"
               autoComplete="new-password"
               aria-describedby="password-help"
-              placeholder="Example42$"
+              placeholder={t('auth:examplePassword')}
               pattern={PASSWORD_PATTERN}
-              title={PASSWORD_MESSAGE}
+              title={t('auth:passwordPatternMessage')}
               value={password}
               onChange={(event) => {
                 event.currentTarget.setCustomValidity('');
@@ -110,21 +111,22 @@ function Register() {
             <Input
               id="register-confirm-password"
               name="confirmPassword"
-              label="Confirm password"
+              label={t('auth:confirmPassword')}
               type="password"
               autoComplete="new-password"
-              placeholder="Repeat your password"
+              placeholder={t('auth:repeatYourPassword')}
               onChange={(event) => {
                 event.currentTarget.setCustomValidity('');
               }}
               required
             />
 
-            <Button type="submit">Create account</Button>
+            <Button type="submit">{t('auth:createAccount')}</Button>
           </Form>
 
           <AuthHint>
-            Already have an account? <Link to="/login">Log in</Link>
+            {t('auth:alreadyHaveAnAccount')}{' '}
+            <Link to="/login">{t('auth:logIn')}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

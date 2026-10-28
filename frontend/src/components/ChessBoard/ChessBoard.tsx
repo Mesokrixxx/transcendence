@@ -5,6 +5,7 @@ import type {
   Move,
   Square as SquareName,
 } from '../../../../chessgame/src/chessgame.types';
+import { useTranslation } from 'react-i18next';
 import { Board, Square, Piece, MoveIndicator } from './ChessBoard.styles';
 
 type ChessBoardProps = {
@@ -26,7 +27,15 @@ const backRow = [
   'bishop',
   'knight',
   'rook',
-];
+] as const;
+const pieceTranslationKeys: Record<string, string> = {
+  rook: 'chess:pieceRook',
+  knight: 'chess:pieceKnight',
+  bishop: 'chess:pieceBishop',
+  queen: 'chess:pieceQueen',
+  king: 'chess:pieceKing',
+  pawn: 'chess:piecePawn',
+};
 
 function ChessBoard({
   board,
@@ -37,108 +46,81 @@ function ChessBoard({
   orientation = 'white',
   legalMoves = [],
 }: ChessBoardProps) {
+  const { t } = useTranslation();
   const [homeSelection, setHomeSelection] = useState<SquareName | null>(null);
-
-  let selection;
-
-  if (selectedSquare === undefined) {
-    selection = homeSelection;
-  } else {
-    selection = selectedSquare;
-  }
+  const selection =
+    selectedSquare === undefined ? homeSelection : selectedSquare;
 
   function handleClick(square: SquareName) {
     if (disabled || readOnly) return;
-
-    if (onSquareClick) {
-      onSquareClick(square);
-    } else if (homeSelection === square) {
-      setHomeSelection(null);
-    } else {
-      setHomeSelection(square);
-    }
+    if (onSquareClick) onSquareClick(square);
+    else setHomeSelection((selected) => (selected === square ? null : square));
   }
 
   return (
-    <Board className="chessboard" aria-label="Chessboard">
+    <Board className="chessboard" aria-label={t('common:chessboard')}>
       {Array.from({ length: 64 }, (_, index) => {
         const row = Math.floor(index / 8);
         const column = index % 8;
-
         const file =
           orientation === 'white' ? 'abcdefgh'[column] : 'hgfedcba'[column];
-
         const rank = orientation === 'white' ? 8 - row : row + 1;
         const square = `${file}${rank}` as SquareName;
-
         const isLight = (row + column) % 2 === 0;
         let pieceFile = '';
 
         if (board) {
           const currentPiece = board[square];
-
-          if (currentPiece) {
+          if (currentPiece)
             pieceFile = `${currentPiece.color}_${currentPiece.type}`;
-          }
-        } else {
-          if (row === 0) {
-            pieceFile = 'black_' + backRow[column];
-          } else if (row === 1) {
-            pieceFile = 'black_pawn';
-          } else if (row === 6) {
-            pieceFile = 'white_pawn';
-          } else if (row === 7) {
-            pieceFile = 'white_' + backRow[column];
-          }
+        } else if (row === 0) {
+          pieceFile = `black_${backRow[column]}`;
+        } else if (row === 1) {
+          pieceFile = 'black_pawn';
+        } else if (row === 6) {
+          pieceFile = 'white_pawn';
+        } else if (row === 7) {
+          pieceFile = `white_${backRow[column]}`;
         }
 
         let piece = null;
-        let squareLabel = 'Empty square';
-
-        if (pieceFile !== '') {
-          squareLabel = pieceFile.replace('_', ' ');
-
+        let squareLabel = t('chess:emptySquare');
+        if (pieceFile) {
+          const color = pieceFile.split('_')[0];
+          const pieceType = pieceFile.split('_')[1];
+          squareLabel = `${t(color, { ns: 'chess' })} ${t(pieceTranslationKeys[pieceType] ?? 'chess:piecePawn')}`;
           piece = (
             <Piece
-              src={'/pieces/kosal/' + pieceFile + '.svg'}
+              src={`/pieces/kosal/${pieceFile}.svg`}
               alt=""
               draggable={false}
             />
           );
         }
+
         const isLegalDestination =
           !readOnly &&
           !disabled &&
           legalMoves.some((move) => move.to === square);
-
         let isCapture = false;
-
         if (isLegalDestination && board && selection) {
           const selectedPiece = board[selection];
-
-          if (board[square]) {
-            isCapture = true;
-          } else if (
+          if (board[square]) isCapture = true;
+          else if (
             selectedPiece &&
             selectedPiece.type === 'pawn' &&
             selection[0] !== square[0]
-          ) {
-            // Prise en passant.
+          )
             isCapture = true;
-          }
         }
-
         if (isLegalDestination) {
-          if (isCapture) {
-            squareLabel += ' — legal capture';
-          } else {
-            squareLabel += ' — legal move';
-          }
+          squareLabel += isCapture
+            ? `, ${t('chess:legalCapture')}`
+            : `, ${t('chess:legalMove')}`;
         }
 
         const isDisabled =
           disabled || readOnly || (!onSquareClick && pieceFile === '');
-
         return (
           <Square
             key={square}
@@ -146,7 +128,7 @@ function ChessBoard({
             $isLight={isLight}
             $selected={!readOnly && selection === square}
             disabled={isDisabled}
-            aria-label={`${square}: ${squareLabel}`}
+            aria-label={t('chess:squareLabel', { square, squareLabel })}
             aria-pressed={!readOnly && selection === square}
             onClick={() => handleClick(square)}
           >
