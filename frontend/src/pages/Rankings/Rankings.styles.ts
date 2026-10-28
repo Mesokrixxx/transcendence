@@ -1,13 +1,12 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Content = styled.main`
   flex: 1;
   padding-block: 24px;
-
-`
+`;
 
 export const Header = styled.header`
-  margin-bottom : 32px;
+  margin-bottom: 32px;
 
   h1 {
     font-size: clamp(32px, 4vw, 56px);
@@ -19,12 +18,11 @@ export const Header = styled.header`
   span {
     color: var(--color-primary);
   }
-  
+
   p {
     color: var(--color-text-secondary);
   }
-
-`
+`;
 
 export const Eyebrow = styled.span`
   display: flex;
@@ -43,14 +41,14 @@ export const Eyebrow = styled.span`
     height: 2px;
     background-color: var(--color-primary);
   }
-`
+`;
 
 export const TableWrapper = styled.div`
   overflow-x: auto;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 10px;
-`
+`;
 
 export const Table = styled.table`
   width: 100%;
@@ -76,10 +74,10 @@ export const Table = styled.table`
     font-weight: 700;
   }
 
-  @media (max-width: 700px){
+  @media (max-width: 700px) {
     th,
     td {
-      padding : 10px 8px
+      padding: 10px 8px;
     }
 
     th:nth-child(4),
@@ -88,9 +86,8 @@ export const Table = styled.table`
     td:nth-child(5) {
       display: none;
     }
-
   }
-`
+`;
 
 export const PlayerCell = styled.div`
   display: flex;
@@ -104,30 +101,30 @@ export const PlayerCell = styled.div`
     white-space: nowrap;
   }
 
-  @media(max-width: 700px) {
+  @media (max-width: 700px) {
     gap: 8px;
 
     > div {
       width: 40px;
-      height: 40px; 
+      height: 40px;
     }
 
     span {
       max-width: 90px;
     }
   }
-`
+`;
 
 export const WinRate = styled.td`
   color: var(--color-primary);
   font-weight: 700;
-`
+`;
 
 export const RankCell = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-`
+`;
 
 export const MedalSlot = styled.span`
   width: 24px;
@@ -139,4 +136,4 @@ export const MedalSlot = styled.span`
     height: 100%
     display: block;
   }
-`
+`;

@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 export const Header = styled.header`
   background: linear-gradient(
@@ -13,7 +13,7 @@ export const Header = styled.header`
     color: var(--color-text-primary);
     text-decoration: none;
   }
-`
+`;
 
 export const Content = styled.div`
   display: grid;
@@ -32,7 +32,7 @@ export const Content = styled.div`
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 16px;
   }
-`
+`;
 
 export const Brand = styled(Link)`
   display: flex;
@@ -48,13 +48,13 @@ export const Brand = styled(Link)`
   @media (max-width: 600px) {
     font-size: 26px;
   }
-`
+`;
 
 export const Icon = styled.img`
   width: 24px;
   height: 32px;
   flex-shrink: 0;
-`
+`;
 
 export const BurgerButton = styled.button`
   display: none;
@@ -78,7 +78,7 @@ export const BurgerButton = styled.button`
   @media (max-width: 600px) {
     display: inline-flex;
   }
-`
+`;
 
 export const MenuContent = styled.div<{ $open: boolean }>`
   display: contents;
@@ -92,7 +92,7 @@ export const MenuContent = styled.div<{ $open: boolean }>`
     padding: 16px 0;
     border-top: 1px solid var(--color-border);
   }
-`
+`;
 
 export const Navigation = styled.nav`
   display: flex;
@@ -120,7 +120,7 @@ export const Navigation = styled.nav`
       background: var(--color-surface);
     }
   }
-`
+`;
 
 export const Auth = styled.div`
   display: flex;
@@ -139,7 +139,7 @@ export const Auth = styled.div`
       white-space: nowrap;
     }
   }
-`
+`;
 
 export const LanguageButton = styled.button`
   display: inline-flex;
@@ -159,11 +159,11 @@ export const LanguageButton = styled.button`
     outline: 2px solid var(--color-primary);
     outline-offset: 4px;
   }
-`
+`;
 
 export const LanguageMenu = styled.div`
   position: relative;
-`
+`;
 
 export const LanguageOptions = styled.ul`
   position: absolute;
@@ -193,4 +193,4 @@ export const LanguageOptions = styled.ul`
       background-color: var(--color-background);
     }
   }
-`
+`;

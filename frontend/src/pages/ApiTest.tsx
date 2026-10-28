@@ -1,42 +1,36 @@
-import { useState } from 'react'
+import { useState } from 'react';
 // import { fakerEN as faker } from '@faker-js/faker'
-import fetchAPI from '../services/fetchAPI'
-import type { AuthUser } from '../types/auth'
-import Button from '../components/Button/Button'
-
+import fetchAPI from '../services/fetchAPI';
+import type { AuthUser } from '../types/auth';
+import Button from '../components/Button/Button';
 
 function ApiTest() {
-    const [result, setResult] = useState('Test not started.')
+  const [result, setResult] = useState('Test not started.');
 
-    async function testAPI() {
-        setResult('Loading...')
+  async function testAPI() {
+    setResult('Loading...');
 
-        const response = await fetchAPI<AuthUser>({
-            path: '/auth/login',
-            method: 'post',
-            body: {}
-        })
+    const response = await fetchAPI<AuthUser>({
+      path: '/auth/login',
+      method: 'post',
+      body: {},
+    });
 
-        setResult(JSON.stringify(response, null, 2))
-    }
+    setResult(JSON.stringify(response, null, 2));
+  }
 
-    return (
-        <main className="container">
-            <h1>API test — backend</h1>
+  return (
+    <main className="container">
+      <h1>API test — backend</h1>
 
-            <Button onClick={testAPI}>
-                Create test account
-            </Button>
+      <Button onClick={testAPI}>Create test account</Button>
 
-            <pre style={{ whiteSpace: 'pre-wrap', marginTop: 24 }}>
-                {result}
-            </pre>
-        </main>
-    )
+      <pre style={{ whiteSpace: 'pre-wrap', marginTop: 24 }}>{result}</pre>
+    </main>
+  );
 }
 
-export default ApiTest
-
+export default ApiTest;
 
 // function ApiTest() {
 //     const [result, setResult] = useState('Test not started.')
@@ -55,7 +49,6 @@ export default ApiTest
 
 //         setResult('Loading...')
 
-       
 //         const originalFetch = window.fetch
 
 //         window.fetch = async (input, options) => {

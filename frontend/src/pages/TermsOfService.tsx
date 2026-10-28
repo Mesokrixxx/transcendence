@@ -1,18 +1,18 @@
-import Navbar from "../components/Navbar/Navbar"
-import { Page } from './Home/Home.styles'
-import Footer from '../components/Footer/Footer'
-
+import Navbar from '../components/Navbar/Navbar';
+import { Page } from './Home/Home.styles';
+import Footer from '../components/Footer/Footer';
 
 function TermsOfService() {
   return (
     <Page>
-      <Navbar/>
+      <Navbar />
       <main className="container" style={{ flex: 1 }}>
         <h1>Terms of Service</h1>
 
         <p>
-          Chess Move is a student project developed as part of the 42 curriculum.
-          By using this application, you agree to follow the rules described below.
+          Chess Move is a student project developed as part of the 42
+          curriculum. By using this application, you agree to follow the rules
+          described below.
         </p>
 
         <h2>Use of the application</h2>
@@ -23,8 +23,8 @@ function TermsOfService() {
 
         <h2>User accounts</h2>
         <p>
-          Users are responsible for the information associated with their account
-          and for keeping their credentials secure.
+          Users are responsible for the information associated with their
+          account and for keeping their credentials secure.
         </p>
 
         <h2>Fair play</h2>
@@ -41,8 +41,8 @@ function TermsOfService() {
 
         <h2>Availability</h2>
         <p>
-          As this is a student project, the service may be modified, interrupted,
-          or unavailable without notice.
+          As this is a student project, the service may be modified,
+          interrupted, or unavailable without notice.
         </p>
 
         <h2>Disclaimer</h2>
@@ -53,9 +53,7 @@ function TermsOfService() {
         <h2>Credits</h2>
         <p>
           Chess piece artwork:{' '}
-          <a href="https://github.com/philatype/kosal">
-            Kosal by Philatype
-          </a>
+          <a href="https://github.com/philatype/kosal">Kosal by Philatype</a>
           {', licensed under '}
           <a href="https://creativecommons.org/licenses/by/4.0/">
             Creative Commons Attribution 4.0
@@ -64,9 +62,8 @@ function TermsOfService() {
         </p>
       </main>
       <Footer />
-     </Page>
-
-  )
+    </Page>
+  );
 }
 
-export default TermsOfService
+export default TermsOfService;

@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Content = styled.main`
   flex: 1;
@@ -9,7 +9,7 @@ export const Content = styled.main`
     font-weight: 800;
     margin-bottom: 24px;
   }
-`
+`;
 
 export const Boxes = styled.div`
   display: grid;
@@ -19,4 +19,4 @@ export const Boxes = styled.div`
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
-`
+`;

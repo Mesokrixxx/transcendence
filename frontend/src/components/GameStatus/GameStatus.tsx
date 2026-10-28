@@ -1,42 +1,33 @@
-import type ChessGame from '../../../../chessgame/src/chessgame'
-import { StatusBox } from './GameStatus.styles'
+import type ChessGame from '../../../../chessgame/src/chessgame';
+import { StatusBox } from './GameStatus.styles';
 
 type GameStatusProps = {
-    game: ChessGame
-}
+  game: ChessGame;
+};
 
 function GameStatus({ game }: GameStatusProps) {
-    let currentColor
-    let winner
+  let currentColor;
+  let winner;
 
-    if (game.getTurn()=== 'white')
-    {
-        currentColor = 'White'
-        winner = 'Black'
-    }
-    else {
-        currentColor = 'Black'
-        winner = 'White'
-    }
+  if (game.getTurn() === 'white') {
+    currentColor = 'White';
+    winner = 'Black';
+  } else {
+    currentColor = 'Black';
+    winner = 'White';
+  }
 
-    let status = currentColor + ' to move'
+  let status = currentColor + ' to move';
 
-    if (game.isCheckmate()) {
-        status =  'Chekmate - ' + winner + 'wins'
-    }
-    else if (game.isDraw()){
-        status = 'Draw'
-    }
-    else if (game.isCheck()){
-        status += ' - Check'
-    }
+  if (game.isCheckmate()) {
+    status = 'Chekmate - ' + winner + 'wins';
+  } else if (game.isDraw()) {
+    status = 'Draw';
+  } else if (game.isCheck()) {
+    status += ' - Check';
+  }
 
-
-    return (
-        <StatusBox role="status">
-            {status}
-        </StatusBox>
-    )
+  return <StatusBox role="status">{status}</StatusBox>;
 }
 
-export default GameStatus
+export default GameStatus;

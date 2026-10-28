@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react';
 import {
   Box,
   Title,
@@ -7,33 +7,33 @@ import {
   Author,
   Form,
   Input,
-  SendButton
-} from './ChatBox.styles'
+  SendButton,
+} from './ChatBox.styles';
 
 type Message = {
-  id: number
-  author: string
-  content: string
-}
+  id: number;
+  author: string;
+  content: string;
+};
 
 type ChatBoxProps = {
-  title: string
-  initialMessages?: Message[]
-}
+  title: string;
+  initialMessages?: Message[];
+};
 
 function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const [draft, setDraft] = useState('')
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [draft, setDraft] = useState('');
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const text = draft.trim()
-    if (text === '') return
+    const text = draft.trim();
+    if (text === '') return;
 
-    const newMessage: Message = { id: Date.now(), author: 'me', content: text }
-    setMessages([...messages, newMessage])
-    setDraft('')
+    const newMessage: Message = { id: Date.now(), author: 'me', content: text };
+    setMessages([...messages, newMessage]);
+    setDraft('');
   }
 
   return (
@@ -59,7 +59,7 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
         <SendButton type="submit">Send</SendButton>
       </Form>
     </Box>
-  )
+  );
 }
 
-export default ChatBox
+export default ChatBox;
