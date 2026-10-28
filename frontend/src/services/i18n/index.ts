@@ -1,24 +1,42 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import en from './locales/en/en.json';
-import fr from './locales/fr/fr.json';
+import backend from 'i18next-http-backend';
 
-const resources = {
-  en: {
-    translation: en,
-  },
-  fr: {
-    translation: fr,
-  },
-};
+const namespaces = [
+  'common',
+  'navigation',
+  'auth',
+  'profile',
+  'chess',
+  'chat',
+  'home',
+  'rankings',
+  'legal',
+];
 
-i18n.use(initReactI18next).init({
-  resources,
-  lng: 'en',
+const supportedLanguages = ['en', 'fr', 'es'];
+const savedLanguage = window.localStorage.getItem('lng');
+const browserLanguage = window.navigator.language.split('-')[0];
+const language =
+  savedLanguage !== null && supportedLanguages.includes(savedLanguage)
+    ? savedLanguage
+    : supportedLanguages.includes(browserLanguage)
+      ? browserLanguage
+      : 'en';
 
-  interpolation: {
-    escapeValue: false, // react already safes from xss
-  },
-});
+i18n
+  .use(backend)
+  .use(initReactI18next)
+  .init({
+    supportedLngs: supportedLanguages,
+    fallbackLng: 'en',
+    lng: language,
+    ns: namespaces,
+    defaultNS: 'common',
+    saveMissing: true,
+    interpolation: {
+      escapeValue: false,
+    },
+  });
 
 export default i18n;
