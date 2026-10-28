@@ -8,15 +8,35 @@ export function treatError(err: unknown) {
   if (err instanceof PrismaClientKnownRequestError) {
     switch (err.code) {
       case 'P2002': {
-        const target = Array.isArray(err.meta?.target) ? err.meta.target : [];
+          const target = Array.isArray(err.meta?.target)
+              ? err.meta.target
+              : [];
 
-        if (target.includes('username'))
-          return { status: 409, error: 'username already exists' };
+          const adapterError = err.meta?.driverAdapterError as {
+              cause?: {
+                  constraint?: {
+                      index?: string;
+                  };
+              };
+          } | undefined;
 
-        if (target.includes('email'))
-          return { status: 409, error: 'email already exists' };
+          const index = adapterError?.cause?.constraint?.index;
 
-        return { status: 409, error: 'value(s) already exists' };
+          if (
+              target.includes('username') ||
+              index === 'User_username_key'
+          ) {
+              return { status: 409, error: 'username already exists' };
+          }
+
+          if (
+              target.includes('email') ||
+              index === 'User_email_key'
+          ) {
+              return { status: 409, error: 'email already exists' };
+          }
+
+          return { status: 409, error: 'value(s) already exists' };
       }
 
       case 'P2025':

@@ -89,12 +89,15 @@ function Register(){
                 message = response.result.error
             }
 
-            if (message === 'value(s) already exists') {
+            if (message === 'username already exists') {
+                setError('This username is already in use.')
+            } else if (message === 'email already exists') {
+                setError('This email is already in use.')
+            } else if (message === 'value(s) already exists') {
                 setError('This username or email is already in use.')
             } else {
                 setError(message)
             }
-
             return
         }
         setSuccess('Account created. You can now log in. ')
