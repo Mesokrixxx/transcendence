@@ -1,0 +1,13 @@
+{
+  "competitivePlay": "Jeu compétitif",
+  "communityLeaderboardDescription": "Découvrez la progression de la communauté au classement.",
+  "playerRankingsTitle": "<1>Classement</1> des joueurs",
+  "player": "Joueur",
+  "rating": "Classement Elo",
+  "wins": "Victoires",
+  "games": "Parties",
+  "winRate": "Taux de victoire",
+  "firstPlace": "Première place",
+  "secondPlace": "Deuxième place",
+  "thirdPlace": "Troisième place"
+}

@@ -1,0 +1,19 @@
+{
+  "cancel": "Cancel",
+  "send": "Send",
+  "online": "Online",
+  "offline": "Offline",
+  "close": "Close",
+  "changeLanguage": "Change language",
+  "closeNavigation": "Close navigation",
+  "openNavigation": "Open navigation",
+  "mainNavigation": "Main navigation",
+  "requestFailed": "The request failed.",
+  "unableToReachServer": "Unable to reach the server.",
+  "invalidJSONResponse": "The server returned an invalid JSON response.",
+  "copyright": "© {{year}} ChessMove",
+  "chessboard": "Chessboard",
+  "avatarOfUsername": "Avatar of {{username}}",
+  "unknownError": "Something went wrong.",
+  "you": "You"
+}

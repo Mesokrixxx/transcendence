@@ -1,0 +1,19 @@
+{
+  "cancel": "Annuler",
+  "send": "Envoyer",
+  "online": "En ligne",
+  "offline": "Hors ligne",
+  "close": "Fermer",
+  "changeLanguage": "Changer de langue",
+  "closeNavigation": "Fermer la navigation",
+  "openNavigation": "Ouvrir la navigation",
+  "mainNavigation": "Navigation principale",
+  "requestFailed": "La requête a échoué.",
+  "unableToReachServer": "Impossible de joindre le serveur.",
+  "invalidJSONResponse": "Le serveur a renvoyé une réponse JSON invalide.",
+  "copyright": "© {{year}} ChessMove",
+  "chessboard": "Échiquier",
+  "avatarOfUsername": "Avatar de {{username}}",
+  "unknownError": "Une erreur est survenue.",
+  "you": "Vous"
+}

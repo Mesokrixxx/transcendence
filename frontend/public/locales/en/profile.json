@@ -1,0 +1,12 @@
+{
+  "avatarOfUsername": "Avatar of {{username}}",
+  "changeAvatar": "Change avatar",
+  "editProfile": "Edit profile",
+  "jpgPngOrWebpMaximum2Mb": "JPG, PNG or WebP. Maximum 2 MB.",
+  "profileInformationAndAvatar": "Profile information and avatar",
+  "yourUsername": "Your username",
+  "chooseImageFormat": "Please choose a JPG, PNG or WebP image.",
+  "imageTooLarge": "The image must be no larger than 2 MB.",
+  "firstNameOptional": "First name (optional)",
+  "lastNameOptional": "Last name (optional)"
+}
