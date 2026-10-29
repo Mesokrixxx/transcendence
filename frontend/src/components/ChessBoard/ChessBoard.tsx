@@ -28,14 +28,6 @@ const backRow = [
   'knight',
   'rook',
 ] as const;
-const pieceTranslationKeys: Record<string, string> = {
-  rook: 'chess:pieceRook',
-  knight: 'chess:pieceKnight',
-  bishop: 'chess:pieceBishop',
-  queen: 'chess:pieceQueen',
-  king: 'chess:pieceKing',
-  pawn: 'chess:piecePawn',
-};
 
 function ChessBoard({
   board,
@@ -88,7 +80,9 @@ function ChessBoard({
         if (pieceFile) {
           const color = pieceFile.split('_')[0];
           const pieceType = pieceFile.split('_')[1];
-          squareLabel = `${t(color, { ns: 'chess' })} ${t(pieceTranslationKeys[pieceType] ?? 'chess:piecePawn')}`;
+          squareLabel = t(
+            `chess:pieceDescriptions.${color}${pieceType[0].toUpperCase()}${pieceType.slice(1)}`,
+          );
           piece = (
             <Piece
               src={`/pieces/kosal/${pieceFile}.svg`}
