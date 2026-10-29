@@ -7,18 +7,23 @@ type GameStatusProps = { game: ChessGame };
 function GameStatus({ game }: GameStatusProps) {
   const { t } = useTranslation();
   const currentColor =
-    game.getTurn() === 'white' ? t('chess:white') : t('chess:black');
+    game.getTurn() === 'white'
+      ? t('white', { ns: 'chess' })
+      : t('black', { ns: 'chess' });
   const winner =
-    game.getTurn() === 'white' ? t('chess:black') : t('chess:white');
+    game.getTurn() === 'white'
+      ? t('black', { ns: 'chess' })
+      : t('white', { ns: 'chess' });
 
   let status: string;
   if (game.isCheckmate()) {
-    status = t('chess:checkmateWinner', { winner });
+    status = t('checkmateWinner', { ns: 'chess', winner });
   } else if (game.isDraw()) {
-    status = t('chess:drawStatus');
+    status = t('drawStatus', { ns: 'chess' });
   } else {
-    status = t('chess:toMove', { color: currentColor });
-    if (game.isCheck()) status = t('chess:checkStatus', { turnStatus: status });
+    status = t('toMove', { ns: 'chess', color: currentColor });
+    if (game.isCheck())
+      status = t('checkStatus', { ns: 'chess', turnStatus: status });
   }
 
   return <StatusBox role="status">{status}</StatusBox>;

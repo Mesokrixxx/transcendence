@@ -46,7 +46,7 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
         {messages.map((message) => (
           <MessageItem key={message.id}>
             <Author>
-              {message.author === 'me' ? t('common:you') : message.author}
+              {message.author === 'me' ? t('you', { ns: 'common' }) : message.author}
             </Author>
             <p>{message.content}</p>
           </MessageItem>
@@ -58,9 +58,9 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
           type="text"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder={t('chat:writeAMessage')}
+          placeholder={t('writeAMessage', { ns: 'chat' })}
         />
-        <SendButton type="submit">{t('common:send')}</SendButton>
+        <SendButton type="submit">{t('send', { ns: 'common' })}</SendButton>
       </Form>
     </Box>
   );

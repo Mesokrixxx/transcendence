@@ -9,11 +9,11 @@ function Footer() {
   return (
     <footer>
       <Links className="container">
-        <span>{t('common:copyright', { year })}</span>
+        <span>{t('copyright', { ns: 'common', year })}</span>
         <span aria-hidden="true">|</span>
-        <Link to="/privacy">{t('legal:privacyPolicy')}</Link>
+        <Link to="/privacy">{t('privacyPolicy', { ns: 'legal' })}</Link>
         <span aria-hidden="true">|</span>
-        <Link to="/terms">{t('legal:termsOfService')}</Link>
+        <Link to="/terms">{t('termsOfService', { ns: 'legal' })}</Link>
       </Links>
     </footer>
   );

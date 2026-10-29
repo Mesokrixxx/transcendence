@@ -18,6 +18,35 @@ type ChessBoardProps = {
   legalMoves?: DeepReadonly<Move[]>;
 };
 
+type PieceDescriptionKey =
+  | 'pieceDescriptions.whiteKing'
+  | 'pieceDescriptions.whiteQueen'
+  | 'pieceDescriptions.whiteRook'
+  | 'pieceDescriptions.whiteBishop'
+  | 'pieceDescriptions.whiteKnight'
+  | 'pieceDescriptions.whitePawn'
+  | 'pieceDescriptions.blackKing'
+  | 'pieceDescriptions.blackQueen'
+  | 'pieceDescriptions.blackRook'
+  | 'pieceDescriptions.blackBishop'
+  | 'pieceDescriptions.blackKnight'
+  | 'pieceDescriptions.blackPawn';
+
+const pieceDescriptionKeys: Record<string, PieceDescriptionKey> = {
+  white_king: 'pieceDescriptions.whiteKing',
+  white_queen: 'pieceDescriptions.whiteQueen',
+  white_rook: 'pieceDescriptions.whiteRook',
+  white_bishop: 'pieceDescriptions.whiteBishop',
+  white_knight: 'pieceDescriptions.whiteKnight',
+  white_pawn: 'pieceDescriptions.whitePawn',
+  black_king: 'pieceDescriptions.blackKing',
+  black_queen: 'pieceDescriptions.blackQueen',
+  black_rook: 'pieceDescriptions.blackRook',
+  black_bishop: 'pieceDescriptions.blackBishop',
+  black_knight: 'pieceDescriptions.blackKnight',
+  black_pawn: 'pieceDescriptions.blackPawn',
+};
+
 const backRow = [
   'rook',
   'knight',
@@ -38,7 +67,8 @@ function ChessBoard({
   orientation = 'white',
   legalMoves = [],
 }: ChessBoardProps) {
-  const { t } = useTranslation();
+  const { t: tCommon } = useTranslation('common');
+  const { t: tChess } = useTranslation('chess');
   const [homeSelection, setHomeSelection] = useState<SquareName | null>(null);
   const selection =
     selectedSquare === undefined ? homeSelection : selectedSquare;
@@ -50,7 +80,7 @@ function ChessBoard({
   }
 
   return (
-    <Board className="chessboard" aria-label={t('common:chessboard')}>
+    <Board className="chessboard" aria-label={tCommon('chessboard')}>
       {Array.from({ length: 64 }, (_, index) => {
         const row = Math.floor(index / 8);
         const column = index % 8;
@@ -76,13 +106,9 @@ function ChessBoard({
         }
 
         let piece = null;
-        let squareLabel = t('chess:emptySquare');
+        let squareLabel: string = tChess('emptySquare');
         if (pieceFile) {
-          const color = pieceFile.split('_')[0];
-          const pieceType = pieceFile.split('_')[1];
-          squareLabel = t(
-            `chess:pieceDescriptions.${color}${pieceType[0].toUpperCase()}${pieceType.slice(1)}`,
-          );
+          squareLabel = tChess(pieceDescriptionKeys[pieceFile]);
           piece = (
             <Piece
               src={`/pieces/kosal/${pieceFile}.svg`}
@@ -109,8 +135,8 @@ function ChessBoard({
         }
         if (isLegalDestination) {
           squareLabel += isCapture
-            ? `, ${t('chess:legalCapture')}`
-            : `, ${t('chess:legalMove')}`;
+            ? `, ${tChess('legalCapture')}`
+            : `, ${tChess('legalMove')}`;
         }
 
         const isDisabled =
@@ -122,7 +148,7 @@ function ChessBoard({
             $isLight={isLight}
             $selected={!readOnly && selection === square}
             disabled={isDisabled}
-            aria-label={t('chess:squareLabel', { square, squareLabel })}
+            aria-label={tChess('squareLabel', { square, squareLabel })}
             aria-pressed={!readOnly && selection === square}
             onClick={() => handleClick(square)}
           >

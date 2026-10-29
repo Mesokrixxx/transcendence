@@ -31,7 +31,7 @@ function Login() {
     setUser(null);
 
     if (typeof email !== 'string' || typeof password !== 'string') {
-      setError(t('auth:enterEmailAndPassword'));
+      setError(t('enterEmailAndPassword', { ns: 'auth' }));
       return;
     }
 
@@ -67,14 +67,14 @@ function Login() {
 
       <AuthContent className="container">
         <AuthPanel>
-          <h1>{t('auth:welcomeBack')}</h1>
+          <h1>{t('welcomeBack', { ns: 'auth' })}</h1>
           <Form onSubmit={handleSubmit}>
             <Input
               id="login-email"
               name="email"
-              label={t('auth:email')}
+              label={t('email', { ns: 'auth' })}
               type="email"
-              placeholder={t('auth:emailPlaceholder')}
+              placeholder={t('emailPlaceholder', { ns: 'auth' })}
               autoComplete="email"
               required
             />
@@ -82,29 +82,29 @@ function Login() {
             <Input
               id="login-password"
               name="password"
-              label={t('auth:password')}
+              label={t('password', { ns: 'auth' })}
               type="password"
-              placeholder={t('auth:yourPassword')}
+              placeholder={t('yourPassword', { ns: 'auth' })}
               autoComplete="current-password"
               required
             />
 
-            <Button type="submit">{t('auth:logIn')}</Button>
+            <Button type="submit">{t('logIn', { ns: 'auth' })}</Button>
 
-            {isLoading && <p role="status">{t('auth:loggingIn')}</p>}
+            {isLoading && <p role="status">{t('loggingIn', { ns: 'auth' })}</p>}
 
             {error && <p role="alert">{error}</p>}
 
             {user && (
               <p role="status">
-                {t('auth:loggedInAs', { username: user.username })}
+                {t('loggedInAs', { ns: 'auth', username: user.username })}
               </p>
             )}
           </Form>
 
           <AuthHint>
-            {t('auth:noAccountYet')}{' '}
-            <Link to="/register">{t('auth:signUp')}</Link>
+            {t('noAccountYet', { ns: 'auth' })}{' '}
+            <Link to="/register">{t('signUp', { ns: 'auth' })}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

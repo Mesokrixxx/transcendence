@@ -16,15 +16,20 @@ import { Page } from '../Home/Home.styles';
 import { PlayContent, GameArea, GameInfo, GameChat } from './Play.styles';
 import { useTranslation } from 'react-i18next';
 
-const promotionLabels: Record<string, string> = {
-  queen: 'chess:promotionQueen',
-  rook: 'chess:promotionRook',
-  bishop: 'chess:promotionBishop',
-  knight: 'chess:promotionKnight',
+type PromotionLabelKey =
+  'promotionQueen' | 'promotionRook' | 'promotionBishop' | 'promotionKnight';
+
+const promotionLabels: Record<string, PromotionLabelKey> = {
+  queen: 'promotionQueen',
+  rook: 'promotionRook',
+  bishop: 'promotionBishop',
+  knight: 'promotionKnight',
 };
 
 function Play() {
-  const { t } = useTranslation();
+  const { t: tChess } = useTranslation('chess');
+  const { t: tCommon } = useTranslation('common');
+  const { t: tChat } = useTranslation('chat');
   const [game, setGame] = useState(() => new ChessGame());
   const [orientation, setOrientation] = useState<'white' | 'black'>('white');
   const [isRotating, setIsRotating] = useState(false);
@@ -60,9 +65,7 @@ function Play() {
       setError('');
     } catch (error: unknown) {
       setError(
-        error instanceof Error
-          ? error.message
-          : t('chess:unableToPlayThisMove'),
+        error instanceof Error ? error.message : tChess('unableToPlayThisMove'),
       );
     }
   }
@@ -109,34 +112,28 @@ function Play() {
       <Navbar />
 
       <PlayContent className="container">
-        <GameArea aria-label={t('chess:localChessGame')}>
-          <GameInfo aria-label={t('chess:gameInformation')}>
+        <GameArea aria-label={tChess('localChessGame')}>
+          <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
-              <Avatar
-                username={t('chess:opponent')}
-                size={64}
-                isOnline={true}
-              />
-              <span>{t('chess:opponent')}</span>
+              <Avatar username={tChess('opponent')} size={64} isOnline={true} />
+              <span>{tChess('opponent')}</span>
             </div>
 
             <GameStatus game={game} />
 
             {promotionMoves.length > 0 && (
-              <div role="group" aria-label={t('chess:choosePromotionPiece')}>
-                <p>{t('chess:promoteYourPawn')}</p>
+              <div role="group" aria-label={tChess('choosePromotionPiece')}>
+                <p>{tChess('promoteYourPawn')}</p>
 
                 {promotionMoves.map((move) => (
                   <Button
-                    key={t(
-                      promotionLabels[move.promotion ?? ''] ??
-                        'chess:promotionQueen',
+                    key={tChess(
+                      promotionLabels[move.promotion ?? ''] ?? 'promotionQueen',
                     )}
                     onClick={() => playMove(move)}
                   >
-                    {t(
-                      promotionLabels[move.promotion ?? ''] ??
-                        'chess:promotionQueen',
+                    {tChess(
+                      promotionLabels[move.promotion ?? ''] ?? 'promotionQueen',
                     )}
                   </Button>
                 ))}
@@ -145,7 +142,7 @@ function Play() {
                   variant="secondary"
                   onClick={() => setPromotionMoves([])}
                 >
-                  {t('common:cancel')}
+                  {tCommon('cancel')}
                 </Button>
               </div>
             )}
@@ -162,8 +159,8 @@ function Play() {
             legalMoves={legalMoves}
             disabled={game.isOver() || promotionMoves.length > 0 || isRotating}
           />
-          <GameChat aria-label={t('chat:gameChat')}>
-            <ChatBox title={t('chat:gameChat')} />
+          <GameChat aria-label={tChat('gameChat')}>
+            <ChatBox title={tChat('gameChat')} />
           </GameChat>
         </GameArea>
       </PlayContent>

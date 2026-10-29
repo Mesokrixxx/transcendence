@@ -43,11 +43,15 @@ function Register() {
     const validation = validatePassword(password);
 
     if (!validation.isValid) {
-      passwordInput.setCustomValidity(t('auth:passwordPatternMessage'));
+      passwordInput.setCustomValidity(
+        t('passwordPatternMessage', { ns: 'auth' }),
+      );
     }
 
     if (password !== confirmation) {
-      confirmationInput.setCustomValidity(t('auth:passwordsDoNotMatch'));
+      confirmationInput.setCustomValidity(
+        t('passwordsDoNotMatch', { ns: 'auth' }),
+      );
     }
 
     if (!form.reportValidity()) {
@@ -63,16 +67,16 @@ function Register() {
 
       <AuthContent className="container">
         <AuthPanel>
-          <h1>{t('auth:createYourAccount')}</h1>
+          <h1>{t('createYourAccount', { ns: 'auth' })}</h1>
 
           <Form onSubmit={handleSubmit}>
             <Input
               id="register-username"
               name="username"
-              label={t('auth:username')}
+              label={t('username', { ns: 'auth' })}
               type="text"
               autoComplete="username"
-              placeholder={t('auth:yourUsername')}
+              placeholder={t('yourUsername', { ns: 'auth' })}
               maxLength={32}
               required
             />
@@ -80,23 +84,23 @@ function Register() {
             <Input
               id="register-email"
               name="email"
-              label={t('auth:email')}
+              label={t('email', { ns: 'auth' })}
               type="email"
               autoComplete="email"
-              placeholder={t('auth:emailPlaceholder')}
+              placeholder={t('emailPlaceholder', { ns: 'auth' })}
               required
             />
 
             <Input
               id="register-password"
               name="password"
-              label={t('auth:password')}
+              label={t('password', { ns: 'auth' })}
               type="password"
               autoComplete="new-password"
               aria-describedby="password-help"
-              placeholder={t('auth:examplePassword')}
+              placeholder={t('examplePassword', { ns: 'auth' })}
               pattern={PASSWORD_PATTERN}
-              title={t('auth:passwordPatternMessage')}
+              title={t('passwordPatternMessage', { ns: 'auth' })}
               value={password}
               onChange={(event) => {
                 event.currentTarget.setCustomValidity('');
@@ -111,22 +115,22 @@ function Register() {
             <Input
               id="register-confirm-password"
               name="confirmPassword"
-              label={t('auth:confirmPassword')}
+              label={t('confirmPassword', { ns: 'auth' })}
               type="password"
               autoComplete="new-password"
-              placeholder={t('auth:repeatYourPassword')}
+              placeholder={t('repeatYourPassword', { ns: 'auth' })}
               onChange={(event) => {
                 event.currentTarget.setCustomValidity('');
               }}
               required
             />
 
-            <Button type="submit">{t('auth:createAccount')}</Button>
+            <Button type="submit">{t('createAccount', { ns: 'auth' })}</Button>
           </Form>
 
           <AuthHint>
-            {t('auth:alreadyHaveAnAccount')}{' '}
-            <Link to="/login">{t('auth:logIn')}</Link>
+            {t('alreadyHaveAnAccount', { ns: 'auth' })}{' '}
+            <Link to="/login">{t('logIn', { ns: 'auth' })}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

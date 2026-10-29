@@ -81,7 +81,7 @@ function Navbar() {
       <Content className="container">
         <Brand to="/" onClick={closeMenus}>
           <Icon src="/icons/rook-solid-full.svg" alt="" />
-          <Trans i18nKey="home:chessMoveBrand">
+          <Trans ns="home" i18nKey="chessMoveBrand">
             Chess<span>Move</span>
           </Trans>
         </Brand>
@@ -90,7 +90,9 @@ function Navbar() {
           ref={burgerRef}
           type="button"
           aria-label={
-            showMenu ? t('common:closeNavigation') : t('common:openNavigation')
+            showMenu
+              ? t('closeNavigation', { ns: 'common' })
+              : t('openNavigation', { ns: 'common' })
           }
           aria-expanded={showMenu}
           aria-controls={menuId}
@@ -110,24 +112,24 @@ function Navbar() {
               closeMenus();
           }}
         >
-          <Navigation aria-label={t('common:mainNavigation')}>
-            <Link to="/play">{t('navigation:play')}</Link>
-            <Link to="/watch">{t('navigation:watch')}</Link>
-            <Link to="/rankings">{t('navigation:rankings')}</Link>
+          <Navigation aria-label={t('mainNavigation', { ns: 'common' })}>
+            <Link to="/play">{t('play', { ns: 'navigation' })}</Link>
+            <Link to="/watch">{t('watch', { ns: 'navigation' })}</Link>
+            <Link to="/rankings">{t('rankings', { ns: 'navigation' })}</Link>
           </Navigation>
 
           <Auth>
             <Button to="/login" variant="secondary">
-              {t('auth:logIn')}
+              {t('logIn', { ns: 'auth' })}
             </Button>
             <Button to="/register" variant="primary">
-              {t('auth:signUp')}
+              {t('signUp', { ns: 'auth' })}
             </Button>
 
             <LanguageMenu ref={languageMenuRef}>
               <LanguageButton
                 type="button"
-                aria-label={t('common:changeLanguage')}
+                aria-label={t('changeLanguage', { ns: 'common' })}
                 aria-expanded={showLanguages}
                 aria-controls={languageId}
                 onClick={() => setShowLanguages((open) => !open)}
@@ -144,7 +146,7 @@ function Navbar() {
                       aria-current={i18n.language === 'fr' ? 'true' : undefined}
                       onClick={() => changeLanguage('fr')}
                     >
-                      {t('navigation:french')}
+                      {t('french', { ns: 'navigation' })}
                     </button>
                   </li>
                   <li>
@@ -154,7 +156,7 @@ function Navbar() {
                       aria-current={i18n.language === 'es' ? 'true' : undefined}
                       onClick={() => changeLanguage('es')}
                     >
-                      {t('navigation:spanish')}
+                      {t('spanish', { ns: 'navigation' })}
                     </button>
                   </li>
                   <li>
@@ -164,7 +166,7 @@ function Navbar() {
                       aria-current={i18n.language === 'en' ? 'true' : undefined}
                       onClick={() => changeLanguage('en')}
                     >
-                      {t('navigation:english')}
+                      {t('english', { ns: 'navigation' })}
                     </button>
                   </li>
                 </LanguageOptions>

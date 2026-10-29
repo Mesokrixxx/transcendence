@@ -43,22 +43,22 @@ function Watch() {
       <Navbar />
 
       <WatchContent className="container">
-        <GameArea aria-label={t('chess:demoGameForSpectators')}>
-          <GameInfo aria-label={t('chess:gameInformation')}>
+        <GameArea aria-label={t('demoGameForSpectators', { ns: 'chess' })}>
+          <GameInfo aria-label={t('gameInformation', { ns: 'chess' })}>
             <div className="opponent">
-              <Avatar username={t('chess:playerWhite')} size={48} />
-              <span>{t('chess:playerWhite')}</span>
+              <Avatar username={t('playerWhite', { ns: 'chess' })} size={48} />
+              <span>{t('playerWhite', { ns: 'chess' })}</span>
             </div>
 
             <div className="opponent">
-              <Avatar username={t('chess:playerBlack')} size={48} />
-              <span>{t('chess:playerBlack')}</span>
+              <Avatar username={t('playerBlack', { ns: 'chess' })} size={48} />
+              <span>{t('playerBlack', { ns: 'chess' })}</span>
             </div>
 
-            <p>{t('chess:demoGame')}</p>
+            <p>{t('demoGame', { ns: 'chess' })}</p>
 
             <Button variant="secondary" onClick={flipBoard}>
-              {t('chess:flipBoard')}
+              {t('flipBoard', { ns: 'chess' })}
             </Button>
 
             <GameStatus game={game} />
@@ -70,8 +70,8 @@ function Watch() {
             readOnly
           />
 
-          <GameChat aria-label={t('chat:spectatorChat')}>
-            <ChatBox title={t('chat:spectatorChat')} />
+          <GameChat aria-label={t('spectatorChat', { ns: 'chat' })}>
+            <ChatBox title={t('spectatorChat', { ns: 'chat' })} />
           </GameChat>
         </GameArea>
       </WatchContent>

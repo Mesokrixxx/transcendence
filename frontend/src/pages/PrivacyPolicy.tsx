@@ -9,24 +9,24 @@ function PrivacyPolicy() {
     <Page>
       <Navbar />
       <main className="container" style={{ flex: 1 }}>
-        <h1>{t('legal:privacyPolicy')}</h1>
-        <p>{t('legal:privacyIntro')}</p>
-        <h2>{t('legal:dataWeCollect')}</h2>
-        <p>{t('legal:weMayCollectInformationSuchAs')}</p>
+        <h1>{t('privacyPolicy', { ns: 'legal' })}</h1>
+        <p>{t('privacyIntro', { ns: 'legal' })}</p>
+        <h2>{t('dataWeCollect', { ns: 'legal' })}</h2>
+        <p>{t('weMayCollectInformationSuchAs', { ns: 'legal' })}</p>
         <ul>
-          <li>{t('auth:emailAddress')}</li>
-          <li>{t('auth:username')}</li>
-          <li>{t('profile:profileInformationAndAvatar')}</li>
-          <li>{t('chess:gameHistoryAndScores')}</li>
+          <li>{t('emailAddress', { ns: 'auth' })}</li>
+          <li>{t('username', { ns: 'auth' })}</li>
+          <li>{t('profileInformationAndAvatar', { ns: 'profile' })}</li>
+          <li>{t('gameHistoryAndScores', { ns: 'chess' })}</li>
         </ul>
-        <h2>{t('legal:howWeUseYourData')}</h2>
-        <p>{t('legal:thisDataIsUsedOnlyTo')}</p>
-        <h2>{t('legal:dataStorage')}</h2>
-        <p>{t('legal:userDataIsStoredOnlyFor')}</p>
-        <h2>{t('legal:yourRights')}</h2>
-        <p>{t('legal:usersMayRequestAccess')}</p>
-        <h2>{t('legal:contact')}</h2>
-        <p>{t('legal:notIntendedForCommercialUse')}</p>
+        <h2>{t('howWeUseYourData', { ns: 'legal' })}</h2>
+        <p>{t('thisDataIsUsedOnlyTo', { ns: 'legal' })}</p>
+        <h2>{t('dataStorage', { ns: 'legal' })}</h2>
+        <p>{t('userDataIsStoredOnlyFor', { ns: 'legal' })}</p>
+        <h2>{t('yourRights', { ns: 'legal' })}</h2>
+        <p>{t('usersMayRequestAccess', { ns: 'legal' })}</p>
+        <h2>{t('contact', { ns: 'legal' })}</h2>
+        <p>{t('notIntendedForCommercialUse', { ns: 'legal' })}</p>
       </main>
       <Footer />
     </Page>

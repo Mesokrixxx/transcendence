@@ -15,7 +15,7 @@ function Watch() {
     <Page>
       <Navbar />
       <main className="container">
-        <h1>{t('chess:gameInProgress')}</h1>
+        <h1>{t('gameInProgress', { ns: 'chess' })}</h1>
 
         <GameList>
           <GameRow>
@@ -24,11 +24,11 @@ function Watch() {
             </MiniBoard>
 
             <div>
-              <h2>{t('chess:playerWhiteVsPlayerBlack')}</h2>
-              <p>{t('chess:demoGame')}</p>
+              <h2>{t('playerWhiteVsPlayerBlack', { ns: 'chess' })}</h2>
+              <p>{t('demoGame', { ns: 'chess' })}</p>
             </div>
 
-            <Button to="/watch/1">{t('chess:watchGame')}</Button>
+            <Button to="/watch/1">{t('watchGame', { ns: 'chess' })}</Button>
           </GameRow>
         </GameList>
       </main>

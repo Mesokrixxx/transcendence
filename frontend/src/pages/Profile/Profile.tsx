@@ -12,7 +12,9 @@ function Profile() {
   const { t } = useTranslation();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string>();
-  const [avatarError, setAvatarError] = useState('');
+  const [avatarError, setAvatarError] = useState<
+    'chooseImageFormat' | 'imageTooLarge' | ''
+  >('');
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState('UserName');
   const [firstName, setFirstName] = useState('');
@@ -66,7 +68,7 @@ function Profile() {
                 <p>{[firstName, lastName].filter(Boolean).join(' ')}</p>
               )}
 
-              <p>{t('common:online')}</p>
+              <p>{t('online', { ns: 'common' })}</p>
             </div>
 
             <Button
@@ -76,16 +78,20 @@ function Profile() {
               aria-expanded={isEditing}
               aria-controls="profile-edit"
             >
-              {isEditing ? t('common:close') : t('profile:editProfile')}
+              {isEditing
+                ? t('close', { ns: 'common' })
+                : t('editProfile', { ns: 'profile' })}
             </Button>
           </ProfileHeader>
 
           {isEditing && (
             <AvatarUpload id="profile-edit">
               <label htmlFor="profile-avatar">
-                {t('profile:changeAvatar')}
+                {t('changeAvatar', { ns: 'profile' })}
               </label>
-              <label htmlFor="profile-username">{t('auth:username')}</label>
+              <label htmlFor="profile-username">
+                {t('username', { ns: 'auth' })}
+              </label>
               <input
                 id="profile-username"
                 type="text"
@@ -96,7 +102,7 @@ function Profile() {
               />
 
               <label htmlFor="profile-firstname">
-                {t('profile:firstNameOptional')}
+                {t('firstNameOptional', { ns: 'profile' })}
               </label>
               <input
                 id="profile-firstname"
@@ -107,7 +113,7 @@ function Profile() {
               />
 
               <label htmlFor="profile-lastname">
-                {t('profile:lastNameOptional')}
+                {t('lastNameOptional', { ns: 'profile' })}
               </label>
               <input
                 id="profile-lastname"
@@ -125,10 +131,12 @@ function Profile() {
                 aria-describedby="avatar-help avatar-error"
               />
 
-              <p id="avatar-help">{t('profile:jpgPngOrWebpMaximum2Mb')}</p>
+              <p id="avatar-help">
+                {t('jpgPngOrWebpMaximum2Mb', { ns: 'profile' })}
+              </p>
 
               <p id="avatar-error" role="alert">
-                {avatarError ? t(`profile:${avatarError}`) : ''}
+                {avatarError ? t(avatarError, { ns: 'profile' }) : ''}
               </p>
             </AvatarUpload>
           )}

@@ -18,14 +18,14 @@ function PasswordRequirements({ password }: PasswordRequirementsProps) {
     <Requirements id="password-help">
       {missingRequirements.length > 0 && (
         <Requirement $valid={false}>
-          {t('auth:passwordRequirements')}{' '}
+          {t('passwordRequirements', { ns: 'auth' })}{' '}
           {missingRequirements.map((requirement, index) => {
             const label =
               requirement === 'passwordRuleMinLength'
-                ? t(`auth:${requirement}`, { count: PASSWORD_MIN_LENGTH })
+                ? t(requirement, { ns: 'auth', count: PASSWORD_MIN_LENGTH })
                 : requirement === 'passwordRuleMaxLength'
-                  ? t(`auth:${requirement}`, { count: PASSWORD_MAX_LENGTH })
-                  : t(`auth:${requirement}`);
+                  ? t(requirement, { ns: 'auth', count: PASSWORD_MAX_LENGTH })
+                  : t(requirement, { ns: 'auth' });
             return (
               <span key={requirement}>
                 {index > 0 ? ' · ' : ''}

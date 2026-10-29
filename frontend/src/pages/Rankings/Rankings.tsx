@@ -80,18 +80,17 @@ function getWinRate(wins: number, games: number): number {
 
 type Medal = {
   src: string;
-  labelKey:
-    'rankings:firstPlace' | 'rankings:secondPlace' | 'rankings:thirdPlace';
+  labelKey: 'firstPlace' | 'secondPlace' | 'thirdPlace';
 };
 
 const medals: Record<number, Medal | undefined> = {
-  1: { src: '/medals/gold.svg', labelKey: 'rankings:firstPlace' },
-  2: { src: '/medals/silver.svg', labelKey: 'rankings:secondPlace' },
-  3: { src: '/medals/bronze.svg', labelKey: 'rankings:thirdPlace' },
+  1: { src: '/medals/gold.svg', labelKey: 'firstPlace' },
+  2: { src: '/medals/silver.svg', labelKey: 'secondPlace' },
+  3: { src: '/medals/bronze.svg', labelKey: 'thirdPlace' },
 };
 
 function RankBadge({ rank }: { rank: number }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('rankings');
   const medal = medals[rank];
 
   return (
@@ -105,20 +104,20 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 function Rankings() {
-  const { t } = useTranslation();
+  const { t } = useTranslation('rankings');
   return (
     <Page>
       <Navbar />
 
       <Content className="container">
         <Header>
-          <Eyebrow>{t('rankings:competitivePlay')}</Eyebrow>
+          <Eyebrow>{t('competitivePlay')}</Eyebrow>
           <h1>
-            <Trans i18nKey="rankings:playerRankingsTitle">
+            <Trans ns="rankings" i18nKey="playerRankingsTitle">
               Player <span>Rankings</span>
             </Trans>
           </h1>
-          <p>{t('rankings:communityLeaderboardDescription')}</p>
+          <p>{t('communityLeaderboardDescription')}</p>
         </Header>
 
         <TableWrapper>
@@ -126,11 +125,11 @@ function Rankings() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>{t('rankings:player')}</th>
-                <th>{t('rankings:rating')}</th>
-                <th>{t('rankings:wins')}</th>
-                <th>{t('rankings:games')}</th>
-                <th>{t('rankings:winRate')}</th>
+                <th>{t('player')}</th>
+                <th>{t('rating')}</th>
+                <th>{t('wins')}</th>
+                <th>{t('games')}</th>
+                <th>{t('winRate')}</th>
               </tr>
             </thead>
             <tbody>

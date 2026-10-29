@@ -15,8 +15,8 @@ type AvatarProps = {
 
 function Avatar({ src, username, isOnline, size = 64 }: AvatarProps) {
   const { t } = useTranslation();
-  const avatarLabel = t('profile:avatarOfUsername', { username });
-  const onlineLabel = isOnline ? t('common:online') : t('common:offline');
+  const avatarLabel = t('avatarOfUsername', { ns: 'profile', username });
+  const onlineLabel = isOnline ? t('online', { ns: 'common' }) : t('offline', { ns: 'common' });
 
   return (
     <AvatarWrapper $size={size}>

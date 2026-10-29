@@ -14,12 +14,12 @@ function Home() {
       <Content className="container">
         <Intro>
           <h1>
-            <Trans i18nKey="home:heroTitle">
+            <Trans ns="home" i18nKey="heroTitle">
               Make your <span>move!</span>
             </Trans>
           </h1>
           <Button to="/play" variant="accent">
-            {t('home:getStarted')}
+            {t('getStarted', { ns: 'home' })}
           </Button>
         </Intro>
 

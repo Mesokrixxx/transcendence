@@ -9,29 +9,29 @@ function TermsOfService() {
     <Page>
       <Navbar />
       <main className="container" style={{ flex: 1 }}>
-        <h1>{t('legal:termsOfService')}</h1>
-        <p>{t('legal:termsIntro')}</p>
-        <h2>{t('legal:applicationUse')}</h2>
-        <p>{t('legal:usersMust')}</p>
-        <h2>{t('legal:userAccounts')}</h2>
-        <p>{t('legal:usersAreResponsibleFor')}</p>
-        <h2>{t('legal:fairPlay')}</h2>
-        <p>{t('legal:usersMustNot')}</p>
-        <h2>{t('legal:accountRestrictions')}</h2>
-        <p>{t('legal:accountsMayBe')}</p>
-        <h2>{t('legal:availability')}</h2>
-        <p>{t('legal:thisIsAStudentProject')}</p>
-        <h2>{t('legal:disclaimer')}</h2>
-        <p>{t('legal:educationalPurposes')}</p>
-        <h2>{t('legal:credits')}</h2>
+        <h1>{t('termsOfService', { ns: 'legal' })}</h1>
+        <p>{t('termsIntro', { ns: 'legal' })}</p>
+        <h2>{t('applicationUse', { ns: 'legal' })}</h2>
+        <p>{t('usersMust', { ns: 'legal' })}</p>
+        <h2>{t('userAccounts', { ns: 'legal' })}</h2>
+        <p>{t('usersAreResponsibleFor', { ns: 'legal' })}</p>
+        <h2>{t('fairPlay', { ns: 'legal' })}</h2>
+        <p>{t('usersMustNot', { ns: 'legal' })}</p>
+        <h2>{t('accountRestrictions', { ns: 'legal' })}</h2>
+        <p>{t('accountsMayBe', { ns: 'legal' })}</p>
+        <h2>{t('availability', { ns: 'legal' })}</h2>
+        <p>{t('thisIsAStudentProject', { ns: 'legal' })}</p>
+        <h2>{t('disclaimer', { ns: 'legal' })}</h2>
+        <p>{t('educationalPurposes', { ns: 'legal' })}</p>
+        <h2>{t('credits', { ns: 'legal' })}</h2>
         <p>
-          {t('legal:chessPieceArtwork')}{' '}
+          {t('chessPieceArtwork', { ns: 'legal' })}{' '}
           <a href="https://github.com/philatype/kosal">
-            {t('legal:kosalByPhilatype')}
+            {t('kosalByPhilatype', { ns: 'legal' })}
           </a>
-          {t('legal:licensedUnder')}{' '}
+          {t('licensedUnder', { ns: 'legal' })}{' '}
           <a href="https://creativecommons.org/licenses/by/4.0/">
-            {t('legal:creativeCommonsAttribution')}
+            {t('creativeCommonsAttribution', { ns: 'legal' })}
           </a>
           .
         </p>

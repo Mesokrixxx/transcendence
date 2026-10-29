@@ -21,12 +21,15 @@ function Chat() {
       <Navbar />
 
       <Content className="container">
-        <h1>{t('chat:chat')}</h1>
+        <h1>{t('chat', { ns: 'chat' })}</h1>
 
         <Boxes>
-          <ChatBox title={t('chat:players')} initialMessages={playerMessages} />
           <ChatBox
-            title={t('chat:spectators')}
+            title={t('players', { ns: 'chat' })}
+            initialMessages={playerMessages}
+          />
+          <ChatBox
+            title={t('spectators', { ns: 'chat' })}
             initialMessages={spectatorMessages}
           />
         </Boxes>

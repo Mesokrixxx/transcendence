@@ -21,8 +21,8 @@ function Input({ id, label, type, ...props }: InputProps) {
   const isPasswordVisible = type === 'password' && showPassword;
   const inputType = isPasswordVisible ? 'text' : type;
   const buttonText = isPasswordVisible
-    ? t('auth:hidePassword')
-    : t('auth:showPassword');
+    ? t('hidePassword', { ns: 'auth' })
+    : t('showPassword', { ns: 'auth' });
   const eyeIcon = isPasswordVisible
     ? '/icons/eye-slash-mdp.svg'
     : '/icons/eye-mdp.svg';

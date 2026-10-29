@@ -55,7 +55,7 @@ const fetchAPI = async <Data = unknown>({
       } catch {
         return {
           result: {
-            error: i18next.t('common:invalidJSONResponse'),
+            error: i18next.t('invalidJSONResponse', { ns: 'common' }),
           },
           error: true,
         };
@@ -64,7 +64,7 @@ const fetchAPI = async <Data = unknown>({
 
     if (!response.ok) {
       let apiError: APIError = {
-        error: i18next.t('common:requestFailed'),
+        error: i18next.t('requestFailed', { ns: 'common' }),
       };
 
       if (typeof result === 'string') {
@@ -98,7 +98,7 @@ const fetchAPI = async <Data = unknown>({
   } catch {
     return {
       result: {
-        error: i18next.t('common:unableToReachServer'),
+        error: i18next.t('unableToReachServer', { ns: 'common' }),
       },
       error: true,
     };
