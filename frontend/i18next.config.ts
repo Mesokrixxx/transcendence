@@ -6,6 +6,7 @@ export default defineConfig({
     input: ['src/**/*.{ts,tsx}'],
     output: 'public/locales/{{language}}/{{namespace}}.json',
     defaultNS: 'common',
+    removeUnusedKeys: false,
   },
   types: {
     input: 'public/locales/en/*.json',
