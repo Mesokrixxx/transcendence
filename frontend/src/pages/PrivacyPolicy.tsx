@@ -4,29 +4,33 @@ import Footer from '../components/Footer/Footer';
 import { Page } from './Home/Home.styles';
 
 function PrivacyPolicy() {
-  const { t } = useTranslation();
+  const { t: tLegal } = useTranslation('legal');
+  const { t: tAuth } = useTranslation('auth');
+  const { t: tProfile } = useTranslation('profile');
+  const { t: tChess } = useTranslation('chess');
+
   return (
     <Page>
       <Navbar />
       <main className="container" style={{ flex: 1 }}>
-        <h1>{t('privacyPolicy', { ns: 'legal' })}</h1>
-        <p>{t('privacyIntro', { ns: 'legal' })}</p>
-        <h2>{t('dataWeCollect', { ns: 'legal' })}</h2>
-        <p>{t('weMayCollectInformationSuchAs', { ns: 'legal' })}</p>
+        <h1>{tLegal('privacyPolicy')}</h1>
+        <p>{tLegal('privacyIntro')}</p>
+        <h2>{tLegal('dataWeCollect')}</h2>
+        <p>{tLegal('weMayCollectInformationSuchAs')}</p>
         <ul>
-          <li>{t('emailAddress', { ns: 'auth' })}</li>
-          <li>{t('username', { ns: 'auth' })}</li>
-          <li>{t('profileInformationAndAvatar', { ns: 'profile' })}</li>
-          <li>{t('gameHistoryAndScores', { ns: 'chess' })}</li>
+          <li>{tAuth('emailAddress')}</li>
+          <li>{tAuth('username')}</li>
+          <li>{tProfile('profileInformationAndAvatar')}</li>
+          <li>{tChess('gameHistoryAndScores')}</li>
         </ul>
-        <h2>{t('howWeUseYourData', { ns: 'legal' })}</h2>
-        <p>{t('thisDataIsUsedOnlyTo', { ns: 'legal' })}</p>
-        <h2>{t('dataStorage', { ns: 'legal' })}</h2>
-        <p>{t('userDataIsStoredOnlyFor', { ns: 'legal' })}</p>
-        <h2>{t('yourRights', { ns: 'legal' })}</h2>
-        <p>{t('usersMayRequestAccess', { ns: 'legal' })}</p>
-        <h2>{t('contact', { ns: 'legal' })}</h2>
-        <p>{t('notIntendedForCommercialUse', { ns: 'legal' })}</p>
+        <h2>{tLegal('howWeUseYourData')}</h2>
+        <p>{tLegal('thisDataIsUsedOnlyTo')}</p>
+        <h2>{tLegal('dataStorage')}</h2>
+        <p>{tLegal('userDataIsStoredOnlyFor')}</p>
+        <h2>{tLegal('yourRights')}</h2>
+        <p>{tLegal('usersMayRequestAccess')}</p>
+        <h2>{tLegal('contact')}</h2>
+        <p>{tLegal('notIntendedForCommercialUse')}</p>
       </main>
       <Footer />
     </Page>
