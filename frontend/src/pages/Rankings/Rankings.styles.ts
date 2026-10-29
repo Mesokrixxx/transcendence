@@ -140,3 +140,42 @@ export const MedalSlot = styled.span`
     display: block;
   }
 `
+
+export const StatusMessage = styled.p`
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+`
+
+export const SearchBox = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+  margin-bottom: 16px;
+  padding: 0 12px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+
+  &:focus-within {
+    border-color: var(--color-primary);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text-primary);
+  }
+`
