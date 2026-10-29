@@ -3,8 +3,6 @@
   "accountsMayBe": "Accounts may be restricted or removed in cases of abusive behaviour, cheating, or misuse of the platform.",
   "applicationUse": "Use of the application",
   "availability": "Availability",
-  "privacyIntro": "Chess Move is a student project developed as part of the 42 curriculum. This Privacy Policy explains how user data may be collected and used within the application.",
-  "termsIntro": "Chess Move is a student project developed as part of the 42 curriculum. By using this application, you agree to follow the rules described below.",
   "chessPieceArtwork": "Chess piece artwork:",
   "contact": "Contact",
   "creativeCommonsAttribution": "Creative Commons Attribution 4.0",
@@ -16,8 +14,11 @@
   "fairPlay": "Fair play",
   "howWeUseYourData": "How we use your data",
   "kosalByPhilatype": "Kosal by Philatype",
+  "licensedUnder": ", licensed under",
   "notIntendedForCommercialUse": "This application is a student project and is not intended for commercial use.",
+  "privacyIntro": "Chess Move is a student project developed as part of the 42 curriculum. This Privacy Policy explains how user data may be collected and used within the application.",
   "privacyPolicy": "Privacy Policy",
+  "termsIntro": "Chess Move is a student project developed as part of the 42 curriculum. By using this application, you agree to follow the rules described below.",
   "termsOfService": "Terms of Service",
   "thisDataIsUsedOnlyTo": "This data is used only to provide the features of the application, including account management, multiplayer games, rankings, statistics, and social features.",
   "thisIsAStudentProject": "As this is a student project, the service may be modified, interrupted, or unavailable without notice.",
@@ -28,6 +29,5 @@
   "usersMust": "Users must use the application responsibly and must not attempt to disrupt, damage, or misuse the service.",
   "usersMustNot": "Users must not cheat, exploit bugs, harass other players, or use the application in a way that negatively affects other users.",
   "weMayCollectInformationSuchAs": "Depending on the features used, we may collect information such as:",
-  "yourRights": "Your rights",
-  "licensedUnder": ", licensed under"
+  "yourRights": "Your rights"
 }

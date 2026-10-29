@@ -1,8 +1,8 @@
 {
-  "play": "Jouer",
-  "watch": "Regarder",
-  "rankings": "Classement",
   "english": "Anglais",
   "french": "Français",
-  "spanish": "Espagnol"
+  "play": "Jouer",
+  "rankings": "Classement",
+  "spanish": "Espagnol",
+  "watch": "Regarder"
 }

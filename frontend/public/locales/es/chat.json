@@ -1,8 +1,8 @@
 {
   "chat": "Chat",
   "gameChat": "Chat de la partida",
-  "spectatorChat": "Chat de espectadores",
-  "writeAMessage": "Escribe un mensaje…",
   "players": "Jugadores",
-  "spectators": "Espectadores"
+  "spectatorChat": "Chat de espectadores",
+  "spectators": "Espectadores",
+  "writeAMessage": "Escribe un mensaje…"
 }

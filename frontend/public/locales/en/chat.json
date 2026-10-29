@@ -1,8 +1,8 @@
 {
   "chat": "Chat",
   "gameChat": "Game chat",
-  "spectatorChat": "Spectator chat",
-  "writeAMessage": "Write a message...",
   "players": "Players",
-  "spectators": "Spectators"
+  "spectatorChat": "Spectator chat",
+  "spectators": "Spectators",
+  "writeAMessage": "Write a message..."
 }

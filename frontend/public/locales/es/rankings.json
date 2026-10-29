@@ -1,13 +1,13 @@
 {
-  "competitivePlay": "Juego competitivo",
   "communityLeaderboardDescription": "Descubre cómo avanza la comunidad en la clasificación.",
-  "playerRankingsTitle": "<1>Clasificación</1> de jugadores",
-  "player": "Jugador",
-  "rating": "Puntuación",
-  "wins": "Victorias",
-  "games": "Partidas",
-  "winRate": "Porcentaje de victorias",
+  "competitivePlay": "Juego competitivo",
   "firstPlace": "Primer puesto",
+  "games": "Partidas",
+  "player": "Jugador",
+  "playerRankingsTitle": "<1>Clasificación</1> de jugadores",
+  "rating": "Puntuación",
   "secondPlace": "Segundo puesto",
-  "thirdPlace": "Tercer puesto"
+  "thirdPlace": "Tercer puesto",
+  "winRate": "Porcentaje de victorias",
+  "wins": "Victorias"
 }

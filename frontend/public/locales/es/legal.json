@@ -3,8 +3,6 @@
   "accountsMayBe": "Las cuentas pueden restringirse o eliminarse en caso de comportamiento abusivo, trampas o uso indebido de la plataforma.",
   "applicationUse": "Uso de la aplicación",
   "availability": "Disponibilidad",
-  "privacyIntro": "Chess Move es un proyecto estudiantil desarrollado como parte del plan de estudios de 42. Esta política de privacidad explica cómo pueden recopilarse y utilizarse los datos de los usuarios en la aplicación.",
-  "termsIntro": "Chess Move es un proyecto estudiantil desarrollado como parte del plan de estudios de 42. Al utilizar esta aplicación, aceptas cumplir las siguientes normas.",
   "chessPieceArtwork": "Ilustraciones de piezas de ajedrez:",
   "contact": "Contacto",
   "creativeCommonsAttribution": "Creative Commons Attribution 4.0",
@@ -16,8 +14,11 @@
   "fairPlay": "Juego limpio",
   "howWeUseYourData": "Cómo usamos tus datos",
   "kosalByPhilatype": "Kosal, de Philatype",
+  "licensedUnder": ", bajo la licencia",
   "notIntendedForCommercialUse": "Esta aplicación es un proyecto estudiantil y no está destinada a un uso comercial.",
+  "privacyIntro": "Chess Move es un proyecto estudiantil desarrollado como parte del plan de estudios de 42. Esta política de privacidad explica cómo pueden recopilarse y utilizarse los datos de los usuarios en la aplicación.",
   "privacyPolicy": "Política de privacidad",
+  "termsIntro": "Chess Move es un proyecto estudiantil desarrollado como parte del plan de estudios de 42. Al utilizar esta aplicación, aceptas cumplir las siguientes normas.",
   "termsOfService": "Condiciones del servicio",
   "thisDataIsUsedOnlyTo": "Estos datos se utilizan únicamente para ofrecer las funciones de la aplicación, incluida la gestión de cuentas, las partidas multijugador, las clasificaciones, las estadísticas y las funciones sociales.",
   "thisIsAStudentProject": "Al tratarse de un proyecto estudiantil, el servicio puede modificarse, interrumpirse o no estar disponible sin previo aviso.",
@@ -28,6 +29,5 @@
   "usersMust": "Los usuarios deben utilizar la aplicación de forma responsable y no intentar interrumpir, dañar ni hacer un uso indebido del servicio.",
   "usersMustNot": "Los usuarios no deben hacer trampas, aprovechar errores, acosar a otros jugadores ni utilizar la aplicación de forma perjudicial para los demás.",
   "weMayCollectInformationSuchAs": "Según las funciones utilizadas, podemos recopilar información como:",
-  "yourRights": "Tus derechos",
-  "licensedUnder": ", bajo la licencia"
+  "yourRights": "Tus derechos"
 }
