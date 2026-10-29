@@ -34,6 +34,11 @@ function Navbar() {
     setShowLanguages(false);
   }
 
+  function changeLanguage(lng: string) {
+    i18n.changeLanguage(lng);
+    closeMenus();
+  }
+
   useEffect(() => {
     if (!showMenu && !showLanguages) return;
 
@@ -137,6 +142,7 @@ function Navbar() {
                       type="button"
                       lang="fr"
                       aria-current={i18n.language === 'fr' ? 'true' : undefined}
+                      onClick={() => changeLanguage('fr')}
                     >
                       {t('navigation:french')}
                     </button>
@@ -146,6 +152,7 @@ function Navbar() {
                       type="button"
                       lang="es"
                       aria-current={i18n.language === 'es' ? 'true' : undefined}
+                      onClick={() => changeLanguage('es')}
                     >
                       {t('navigation:spanish')}
                     </button>
@@ -155,6 +162,7 @@ function Navbar() {
                       type="button"
                       lang="en"
                       aria-current={i18n.language === 'en' ? 'true' : undefined}
+                      onClick={() => changeLanguage('en')}
                     >
                       {t('navigation:english')}
                     </button>
