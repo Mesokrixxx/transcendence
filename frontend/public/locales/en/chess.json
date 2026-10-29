@@ -37,6 +37,20 @@
   "pieceQueen": "Queen",
   "pieceKing": "King",
   "piecePawn": "Pawn",
+  "pieceDescriptions": {
+    "whiteKing": "white king",
+    "whiteQueen": "white queen",
+    "whiteRook": "white rook",
+    "whiteBishop": "white bishop",
+    "whiteKnight": "white knight",
+    "whitePawn": "white pawn",
+    "blackKing": "black king",
+    "blackQueen": "black queen",
+    "blackRook": "black rook",
+    "blackBishop": "black bishop",
+    "blackKnight": "black knight",
+    "blackPawn": "black pawn"
+  },
   "demoGameForSpectators": "Demo game for spectators",
   "watchGame": "Watch game"
 }

@@ -37,6 +37,20 @@
   "pieceQueen": "Dame",
   "pieceKing": "Roi",
   "piecePawn": "Pion",
+  "pieceDescriptions": {
+    "whiteKing": "roi blanc",
+    "whiteQueen": "reine blanche",
+    "whiteRook": "tour blanche",
+    "whiteBishop": "fou blanc",
+    "whiteKnight": "cavalier blanc",
+    "whitePawn": "pion blanc",
+    "blackKing": "roi noir",
+    "blackQueen": "reine noire",
+    "blackRook": "tour noire",
+    "blackBishop": "fou noir",
+    "blackKnight": "cavalier noir",
+    "blackPawn": "pion noir"
+  },
   "demoGameForSpectators": "Partie de démonstration pour les spectateurs",
   "watchGame": "Regarder la partie"
 }
