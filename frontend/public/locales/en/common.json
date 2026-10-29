@@ -13,7 +13,6 @@
   "invalidJSONResponse": "The server returned an invalid JSON response.",
   "copyright": "© {{year}} ChessMove",
   "chessboard": "Chessboard",
-  "avatarOfUsername": "Avatar of {{username}}",
   "unknownError": "Something went wrong.",
   "you": "You"
 }

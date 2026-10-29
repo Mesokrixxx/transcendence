@@ -13,7 +13,6 @@
   "invalidJSONResponse": "El servidor devolvió una respuesta JSON no válida.",
   "copyright": "© {{year}} ChessMove",
   "chessboard": "Tablero de ajedrez",
-  "avatarOfUsername": "Avatar de {{username}}",
   "unknownError": "Se ha producido un error.",
   "you": "Tú"
 }
