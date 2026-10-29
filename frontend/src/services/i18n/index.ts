@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import backend from 'i18next-http-backend';
+import localStorage from '../localStorage';
 
 const namespaces = [
   'common',
@@ -15,7 +16,7 @@ const namespaces = [
 ];
 
 const supportedLanguages = ['en', 'fr', 'es'];
-const savedLanguage = window.localStorage.getItem('lng');
+const savedLanguage = localStorage.get('lng');
 const browserLanguage = window.navigator.language.split('-')[0];
 const language =
   savedLanguage !== null && supportedLanguages.includes(savedLanguage)
@@ -40,7 +41,7 @@ i18n
   });
 
 i18n.on('languageChanged', (lng) => {
-  window.localStorage.setItem('lng', lng);
+  localStorage.set('lng', lng);
 });
 
 export default i18n;
