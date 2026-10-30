@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import fetchAPI from '../../services/fetchAPI'
 import Button from '../Button/Button'
+import UserMenu from '../UserMenu/UserMenu'
 import {
   Header,
   Content,
@@ -158,24 +159,18 @@ function Navbar() {
           }}
         >
           <Navigation aria-label="Main navigation">
-            <Link to="/play">Play</Link>
-            <Link to="/watch">Watch</Link>
-            <Link to="/rankings">Rankings</Link>
+            <NavLink to="/play">Play</NavLink>
+            <NavLink to="/watch">Watch</NavLink>
+            <NavLink to="/rankings">Rankings</NavLink>
           </Navigation>
 
           <Auth>
             {user ? (
-              <>
-                <span>{user.username}</span>
-
-                <Button to="/Profile" variant="secondary">
-                  Profile
-                </Button>
-
-                <Button onClick={handleLogout} variant="primary">
-                  {isLoggingOut ? 'Logging out...' : 'Log out'}
-                </Button>
-              </>
+              <UserMenu
+                username={user.username}
+                isLoggingOut={isLoggingOut}
+                onLogout={handleLogout}
+              />
             ) : (
               <>
                 <Button to="/login" variant="secondary">

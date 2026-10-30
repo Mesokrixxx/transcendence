@@ -93,12 +93,31 @@ export const MenuContent = styled.div<{ $open: boolean }>`
     border-top: 1px solid var(--color-border);
   }
 `
-
 export const Navigation = styled.nav`
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 24px;
+
+  a {
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: background-color 150ms ease;
+  }
+
+  a:hover {
+    background-color: var(--color-background);
+  }
+
+  a[aria-current='page'] {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
 
   @media (max-width: 1100px) {
     grid-column: 1 / -1;
@@ -113,11 +132,6 @@ export const Navigation = styled.nav`
 
     a {
       padding: 12px;
-      border-radius: 8px;
-    }
-
-    a:hover {
-      background: var(--color-surface);
     }
   }
 `
