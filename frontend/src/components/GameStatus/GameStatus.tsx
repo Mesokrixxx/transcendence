@@ -1,42 +1,32 @@
-import type ChessGame from '../../../../chessgame/src/chessgame'
-import { StatusBox } from './GameStatus.styles'
+import type ChessGame from '../../../../chessgame/src/chessgame';
+import { useTranslation } from 'react-i18next';
+import { StatusBox } from './GameStatus.styles';
 
-type GameStatusProps = {
-    game: ChessGame
-}
+type GameStatusProps = { game: ChessGame };
 
 function GameStatus({ game }: GameStatusProps) {
-    let currentColor
-    let winner
+  const { t } = useTranslation();
+  const currentColor =
+    game.getTurn() === 'white'
+      ? t('white', { ns: 'chess' })
+      : t('black', { ns: 'chess' });
+  const winner =
+    game.getTurn() === 'white'
+      ? t('black', { ns: 'chess' })
+      : t('white', { ns: 'chess' });
 
-    if (game.getTurn()=== 'white')
-    {
-        currentColor = 'White'
-        winner = 'Black'
-    }
-    else {
-        currentColor = 'Black'
-        winner = 'White'
-    }
+  let status: string;
+  if (game.isCheckmate()) {
+    status = t('checkmateWinner', { ns: 'chess', winner });
+  } else if (game.isDraw()) {
+    status = t('drawStatus', { ns: 'chess' });
+  } else {
+    status = t('toMove', { ns: 'chess', color: currentColor });
+    if (game.isCheck())
+      status = t('checkStatus', { ns: 'chess', turnStatus: status });
+  }
 
-    let status = currentColor + ' to move'
-
-    if (game.isCheckmate()) {
-        status =  'Chekmate - ' + winner + 'wins'
-    }
-    else if (game.isDraw()){
-        status = 'Draw'
-    }
-    else if (game.isCheck()){
-        status += ' - Check'
-    }
-
-
-    return (
-        <StatusBox role="status">
-            {status}
-        </StatusBox>
-    )
+  return <StatusBox role="status">{status}</StatusBox>;
 }
 
-export default GameStatus
+export default GameStatus;

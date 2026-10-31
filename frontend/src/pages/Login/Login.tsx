@@ -1,119 +1,127 @@
-import { useState } from 'react'
-import type { SubmitEvent } from 'react'
-import { Link, useNavigate} from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import Navbar from '../../components/Navbar/Navbar'
-import Form from '../../components/Form/Form'
-import Input from '../../components/Input/Input'
-import Button from '../../components/Button/Button'
-import Footer from '../../components/Footer/Footer'
-import fetchAPI from '../../services/fetchAPI'
-import type { AuthUser} from '../../types/auth'
-import { Page } from '../Home/Home.styles'
-import { AuthContent, AuthPanel, AuthHint } from './Auth.styles'
+import { useState } from 'react';
+import type { SubmitEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import Navbar from '../../components/Navbar/Navbar';
+import Form from '../../components/Form/Form';
+import Input from '../../components/Input/Input';
+import Button from '../../components/Button/Button';
+import Footer from '../../components/Footer/Footer';
+import fetchAPI from '../../services/fetchAPI';
+import type { AuthUser } from '../../types/auth';
+import { Page } from '../Home/Home.styles';
+import { AuthContent, AuthPanel, AuthHint } from './Auth.styles';
 
-function Login(){
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
-    const { setUser }= useAuth()
-    const navigate = useNavigate()
+function Login() {
+  const { t } = useTranslation();
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
 
-    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-        event.preventDefault()
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-        if (isLoading)
-            return
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-        const formData = new FormData(event.currentTarget)
-        const email = formData.get('email')
-        const password = formData.get('password')
+    if (isLoading) return;
 
-        setError('')
-        
-        if (
-            typeof email !== 'string' || typeof password !== 'string'
-        ){
-            setError('Please enter your email and password.')
-            return
-        }
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-        setIsLoading(true)
+    setError('');
 
-        try {
-            const response = await fetchAPI<AuthUser>({
-                path: '/auth/login',
-                method: 'post',
-                body: {
-                    email: email.trim(),
-                    password
-                }
-            })
-
-            if(response.error == true){
-                if (typeof response.result === 'string'){
-                    setError(response.result)
-                }
-                else{
-                    setError(response.result.error)
-                }
-
-                return
-            }
-            setUser(response.result)
-            navigate('/Profile', { replace: true })
-        }
-        finally{
-            setIsLoading(false)
-        }
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      setError(t('enterEmailAndPassword', { ns: 'auth' }));
+      return;
     }
-    return(
-        <Page>
-            <Navbar />
 
-            <AuthContent className="container">
-                <AuthPanel>
-                    <h1>Welcome Back!</h1>
-                    <Form onSubmit={handleSubmit}>
-                        <Input 
-                        id="login-email" 
-                        name="email" 
-                        label="Email" 
-                        type="email" 
-                        placeholder="you@example.com"
-                        autoComplete="email"
-                        required/>
+    setIsLoading(true);
 
-                        <Input 
-                        id="login-password"
-                        name="password"
-                        label="Password"
-                        type="password"
-                        placeholder="Your password"
-                        autoComplete="current-password"
-                        required/>
+    try {
+      const response = await fetchAPI<AuthUser>({
+        path: '/auth/login',
+        method: 'post',
+        body: {
+          email: email.trim(),
+          password,
+        },
+      });
 
-                        <Button type="submit">Log in</Button>
+      if (response.error === true) {
+        if (typeof response.result === 'string') {
+          setError(response.result);
+        } else {
+          setError(response.result.error);
+        }
 
-                        {isLoading && (
-                            <p role="status">logging in ...</p>
-                        )}
+        return;
+      }
 
-                        {error &&(
-                            <p role="alert">{error}</p>
-                        )}
+      setUser(response.result);
+      navigate('/profile', { replace: true });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-                    </Form>
+  return (
+    <Page>
+      <Navbar />
 
-                    <AuthHint>
-                        No account yet ? <Link to="/register">Sign up</Link>
-                    </AuthHint>
-                </AuthPanel>
-            </AuthContent>
+      <AuthContent className="container">
+        <AuthPanel>
+          <h1>{t('welcomeBack', { ns: 'auth' })}</h1>
 
-            <Footer/>
+          <Form
+            onSubmit={(event) => {
+              void handleSubmit(event);
+            }}
+          >
+            <Input
+              id="login-email"
+              name="email"
+              label={t('email', { ns: 'auth' })}
+              type="email"
+              placeholder={t('emailPlaceholder', { ns: 'auth' })}
+              autoComplete="email"
+              required
+            />
 
-        </Page>
-    )
+            <Input
+              id="login-password"
+              name="password"
+              label={t('password', { ns: 'auth' })}
+              type="password"
+              placeholder={t('yourPassword', { ns: 'auth' })}
+              autoComplete="current-password"
+              required
+            />
+
+            <Button type="submit">
+              {t('logIn', { ns: 'auth' })}
+            </Button>
+
+            {isLoading && (
+              <p role="status">{t('loggingIn', { ns: 'auth' })}</p>
+            )}
+
+            {error && <p role="alert">{error}</p>}
+          </Form>
+
+          <AuthHint>
+            {t('noAccountYet', { ns: 'auth' })}{' '}
+            <Link to="/register">
+              {t('signUp', { ns: 'auth' })}
+            </Link>
+          </AuthHint>
+        </AuthPanel>
+      </AuthContent>
+
+      <Footer />
+    </Page>
+  );
 }
 
-export default Login
+export default Login;

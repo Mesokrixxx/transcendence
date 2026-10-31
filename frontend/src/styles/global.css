@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap');
 
-
 /* CSS Reset */
 
 *,
@@ -48,8 +47,8 @@ h6 {
   overflow-wrap: break-word;
 }
 
-.container{
-   width: 100%;
+.container {
+  width: 100%;
   max-width: 1200px;
   margin-inline: auto;
   padding: 24px;

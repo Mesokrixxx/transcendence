@@ -1,17 +1,16 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const AuthContent = styled.main`
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 
 export const AuthPanel = styled.div`
   width: 100%;
   max-width: 440px;
   padding: 32px;
-
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
@@ -22,37 +21,32 @@ export const AuthPanel = styled.div`
     font-size: 32px;
     text-align: center;
   }
-`
+`;
 
 export const AuthHint = styled.p`
   margin-top: 24px;
   color: var(--color-text-secondary);
   font-size: 14px;
   text-align: center;
-`
+`;
 
 export const PasswordHelp = styled.p`
   margin-top: -16px;
   color: var(--color-text-secondary);
   font-size: 13px;
-`
+`;
 
 export const AuthSuccess = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px;
-    border: 2px solid var(--color-primary);
-    border-radius: 12px;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 2px solid var(--color-primary);
+  border-radius: 12px;
+  text-align: center;
 
-    h2 {
-      margin: 0;
-      color: var(--color-primary);
-    }
-
-    p {
-        margin: 0;
-        color: var(--color-text-primary);;
-    }
-`
+  p {
+    margin: 0;
+    color: var(--color-text-primary);
+  }
+`;
