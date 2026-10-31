@@ -160,6 +160,7 @@ function Navbar() {
         >
           <Navigation aria-label="Main navigation">
             <NavLink to="/play">Play</NavLink>
+            <NavLink to="/training">Training</NavLink>
             <NavLink to="/watch">Watch</NavLink>
             <NavLink to="/rankings">Rankings</NavLink>
           </Navigation>
