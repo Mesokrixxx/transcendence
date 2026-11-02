@@ -1,12 +1,12 @@
 import './App.css';
 import './services/i18n';
-import AppRoutes from './routes/AppRoutes';
 import AuthProvider from './context/AuthProvider';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <Outlet />
     </AuthProvider>
   );
 }
