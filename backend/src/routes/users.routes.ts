@@ -4,6 +4,7 @@ import { requireAuth } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
+router.get('/', requireAuth, userController.getUsersByRanking);
 router.get('/:id', requireAuth, userController.getUser);
 router.patch('/me', requireAuth, userController.updateUser);
 router.post('/', userController.createUser); // see CreateUserBody

@@ -88,3 +88,7 @@ export async function update(
 
 	return get(updatedUser.id);
 }
+
+export async function getAll() {
+	return null;
+}
