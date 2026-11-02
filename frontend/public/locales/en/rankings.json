@@ -9,5 +9,11 @@
   "secondPlace": "Second place",
   "thirdPlace": "Third place",
   "winRate": "Win rate",
-  "wins": "Wins"
+  "wins": "Wins",
+  "searchPlayersPlaceholder": "Search players...",
+  "searchPlayerLabel": "Search players",
+  "loading": "Loading...",
+  "loadError": "Could not load the rankings.",
+  "noPlayersYet": "No players yet.",
+  "noMatch": "No player matches your search."
 }

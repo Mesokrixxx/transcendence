@@ -9,5 +9,11 @@
   "secondPlace": "Segundo puesto",
   "thirdPlace": "Tercer puesto",
   "winRate": "Porcentaje de victorias",
-  "wins": "Victorias"
+  "wins": "Victorias",
+  "searchPlayersPlaceholder": "Buscar jugadores...",
+  "searchPlayerLabel": "Buscar jugadores",
+  "loading": "Cargando...",
+  "loadError": "No se pudo cargar la clasificación.",
+  "noPlayersYet": "Todavía no hay jugadores.",
+  "noMatch": "Ningún jugador coincide con tu búsqueda."
 }
