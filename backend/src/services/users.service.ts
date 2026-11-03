@@ -90,5 +90,19 @@ export async function update(
 }
 
 export async function getAll() {
-	return null;
+	return await prisma.user.findMany({
+		select: {
+			id: true,
+			username: true,
+			elo: true,
+			gamesPlayed: true,
+			maxElo: true,
+		},
+		orderBy: [
+			{ elo: 'desc' },
+			{ gamesPlayed: 'desc' },
+			{ username: 'asc' },
+			{ id: 'asc' },
+		],
+	});
 }
