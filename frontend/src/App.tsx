@@ -1,12 +1,15 @@
 import './App.css';
-import './services/i18n';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import routes from './routes/AppRoutes.tsx';
 import AuthProvider from './context/AuthProvider';
-import { Outlet } from 'react-router-dom';
+import './services/i18n';
+
+const router = createBrowserRouter(routes);
 
 function App() {
   return (
     <AuthProvider>
-      <Outlet />
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }
