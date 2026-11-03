@@ -90,19 +90,47 @@ export async function update(
 }
 
 export async function getAll() {
-	return await prisma.user.findMany({
+	const users = await prisma.user.findMany({
 		select: {
 			id: true,
 			username: true,
 			elo: true,
-			gamesPlayed: true,
-			maxElo: true,
+			profile: {
+				select: { avatar: true },
+			},
+			whiteGames: {
+				where: { result: { not: null } },
+				select: { result: true },
+			},
+			blackGames: {
+				where: { result: { not: null } },
+				select: { result: true },
+			},
 		},
-		orderBy: [
-			{ elo: 'desc' },
-			{ gamesPlayed: 'desc' },
-			{ username: 'asc' },
-			{ id: 'asc' },
-		],
+		orderBy: { elo: 'desc' },
 	});
+
+	return users
+		.map((user) => {
+			const wins =
+				user.whiteGames.filter((game) => game.result === 'WHITE').length +
+				user.blackGames.filter((game) => game.result === 'BLACK').length;
+			const games = user.whiteGames.length + user.blackGames.length;
+
+			return {
+				id: user.id,
+				username: user.username,
+				rating: user.elo,
+				wins,
+				games,
+				avatar: user.profile?.avatar ?? '',
+			};
+		})
+		.sort(
+			(left, right) =>
+				right.rating - left.rating ||
+				right.games - left.games ||
+				left.username.localeCompare(right.username) ||
+				left.id - right.id,
+		);
 }
