@@ -1,5 +1,4 @@
-import { type RouteObject } from 'react-router';
-import App from '../App';
+import type { RouteObject } from 'react-router-dom';
 import Home from '../pages/Home/Home';
 import Play from '../pages/Play/Play';
 import Training from '../pages/Training/Training';
@@ -13,65 +12,70 @@ import Chat from '../pages/Chat/Chat';
 import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
 import ApiTest from '../pages/ApiTest';
+import ProtectedPage from '../pages/ProtectedPage';
+import { guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
 
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <App />,
+    element: <ProtectedPage />,
+    loader: requireAuthLoader,
     children: [
       {
         index: true,
         element: <Home />,
       },
       {
-        path: '/play',
+        path: 'play',
         element: <Play />,
       },
       {
-        path: '/training',
+        path: 'training',
         element: <Training />,
       },
       {
-        path: '/watch',
+        path: 'watch',
         element: <Watch />,
       },
       {
-        path: '/watch/:gameId',
+        path: 'watch/:gameId',
         element: <WatchGame />,
       },
       {
-        path: '/rankings',
+        path: 'rankings',
         element: <Rankings />,
       },
       {
-        path: '/register',
-        element: <Register />,
-      },
-      {
-        path: '/login',
-        element: <Login />,
-      },
-      {
-        path: '/profile',
+        path: 'profile',
         element: <Profile />,
       },
       {
-        path: '/privacy',
-        element: <PrivacyPolicy />,
-      },
-      {
-        path: '/terms',
-        element: <TermsOfService />,
-      },
-      {
-        path: '/chat',
+        path: 'chat',
         element: <Chat />,
       },
-      {
-        path: '/test-api',
-        element: <ApiTest />,
-      },
     ],
+  },
+  {
+    path: '/register',
+    element: <Register />,
+    loader: guestOnlyLoader,
+  },
+  {
+    path: '/login',
+    element: <Login />,
+    loader: guestOnlyLoader,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfService />,
+  },
+  {
+    path: '/test-api',
+    element: <ApiTest />,
   },
 ];
 
