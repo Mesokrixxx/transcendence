@@ -13,44 +13,50 @@ import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
-import { guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
+import { publicPageLoader, guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
 
 const routes: RouteObject[] = [
   {
     path: '/',
     element: <ProtectedPage />,
-    loader: requireAuthLoader,
+    loader: publicPageLoader,
     children: [
       {
         index: true,
         element: <Home />,
       },
+    ],
+  },
+  {
+    element: <ProtectedPage />,
+    loader: requireAuthLoader,
+    children: [
       {
-        path: 'play',
+        path: '/play',
         element: <Play />,
       },
       {
-        path: 'training',
+        path: '/training',
         element: <Training />,
       },
       {
-        path: 'watch',
+        path: '/watch',
         element: <Watch />,
       },
       {
-        path: 'watch/:gameId',
+        path: '/watch/:gameId',
         element: <WatchGame />,
       },
       {
-        path: 'rankings',
+        path: '/rankings',
         element: <Rankings />,
       },
       {
-        path: 'profile',
+        path: '/profile',
         element: <Profile />,
       },
       {
-        path: 'chat',
+        path: '/chat',
         element: <Chat />,
       },
     ],

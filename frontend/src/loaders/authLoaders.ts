@@ -2,6 +2,14 @@ import type { AuthUser } from "../types/auth";
 import fetchAPI from "../services/fetchAPI";
 import { redirect } from "react-router-dom";
 
+async function publicPageLoader() {
+  const response = await fetchAPI<AuthUser>({
+    path: '/auth/me',
+    method: 'get',
+  });
+  return response.error ? null : response.result;
+}
+
 async function guestOnlyLoader() {
   const response = await fetchAPI<AuthUser>({
     path: '/auth/me',
@@ -23,4 +31,4 @@ async function requireAuthLoader() {
   return response.result;
 }
 
-export { guestOnlyLoader, requireAuthLoader };
+export { publicPageLoader, guestOnlyLoader, requireAuthLoader };

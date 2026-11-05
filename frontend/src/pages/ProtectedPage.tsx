@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import type { AuthUser } from "../types/auth";
 
 function ProtectedPage() {
-  const loadedUser = useLoaderData<AuthUser>();
+  const loadedUser = useLoaderData<AuthUser | null>();
   const { setUser } = useAuth();
   useEffect(() => {
     setUser(loadedUser);
