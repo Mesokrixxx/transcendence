@@ -4,6 +4,7 @@ export const AvatarWrapper = styled.div<{ $size: number }>`
   position: relative;
   width: ${({ $size }) => $size}px;
   height: ${({ $size }) => $size}px;
+    font-size: ${({ $size }) => Math.max(24, $size * 0.45)}px;
   flex-shrink: 0;
 `;
 
@@ -24,7 +25,7 @@ export const AvatarFallback = styled.div`
   justify-content: center;
   background: var(--color-primary);
   color: var(--color-background);
-  font-size: 1.5rem;
+  font-size: inherit;
   font-weight: 600;
 `;
 

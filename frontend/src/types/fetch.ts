@@ -1,6 +1,6 @@
 // Types adaptés du modèle de Noa aux réponses du backend.
 
-export type Method = 'get' | 'post' | 'put' | 'delete';
+export type Method = 'get' | 'post' | 'patch' | 'put' | 'delete';
 
 export interface RequestOptions {
   body: string | null;

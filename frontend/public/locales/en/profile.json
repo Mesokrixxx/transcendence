@@ -7,6 +7,10 @@
   "imageTooLarge": "The image must be no larger than 2 MB.",
   "jpgPngOrWebpMaximum2Mb": "JPG, PNG or WebP. Maximum 2 MB.",
   "lastNameOptional": "Last name (optional)",
+  "localProfileNotice": "Your username is saved to your account. Your first name, last name and image are temporary and disappear when you reload.",
   "profileInformationAndAvatar": "Profile information and avatar",
+  "saveChanges": "Save changes",
+  "saveError": "Unable to save your changes. Please try again.",
+  "saving": "Saving...",
   "yourUsername": "Your username"
 }

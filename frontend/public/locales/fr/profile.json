@@ -7,6 +7,10 @@
   "imageTooLarge": "L'image ne doit pas dépasser 2 Mo.",
   "jpgPngOrWebpMaximum2Mb": "JPG, PNG ou WebP. 2 Mo maximum.",
   "lastNameOptional": "Nom (facultatif)",
+  "localProfileNotice": "Le pseudo est enregistré sur ton compte. Le prénom, le nom et l’image restent temporaires et disparaissent au rechargement.",
   "profileInformationAndAvatar": "Informations du profil et avatar",
+  "saveChanges": "Enregistrer",
+  "saveError": "Impossible d’enregistrer les modifications. Réessaie.",
+  "saving": "Enregistrement...",
   "yourUsername": "Votre nom d'utilisateur"
 }
