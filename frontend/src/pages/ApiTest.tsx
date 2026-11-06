@@ -1,42 +1,56 @@
-import { useState } from 'react'
-// import { fakerEN as faker } from '@faker-js/faker'
-import fetchAPI from '../services/fetchAPI'
-import type { AuthUser } from '../types/auth'
-import Button from '../components/Button/Button'
 
+// import { fakerEN as faker } from '@faker-js/faker'
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import fetchAPI from '../services/fetchAPI';
+import type { AuthUser } from '../types/auth';
+import Button from '../components/Button/Button';
 
 function ApiTest() {
-    const [result, setResult] = useState('Test not started.')
+  const { t } = useTranslation('common');
+  const [result, setResult] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-    async function testAPI() {
-        setResult('Loading...')
+  async function testAPI() {
+    if (isLoading) return;
 
-        const response = await fetchAPI<AuthUser>({
-            path: '/auth/login',
-            method: 'post',
-            body: {}
-        })
+    setIsLoading(true);
 
-        setResult(JSON.stringify(response, null, 2))
+    try {
+      const response = await fetchAPI<AuthUser>({
+        path: '/auth/login',
+        method: 'post',
+        body: {},
+      });
+
+      setResult(JSON.stringify(response, null, 2));
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    return (
-        <main className="container">
-            <h1>API test — backend</h1>
+  return (
+    <main className="container">
+      <h1>{t('apiTestTitle')}</h1>
 
-            <Button onClick={testAPI}>
-                Create test account
-            </Button>
+      <Button
+        onClick={() => {
+          void testAPI();
+        }}
+      >
+        {t('testAPI')}
+      </Button>
 
-            <pre style={{ whiteSpace: 'pre-wrap', marginTop: 24 }}>
-                {result}
-            </pre>
-        </main>
-    )
+      <pre style={{ whiteSpace: 'pre-wrap', marginTop: 24 }}>
+        {isLoading
+          ? t('loading')
+          : result ?? t('testNotStarted')}
+      </pre>
+    </main>
+  );
 }
 
-export default ApiTest
-
+export default ApiTest;
 
 // function ApiTest() {
 //     const [result, setResult] = useState('Test not started.')
@@ -55,7 +69,6 @@ export default ApiTest
 
 //         setResult('Loading...')
 
-       
 //         const originalFetch = window.fetch
 
 //         window.fetch = async (input, options) => {

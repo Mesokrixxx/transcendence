@@ -1,0 +1,16 @@
+{
+  "avatarOfUsername": "Avatar de {{username}}",
+  "changeAvatar": "Cambiar avatar",
+  "chooseImageFormat": "Elige una imagen JPG, PNG o WebP.",
+  "editProfile": "Editar perfil",
+  "firstNameOptional": "Nombre (opcional)",
+  "imageTooLarge": "La imagen no puede superar los 2 MB.",
+  "jpgPngOrWebpMaximum2Mb": "JPG, PNG o WebP. Máximo 2 MB.",
+  "lastNameOptional": "Apellidos (opcional)",
+  "localProfileNotice": "El nombre de usuario se guarda en tu cuenta. El nombre, los apellidos y la imagen son temporales y desaparecen al recargar.",
+  "profileInformationAndAvatar": "Información del perfil y avatar",
+  "saveChanges": "Guardar cambios",
+  "saveError": "No se han podido guardar los cambios. Inténtalo de nuevo.",
+  "saving": "Guardando...",
+  "yourUsername": "Tu nombre de usuario"
+}

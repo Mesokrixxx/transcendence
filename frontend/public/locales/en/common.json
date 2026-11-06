@@ -1,0 +1,22 @@
+{
+  "apiTestTitle": "API test — backend",
+  "cancel": "Cancel",
+  "changeLanguage": "Change language",
+  "chessboard": "Chessboard",
+  "close": "Close",
+  "closeNavigation": "Close navigation",
+  "copyright": "© {{year}} ChessMove",
+  "invalidJSONResponse": "The server returned an invalid JSON response.",
+  "loading": "Loading...",
+  "mainNavigation": "Main navigation",
+  "offline": "Offline",
+  "online": "Online",
+  "openNavigation": "Open navigation",
+  "requestFailed": "The request failed.",
+  "send": "Send",
+  "testAPI": "Test the API",
+  "testNotStarted": "Test not started.",
+  "unableToReachServer": "Unable to reach the server.",
+  "unknownError": "Something went wrong.",
+  "you": "You"
+}

@@ -1,8 +1,8 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 type StyledButtonProps = {
-  $variant: 'primary' | 'secondary' | 'accent'
-}
+  $variant: 'primary' | 'secondary' | 'accent';
+};
 
 export const StyledButton = styled.button<StyledButtonProps>`
   display: inline-flex;
@@ -12,33 +12,34 @@ export const StyledButton = styled.button<StyledButtonProps>`
 
   background-color: ${({ $variant }) => {
     if ($variant === 'secondary') {
-      return 'transparent'
+      return 'transparent';
     }
 
     if ($variant === 'accent') {
-      return 'var(--color-accent)'
+      return 'var(--color-accent)';
     }
 
-    return 'var(--color-primary)'
+    return 'var(--color-primary)';
   }};
 
-  border: 2px solid ${({ $variant }) => {
-    if ($variant === 'secondary') {
-      return 'var(--color-primary)'
-    }
+  border: 2px solid
+    ${({ $variant }) => {
+      if ($variant === 'secondary') {
+        return 'var(--color-primary)';
+      }
 
-    return 'transparent'
-  }};
+      return 'transparent';
+    }};
 
   border-radius: 10px;
 
   && {
     color: ${({ $variant }) => {
       if ($variant === 'secondary') {
-        return 'var(--color-primary)'
+        return 'var(--color-primary)';
       }
 
-      return 'var(--color-background)'
+      return 'var(--color-background)';
     }};
 
     text-decoration: none;
@@ -68,4 +69,4 @@ export const StyledButton = styled.button<StyledButtonProps>`
       transform: none;
     }
   }
-`
+`;

@@ -1,35 +1,88 @@
-import { Routes, Route } from 'react-router-dom'
-import Home from '../pages/Home/Home'
-import Play from '../pages/Play/Play'
-import Register from '../pages/Register'
-import Login from '../pages/Login/Login'
-import Profile from '../pages/Profile/Profile'
-import PrivacyPolicy from '../pages/PrivacyPolicy'
-import TermsOfService from '../pages/TermsOfService'
-import Rankings from '../pages/Rankings/Rankings'
-import Chat from '../pages/Chat/Chat'
-import WatchGame from '../pages/Watch/WatchGame'
-import Watch from '../pages/Watch/Watch'
-import ApiTest from '../pages/ApiTest'
+import type { RouteObject } from 'react-router-dom';
+import Home from '../pages/Home/Home';
+import Play from '../pages/Play/Play';
+import Training from '../pages/Training/Training';
+import Register from '../pages/Register';
+import Login from '../pages/Login/Login';
+import Profile from '../pages/Profile/Profile';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import TermsOfService from '../pages/TermsOfService';
+import Rankings from '../pages/Rankings/Rankings';
+import Chat from '../pages/Chat/Chat';
+import WatchGame from '../pages/Watch/WatchGame';
+import Watch from '../pages/Watch/Watch';
+import ApiTest from '../pages/ApiTest';
+import ProtectedPage from '../pages/ProtectedPage';
+import { publicPageLoader, guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
 
+const routes: RouteObject[] = [
+  {
+    path: '/',
+    element: <ProtectedPage />,
+    loader: publicPageLoader,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+    ],
+  },
+  {
+    element: <ProtectedPage />,
+    loader: requireAuthLoader,
+    children: [
+      {
+        path: '/play',
+        element: <Play />,
+      },
+      {
+        path: '/training',
+        element: <Training />,
+      },
+      {
+        path: '/watch',
+        element: <Watch />,
+      },
+      {
+        path: '/watch/:gameId',
+        element: <WatchGame />,
+      },
+      {
+        path: '/rankings',
+        element: <Rankings />,
+      },
+      {
+        path: '/profile',
+        element: <Profile />,
+      },
+      {
+        path: '/chat',
+        element: <Chat />,
+      },
+    ],
+  },
+  {
+    path: '/register',
+    element: <Register />,
+    loader: guestOnlyLoader,
+  },
+  {
+    path: '/login',
+    element: <Login />,
+    loader: guestOnlyLoader,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfService />,
+  },
+  {
+    path: '/test-api',
+    element: <ApiTest />,
+  },
+];
 
-function AppRoutes(){
-    return(
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/play" element={<Play />} />
-            <Route path="/watch" element={<Watch />} />
-            <Route path="/watch/:gameId" element={<WatchGame />} />
-            <Route path="/rankings" element={<Rankings />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/Profile" element={<Profile />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/test-api" element={<ApiTest />} />
-        </Routes>
-    )
-}
-
-export default AppRoutes
+export default routes;

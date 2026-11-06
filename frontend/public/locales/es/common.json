@@ -1,0 +1,22 @@
+{
+  "apiTestTitle": "Prueba de API — backend",
+  "cancel": "Cancelar",
+  "changeLanguage": "Cambiar idioma",
+  "chessboard": "Tablero de ajedrez",
+  "close": "Cerrar",
+  "closeNavigation": "Cerrar navegación",
+  "copyright": "© {{year}} ChessMove",
+  "invalidJSONResponse": "El servidor devolvió una respuesta JSON no válida.",
+  "loading": "Cargando...",
+  "mainNavigation": "Navegación principal",
+  "offline": "Desconectado",
+  "online": "En línea",
+  "openNavigation": "Abrir navegación",
+  "requestFailed": "La solicitud ha fallado.",
+  "send": "Enviar",
+  "testAPI": "Probar la API",
+  "testNotStarted": "Prueba no iniciada.",
+  "unableToReachServer": "No se puede conectar con el servidor.",
+  "unknownError": "Se ha producido un error.",
+  "you": "Tú"
+}

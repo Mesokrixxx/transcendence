@@ -1,0 +1,19 @@
+{
+  "communityLeaderboardDescription": "Découvrez la progression de la communauté au classement.",
+  "competitivePlay": "Jeu compétitif",
+  "firstPlace": "Première place",
+  "games": "Parties",
+  "loadError": "Impossible de charger le classement.",
+  "loading": "Chargement...",
+  "noMatch": "Aucun joueur ne correspond à votre recherche.",
+  "noPlayersYet": "Aucun joueur pour le moment.",
+  "player": "Joueur",
+  "playerRankingsTitle": "<1>Classement</1> des joueurs",
+  "rating": "Classement Elo",
+  "searchPlayerLabel": "Rechercher un joueur",
+  "searchPlayersPlaceholder": "Rechercher un joueur...",
+  "secondPlace": "Deuxième place",
+  "thirdPlace": "Troisième place",
+  "winRate": "Taux de victoire",
+  "wins": "Victoires"
+}

@@ -1,6 +1,11 @@
-import { Link } from 'react-router-dom'
-import { useEffect, useId, useRef, useState } from 'react'
-import Button from '../Button/Button'
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useId, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import fetchAPI from '../../services/fetchAPI';
+import i18n from '../../services/i18n';
+import Button from '../Button/Button';
+import UserMenu from '../UserMenu/UserMenu';
 import {
   Header,
   Content,
@@ -12,94 +17,130 @@ import {
   Auth,
   LanguageButton,
   LanguageMenu,
-  LanguageOptions
-} from './Navbar.styles'
+  LanguageOptions,
+} from './Navbar.styles';
 
 function Navbar() {
-  const [showMenu, setShowMenu] = useState(false)
-  const [showLanguages, setShowLanguages] = useState(false)
+  const { t } = useTranslation();
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
 
-  const headerRef = useRef<HTMLElement>(null)
-  const burgerRef = useRef<HTMLButtonElement>(null)
-  const languageMenuRef = useRef<HTMLDivElement>(null)
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
+  const [showLanguages, setShowLanguages] = useState(false);
 
-  const menuId = useId()
-  const languageId = useId()
+  const headerRef = useRef<HTMLElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
+
+  const menuId = useId();
+  const languageId = useId();
 
   function closeMenus() {
-    setShowMenu(false)
-    setShowLanguages(false)
+    setShowMenu(false);
+    setShowLanguages(false);
+  }
+
+  function changeLanguage(language: string) {
+    void i18n.changeLanguage(language);
+    closeMenus();
   }
 
   useEffect(() => {
-    if (!showMenu && !showLanguages) 
-      return
+    if (!showMenu && !showLanguages) return;
 
     function handleClickOutside(event: PointerEvent) {
-      if (!(event.target instanceof Node)) 
-        return
+      if (!(event.target instanceof Node)) return;
 
       if (
         headerRef.current &&
         !headerRef.current.contains(event.target)
       ) {
-        setShowMenu(false)
-        setShowLanguages(false)
+        setShowMenu(false);
+        setShowLanguages(false);
       } else if (
         languageMenuRef.current &&
         !languageMenuRef.current.contains(event.target)
       ) {
-        setShowLanguages(false)
+        setShowLanguages(false);
       }
     }
 
     function handleEscape(event: KeyboardEvent) {
-      if (event.key !== 'Escape') 
-        return
+      if (event.key !== 'Escape') return;
 
       if (showLanguages) {
-        setShowLanguages(false)
-
-        if (languageMenuRef.current) {
-          const button = languageMenuRef.current.querySelector('button')
-
-          if (button) {
-            button.focus()
-          }
-        }
-
+        setShowLanguages(false);
+        languageMenuRef.current?.querySelector('button')?.focus();
       } else {
-        setShowMenu(false)
-        burgerRef.current?.focus()
+        setShowMenu(false);
+        burgerRef.current?.focus();
       }
     }
 
-    document.addEventListener('pointerdown', handleClickOutside)
-    document.addEventListener('keydown', handleEscape)
+    document.addEventListener('pointerdown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.removeEventListener('pointerdown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscape)
+      document.removeEventListener('pointerdown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [showMenu, showLanguages]);
+
+  async function handleLogout() {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+    setLogoutError('');
+
+    try {
+      const response = await fetchAPI<void>({
+        path: '/auth/logout',
+        method: 'post',
+      });
+
+      if (response.error === true) {
+        if (typeof response.result === 'string') {
+          setLogoutError(response.result);
+        } else {
+          setLogoutError(response.result.error);
+        }
+
+        return;
+      }
+
+      setUser(null);
+      closeMenus();
+      navigate('/login', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
     }
-  }, [showMenu, showLanguages])
+  }
 
   return (
     <Header ref={headerRef}>
       <Content className="container">
         <Brand to="/" onClick={closeMenus}>
           <Icon src="/icons/rook-solid-full.svg" alt="" />
-          Chess<span>Move</span>
+          <Trans ns="home" i18nKey="chessMoveBrand">
+            Chess<span>Move</span>
+          </Trans>
         </Brand>
 
         <BurgerButton
           ref={burgerRef}
           type="button"
-          aria-label={showMenu ? 'Close navigation' : 'Open navigation'}
+          aria-label={
+            showMenu
+              ? t('closeNavigation', { ns: 'common' })
+              : t('openNavigation', { ns: 'common' })
+          }
           aria-expanded={showMenu}
           aria-controls={menuId}
           onClick={() => {
-            setShowMenu((open) => !open)
-            setShowLanguages(false)
+            setShowMenu((open) => !open);
+            setShowLanguages(false);
           }}
         >
           <span aria-hidden="true">{showMenu ? '✕' : '☰'}</span>
@@ -113,30 +154,55 @@ function Navbar() {
               event.target instanceof Element &&
               event.target.closest('a')
             ) {
-              closeMenus()
+              closeMenus();
             }
           }}
         >
-          <Navigation aria-label="Main navigation">
-            <Link to="/play">Play</Link>
-            <Link to="/watch">Watch</Link>
-            {/* <Link to="/tournaments">Tournaments</Link> */}
-            <Link to="/rankings">Rankings</Link>
+          <Navigation
+            aria-label={t('mainNavigation', { ns: 'common' })}
+          >
+            <NavLink to="/play">
+              {t('play', { ns: 'navigation' })}
+            </NavLink>
+
+            <NavLink to="/training">
+              {t('training', { ns: 'navigation' })}
+            </NavLink>
+
+            <NavLink to="/watch">
+              {t('watch', { ns: 'navigation' })}
+            </NavLink>
+
+            <NavLink to="/rankings">
+              {t('rankings', { ns: 'navigation' })}
+            </NavLink>
           </Navigation>
 
           <Auth>
-            <Button to="/login" variant="secondary">
-              Log in
-            </Button>
+            {user ? (
+              <UserMenu
+                username={user.username}
+                isLoggingOut={isLoggingOut}
+                onLogout={handleLogout}
+              />
+            ) : (
+              <>
+                <Button to="/login" variant="secondary">
+                  {t('logIn', { ns: 'auth' })}
+                </Button>
 
-            <Button to="/register" variant="primary">
-              Sign Up
-            </Button>
+                <Button to="/register" variant="primary">
+                  {t('signUp', { ns: 'auth' })}
+                </Button>
+              </>
+            )}
+
+            {logoutError && <p role="alert">{logoutError}</p>}
 
             <LanguageMenu ref={languageMenuRef}>
               <LanguageButton
                 type="button"
-                aria-label="Change language"
+                aria-label={t('changeLanguage', { ns: 'common' })}
                 aria-expanded={showLanguages}
                 aria-controls={languageId}
                 onClick={() => setShowLanguages((open) => !open)}
@@ -150,27 +216,38 @@ function Navbar() {
                     <button
                       type="button"
                       lang="fr"
-                      onClick={closeMenus}
+                      aria-current={
+                        i18n.language === 'fr' ? 'true' : undefined
+                      }
+                      onClick={() => changeLanguage('fr')}
                     >
-                      Français
+                      {t('french', { ns: 'navigation' })}
                     </button>
                   </li>
+
                   <li>
                     <button
                       type="button"
                       lang="es"
-                      onClick={closeMenus}
+                      aria-current={
+                        i18n.language === 'es' ? 'true' : undefined
+                      }
+                      onClick={() => changeLanguage('es')}
                     >
-                      Español
+                      {t('spanish', { ns: 'navigation' })}
                     </button>
                   </li>
+
                   <li>
                     <button
                       type="button"
                       lang="en"
-                      onClick={closeMenus}
+                      aria-current={
+                        i18n.language === 'en' ? 'true' : undefined
+                      }
+                      onClick={() => changeLanguage('en')}
                     >
-                      English
+                      {t('english', { ns: 'navigation' })}
                     </button>
                   </li>
                 </LanguageOptions>
@@ -180,7 +257,7 @@ function Navbar() {
         </MenuContent>
       </Content>
     </Header>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;

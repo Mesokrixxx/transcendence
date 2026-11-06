@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Links = styled.div`
   display: flex;
@@ -9,10 +9,8 @@ export const Links = styled.div`
   color: var(--color-text-secondary);
   font-size: 14px;
 
-
-
   a {
     color: inherit;
     text-decoration: none;
   }
-`
+`;

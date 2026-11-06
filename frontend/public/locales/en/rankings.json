@@ -1,0 +1,19 @@
+{
+  "communityLeaderboardDescription": "See how the community is climbing the leaderboard.",
+  "competitivePlay": "Competitive play",
+  "firstPlace": "First place",
+  "games": "Games",
+  "loadError": "Could not load the rankings.",
+  "loading": "Loading...",
+  "noMatch": "No player matches your search.",
+  "noPlayersYet": "No players yet.",
+  "player": "Player",
+  "playerRankingsTitle": "Player <1>Rankings</1>",
+  "rating": "Rating",
+  "searchPlayerLabel": "Search players",
+  "searchPlayersPlaceholder": "Search players...",
+  "secondPlace": "Second place",
+  "thirdPlace": "Third place",
+  "winRate": "Win rate",
+  "wins": "Wins"
+}

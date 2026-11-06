@@ -1,0 +1,19 @@
+{
+  "communityLeaderboardDescription": "Descubre cómo avanza la comunidad en la clasificación.",
+  "competitivePlay": "Juego competitivo",
+  "firstPlace": "Primer puesto",
+  "games": "Partidas",
+  "loadError": "No se pudo cargar la clasificación.",
+  "loading": "Cargando...",
+  "noMatch": "Ningún jugador coincide con tu búsqueda.",
+  "noPlayersYet": "Todavía no hay jugadores.",
+  "player": "Jugador",
+  "playerRankingsTitle": "<1>Clasificación</1> de jugadores",
+  "rating": "Puntuación",
+  "searchPlayerLabel": "Buscar jugadores",
+  "searchPlayersPlaceholder": "Buscar jugadores...",
+  "secondPlace": "Segundo puesto",
+  "thirdPlace": "Tercer puesto",
+  "winRate": "Porcentaje de victorias",
+  "wins": "Victorias"
+}

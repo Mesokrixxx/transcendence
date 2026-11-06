@@ -1,122 +1,173 @@
+import { useEffect, useState, type ReactNode } from 'react'
 import Navbar from '../../components/Navbar/Navbar';
-import Footer from '../../components/Footer/Footer'
-import { Page } from '../Home/Home.styles'
+import Footer from '../../components/Footer/Footer';
+import { Page } from '../Home/Home.styles';
 import {
-    Content,
-    Header,
-    Eyebrow,
-    TableWrapper,
-    Table,
-    PlayerCell,
-    WinRate,
-    RankCell,
-    MedalSlot } from './Rankings.styles'
-import Avatar from '../../components/Avatar/Avatar'
-
-type Player =  {
-    id: number
-    username: string
-    rating: number
-    wins: number
-    games: number
-    avatar?: string
-    isOnline?: boolean
-}
-
-//fake data, pending the backend
-//we rempace it by the response of GET /api/rankings
-const fakePlayers: Player[] = [
-    {id: 1, username: 'alice', rating: 1842, wins:42, games: 60, isOnline: true, avatar: '/avatars/queen.svg'},
-    {id: 2, username: 'bob', rating: 1755, wins: 35, games: 55, isOnline: false, avatar: '/avatars/king.svg'},
-    {id: 3, username: 'charlie', rating: 1610, wins: 20, games: 48, avatar: '/avatars/knight.svg'},
-    {id: 4, username: 'jack', rating: 1440, wins: 15, games: 35, isOnline: true},
-    {id: 5, username: 'diana', rating: 1300, wins: 12, games: 30, isOnline: false,},
-    {id: 6, username: 'sofia', rating: 1210, wins: 10, games: 25},
-
-]
+  Content,
+  Header,
+  Eyebrow,
+  TableWrapper,
+  Table,
+  PlayerCell,
+  WinRate,
+  RankCell,
+  MedalSlot,
+  StatusMessage,
+  SearchBox
+} from './Rankings.styles';
+import Avatar from '../../components/Avatar/Avatar';
+import { useTranslation, Trans } from 'react-i18next';
+import { getRankings , type Player } from './Rankings.service'
 
 function getWinRate(wins: number, games: number): number {
-    if (games === 0) return 0
-    return Math.round((wins / games) * 100)
+  if (games === 0) return 0;
+  return Math.round((wins / games) * 100);
 }
 
 type Medal = {
-    src: string
-    label: string
-}
+  src: string;
+  labelKey: 'firstPlace' | 'secondPlace' | 'thirdPlace';
+};
 
 const medals: Record<number, Medal | undefined> = {
-    1 : {src: '/medals/gold.svg', label: 'First place'},
-    2 : {src: '/medals/silver.svg', label: 'Second place'},
-    3 : {src: '/medals/bronze.svg', label: 'Third place'},
-}
+  1: { src: '/medals/gold.svg', labelKey: 'firstPlace' },
+  2: { src: '/medals/silver.svg', labelKey: 'secondPlace' },
+  3: { src: '/medals/bronze.svg', labelKey: 'thirdPlace' },
+};
 
-function RankBadge({ rank }: {rank: number}){
-    const medal = medals[rank]
+function RankBadge({ rank }: { rank: number }) {
+  const { t } = useTranslation('rankings');
+  const medal = medals[rank];
 
-    return (
-        <RankCell>
-            <MedalSlot>
-                {medal && <img src={medal.src} alt={medal.label} />}
-            </MedalSlot>
-            <span>{rank}</span>
-        </RankCell>
-    )
+  return (
+    <RankCell>
+      <MedalSlot>
+        {medal && <img src={medal.src} alt={t(medal.labelKey)} />}
+      </MedalSlot>
+      <span>{rank}</span>
+    </RankCell>
+  );
 }
 
 function Rankings() {
-    return (
-        <Page>
-            <Navbar />
+  const { t } = useTranslation('rankings');
 
-            <Content className='container'>
-                <Header>
-                    <Eyebrow>Competitive play</Eyebrow>
-                    <h1>Player <span>Rankings</span></h1>
-                    <p>See how the community is climbing the leaderboard.</p>
-                </Header>
+  const [players, setPlayers] = useState<Player[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+  const [search, setSearch] = useState('')
 
-                <TableWrapper>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Player</th>
-                                <th>Rating</th>
-                                <th>Wins</th>
-                                <th>Games</th>
-                                <th>Win rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {fakePlayers.map((player, index) => (
-                                <tr key={player.id}>
-                                    <td><RankBadge rank={index + 1} /></td>
-                                    <td>
-                                        <PlayerCell>
-                                            <Avatar
-                                                src={player.avatar}
-                                                username={player.username}
-                                                isOnline={player.isOnline}
-                                                size={48}
-                                            />
-                                            <span title={player.username}>{player.username}</span>
-                                        </PlayerCell>
-                                    </td>
-                                    <td>{player.rating}</td>
-                                    <td>{player.wins}</td>
-                                    <td>{player.games}</td>
-                                    <WinRate>{getWinRate(player.wins, player.games)}%</WinRate>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </TableWrapper>
-            </Content>
+  useEffect(() => {
+      getRankings()
+          .then((data) => setPlayers(data))
+          .catch(() => setHasError(true))
+          .finally(() => setIsLoading(false))
+  }, [])
 
-            <Footer/>
-        </Page>
-    )
+  const rankedPlayers = players.map((player, index) => ({
+      ...player,
+      rank: index + 1,
+  }))
+
+  const searchTerm = search.trim().toLowerCase()
+  const visiblePlayers = rankedPlayers.filter((player) =>
+      player.username.toLowerCase().includes(searchTerm))
+
+  let content: ReactNode
+  if (isLoading) {
+      content = <StatusMessage>{t('loading')}</StatusMessage>
+  } else if (hasError) {
+      content = <StatusMessage role="alert">{t('loadError')}</StatusMessage>
+  } else if (players.length === 0) {
+      content = <StatusMessage>{t('noPlayersYet')}</StatusMessage>
+  } else if (visiblePlayers.length === 0) {
+      content = <StatusMessage>{t('noMatch')}</StatusMessage>
+  } else {
+      content = (
+          <TableWrapper>
+              <Table>
+                  <thead>
+                      <tr>
+                          <th>#</th>
+                          <th>{t('player')}</th>
+                          <th>{t('rating')}</th>
+                          <th>{t('wins')}</th>
+                          <th>{t('games')}</th>
+                          <th>{t('winRate')}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {visiblePlayers.map((player) => (
+                          <tr key={player.id} data-top={player.rank === 1}>
+                              <td><RankBadge rank={player.rank} /></td>
+                              <td>
+                                  <PlayerCell>
+                                      <Avatar
+                                          src={player.avatar}
+                                          username={player.username}
+                                          isOnline={player.isOnline}
+                                          size={48}
+                                      />
+                                      <span title={player.username}>{player.username}</span>
+                                  </PlayerCell>
+                              </td>
+                              <td>{player.rating}</td>
+                              <td>{player.wins}</td>
+                              <td>{player.games}</td>
+                              <WinRate>{getWinRate(player.wins, player.games)}%</WinRate>
+                          </tr>
+                      ))}
+                  </tbody>
+              </Table>
+          </TableWrapper>
+      )
+  }
+
+  return (
+    <Page>
+      <Navbar />
+
+      <Content className="container">
+        <Header>
+          <Eyebrow>{t('competitivePlay')}</Eyebrow>
+          <h1>
+            <Trans ns="rankings" i18nKey="playerRankingsTitle">
+              Player <span>Rankings</span>
+            </Trans>
+          </h1>
+          <p>{t('communityLeaderboardDescription')}</p>
+        </Header>
+
+        {players.length > 0 && (
+            <SearchBox>
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    aria-hidden="true"
+                >
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="M20 20l-3.5-3.5"/>
+                </svg>
+                <input
+                    type="search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder={t('searchPlayersPlaceholder')}
+                    aria-label={t('searchPlayerLabel')}    
+                />
+            </SearchBox>
+        )}
+
+        {content}
+        
+      </Content>
+
+      <Footer />
+    </Page>
+  );
 }
 
-export default Rankings
+export default Rankings;

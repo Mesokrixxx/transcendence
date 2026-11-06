@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react';
 import {
   Box,
   Title,
@@ -7,33 +7,35 @@ import {
   Author,
   Form,
   Input,
-  SendButton
-} from './ChatBox.styles'
+  SendButton,
+} from './ChatBox.styles';
+import { useTranslation } from 'react-i18next';
 
 type Message = {
-  id: number
-  author: string
-  content: string
-}
+  id: number;
+  author: string;
+  content: string;
+};
 
 type ChatBoxProps = {
-  title: string
-  initialMessages?: Message[]
-}
+  title: string;
+  initialMessages?: Message[];
+};
 
 function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const [draft, setDraft] = useState('')
+  const { t } = useTranslation();
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [draft, setDraft] = useState('');
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const text = draft.trim()
-    if (text === '') return
+    const text = draft.trim();
+    if (text === '') return;
 
-    const newMessage: Message = { id: Date.now(), author: 'me', content: text }
-    setMessages([...messages, newMessage])
-    setDraft('')
+    const newMessage: Message = { id: Date.now(), author: 'me', content: text };
+    setMessages([...messages, newMessage]);
+    setDraft('');
   }
 
   return (
@@ -43,7 +45,9 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
       <MessageList>
         {messages.map((message) => (
           <MessageItem key={message.id}>
-            <Author>{message.author}</Author>
+            <Author>
+              {message.author === 'me' ? t('you', { ns: 'common' }) : message.author}
+            </Author>
             <p>{message.content}</p>
           </MessageItem>
         ))}
@@ -54,12 +58,12 @@ function ChatBox({ title, initialMessages = [] }: ChatBoxProps) {
           type="text"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Write a message..."
+          placeholder={t('writeAMessage', { ns: 'chat' })}
         />
-        <SendButton type="submit">Send</SendButton>
+        <SendButton type="submit">{t('send', { ns: 'common' })}</SendButton>
       </Form>
     </Box>
-  )
+  );
 }
 
-export default ChatBox
+export default ChatBox;

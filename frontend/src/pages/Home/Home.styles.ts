@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Page = styled.div`
   min-height: 100vh;
@@ -13,8 +13,7 @@ export const Page = styled.div`
   > footer {
     flex-shrink: 0;
   }
-  
-`
+`;
 
 export const Content = styled.main`
   flex: 1;
@@ -39,11 +38,11 @@ export const Content = styled.main`
     gap: 32px;
   }
 
-  @media (max-width: 480px){
-    padding:24px 16px;
-    gap: 24px
-    }
-`
+  @media (max-width: 480px) {
+    padding: 24px 16px;
+    gap: 24px;
+  }
+`;
 
 export const Intro = styled.div`
   display: flex;
@@ -61,19 +60,19 @@ export const Intro = styled.div`
   span {
     color: var(--color-primary);
   }
-  
+
   @media (max-width: 900px) {
     align-items: center;
     text-align: center;
-    
+
     h1 {
-        text-align: center;
+      text-align: center;
     }
   }
-`
+`;
 
 export const Aside = styled.div`
   @media (max-width: 900px) {
     display: none;
   }
-`
+`;
