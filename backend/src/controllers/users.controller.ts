@@ -73,3 +73,20 @@ export async function updateUser(req: Request, res: Response) {
 
 	return res.status(200).json(result);
 }
+
+export async function getUsersByRanking(req: Request, res: Response) {
+	const user = req.user;
+	if (!user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const { result, error } = await query(() => userService.getAll());
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+
+	if (!result)
+		return res.status(200).json({});
+
+	return res.status(200).json(result);
+}

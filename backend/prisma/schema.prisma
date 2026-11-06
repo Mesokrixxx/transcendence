@@ -51,6 +51,8 @@ model User {
   // If Bob is ONLY in addedBy, then Bob sent User a friend request
   friendsAdded User[] @relation("FriendsList")
   addedBy      User[] @relation("FriendsList")
+  blockedUsers User[] @relation("BlockedUsers")
+  blockedBy    User[] @relation("BlockedUsers")
 
   chats    Chat[]
   messages Message[]
