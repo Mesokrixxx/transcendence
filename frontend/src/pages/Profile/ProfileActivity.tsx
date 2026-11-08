@@ -1,42 +1,44 @@
 import { useId, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityPanel, ActivityTabs, ActivityTab,ActivityContent } from './ProfileActivity.styles';
+import Messaging from '../Chat/Messaging';
+import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent } from './ProfileActivity.styles';
+
+const tabs = ['history', 'friends', 'messages'] as const;
+type Tab = (typeof tabs)[number];
 
 function ProfileActivity() {
   const { t } = useTranslation('profile');
-  const [activeTab, setActiveTab] = useState<'history' | 'friends'>(
-    'history',
-  );
+  const [activeTab, setActiveTab] = useState<Tab>('history');
   const id = useId();
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    let nextTab: 'history' | 'friends';
+    const currentIndex = tabs.indexOf(activeTab);
+    let nextIndex: number;
 
     switch (event.key) {
-      case 'ArrowLeft':
       case 'ArrowRight':
-        nextTab = activeTab === 'history' ? 'friends' : 'history';
+        nextIndex = (currentIndex + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
         break;
       case 'Home':
-        nextTab = 'history';
+        nextIndex = 0;
         break;
       case 'End':
-        nextTab = 'friends';
+        nextIndex = tabs.length - 1;
         break;
       default:
         return;
     }
 
     event.preventDefault();
-    setActiveTab(nextTab);
+    setActiveTab(tabs[nextIndex]);
 
-    const buttons =
-      event.currentTarget.querySelectorAll<HTMLButtonElement>(
-        '[role="tab"]',
-      );
-
-    buttons[nextTab === 'history' ? 0 : 1]?.focus();
+    event.currentTarget
+      .querySelectorAll<HTMLButtonElement>('[role="tab"]')
+      [nextIndex]?.focus();
   }
 
   return (
@@ -46,29 +48,24 @@ function ProfileActivity() {
         aria-label={t('profileActivity')}
         onKeyDown={handleKeyDown}
       >
-        <ActivityTab
-          type="button"
-          role="tab"
-          id={`${id}-history-tab`}
-          aria-controls={`${id}-history-panel`}
-          aria-selected={activeTab === 'history'}
-          tabIndex={activeTab === 'history' ? 0 : -1}
-          onClick={() => setActiveTab('history')}
-        >
-          {t('gameHistory')}
-        </ActivityTab>
-
-        <ActivityTab
-          type="button"
-          role="tab"
-          id={`${id}-friends-tab`}
-          aria-controls={`${id}-friends-panel`}
-          aria-selected={activeTab === 'friends'}
-          tabIndex={activeTab === 'friends' ? 0 : -1}
-          onClick={() => setActiveTab('friends')}
-        >
-          {t('friends')}
-        </ActivityTab>
+        {tabs.map((tab) => (
+          <ActivityTab
+            key={tab}
+            type="button"
+            role="tab"
+            id={`${id}-${tab}-tab`}
+            aria-controls={`${id}-${tab}-panel`}
+            aria-selected={activeTab === tab}
+            tabIndex={activeTab === tab ? 0 : -1}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === 'history'
+              ? t('gameHistory')
+              : tab === 'friends'
+                ? t('friends')
+                : t('messages', { ns: 'chat' })}
+          </ActivityTab>
+        ))}
       </ActivityTabs>
 
       <ActivityContent
@@ -89,6 +86,17 @@ function ProfileActivity() {
         tabIndex={0}
       >
         <p>{t('friendsPlaceholder')}</p>
+      </ActivityContent>
+
+      <ActivityContent
+        className="messages-panel"
+        role="tabpanel"
+        id={`${id}-messages-panel`}
+        aria-labelledby={`${id}-messages-tab`}
+        hidden={activeTab !== 'messages'}
+        tabIndex={0}
+      >
+        <Messaging />
       </ActivityContent>
     </ActivityPanel>
   );

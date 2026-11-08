@@ -45,7 +45,9 @@ export default interface Resources {
   },
   "chat": {
     "chat": "Chat",
+    "conversations": "Conversations",
     "gameChat": "Game chat",
+    "messages": "Messages",
     "players": "Players",
     "spectatorChat": "Spectator chat",
     "spectators": "Spectators",

@@ -1,6 +1,8 @@
 {
   "chat": "Chat",
+  "conversations": "Conversaciones",
   "gameChat": "Chat de la partida",
+  "messages": "Mensajes",
   "players": "Jugadores",
   "spectatorChat": "Chat de espectadores",
   "spectators": "Espectadores",

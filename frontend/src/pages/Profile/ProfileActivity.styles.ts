@@ -12,6 +12,7 @@ export const ActivityTabs = styled.div`
   display: flex;
   gap: 24px;
   padding: 0 32px;
+  overflow-x: auto;
   border-bottom: 1px solid var(--color-border);
 
   @media (max-width: 600px) {
@@ -22,6 +23,7 @@ export const ActivityTabs = styled.div`
 
 export const ActivityTab = styled.button`
   min-width: 0;
+  flex-shrink: 0;
   padding: 20px 0;
   border: none;
   border-bottom: 3px solid transparent;
@@ -61,6 +63,15 @@ export const ActivityContent = styled.div`
     outline: 2px solid var(--color-primary);
     outline-offset: -4px;
     border-radius: 12px;
+  }
+
+  &.messages-panel {
+    padding: 0;
+  }
+
+  &.messages-panel > div {
+    border: none;
+    border-radius: 0 0 16px 16px;
   }
 
   @media (max-width: 600px) {
