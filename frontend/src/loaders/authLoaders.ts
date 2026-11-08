@@ -1,6 +1,7 @@
-import type { AuthUser } from "../types/auth";
-import fetchAPI from "../services/fetchAPI";
-import { redirect } from "react-router-dom";
+import type { AuthUser } from '../types/auth';
+import fetchAPI from '../services/fetchAPI';
+import { redirect } from 'react-router-dom';
+import localStorage from '../services/localStorage';
 
 async function publicPageLoader() {
   const response = await fetchAPI<AuthUser>({
@@ -15,8 +16,7 @@ async function guestOnlyLoader() {
     path: '/auth/me',
     method: 'get',
   });
-  if (response.error)
-    return null;
+  if (response.error) return null;
   return redirect('/');
 }
 
@@ -31,4 +31,45 @@ async function requireAuthLoader() {
   return response.result;
 }
 
-export { publicPageLoader, guestOnlyLoader, requireAuthLoader };
+async function githubLoader() {
+  const redirectResponse = await guestOnlyLoader();
+  if (redirectResponse) return redirectResponse;
+
+  const client_id = import.meta.env.VITE_OAUTH_CLIENT_ID;
+  const redirect_uri = import.meta.env.VITE_OAUTH_REDIRECT_URI;
+  const state = crypto.randomUUID();
+  localStorage.set('githubState', state);
+  return redirect(
+    `https://github.com/login/oauth/authorize?client_id=${client_id}&response_type=code&scope=repo&redirect_uri=${redirect_uri}&state=${state}&scope=user:email`,
+  );
+}
+
+async function githubCallbackLoader({ request }: { request: Request }) {
+  const redirectResponse = await guestOnlyLoader();
+  if (redirectResponse) return redirectResponse;
+
+  const searchParams = new URL(request.url).searchParams;
+  const code = searchParams.get('code');
+  const state = searchParams.get('state');
+
+  if (
+    code !== null &&
+    state !== null &&
+    state === localStorage.get('githubState')
+  ) {
+    await fetchAPI({
+      path: `/auth/oauth?code=${code}`,
+      method: 'post',
+    });
+  }
+  localStorage.remove('githubState');
+  return redirect('/');
+}
+
+export {
+  publicPageLoader,
+  guestOnlyLoader,
+  requireAuthLoader,
+  githubLoader,
+  githubCallbackLoader,
+};
