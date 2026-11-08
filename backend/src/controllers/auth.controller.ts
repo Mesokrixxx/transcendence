@@ -5,6 +5,7 @@ import * as authService from '../services/auth.service.js';
 import { authUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
+import { getGithubUser } from '../utils/github.js';
 
 function sessionCookie(token: string, maxAge: number) {
 	return stringifySetCookie({
@@ -72,4 +73,14 @@ export function getCurrentUser(req: Request, res: Response) {
 		return res.status(401).json({ error: 'user must be logged in' });
 
 	return res.status(200).json(req.user);
+}
+
+export async function oauth(req: Request, res: Response) {
+  const { code } = req.query;
+  if (typeof code !== 'string')
+    return res.sendStatus(400);
+  const githubUser = await getGithubUser(code);
+  if (githubUser === null)
+    return res.status(400).json('Github authentication failed');
+  return res.json(githubUser);
 }
