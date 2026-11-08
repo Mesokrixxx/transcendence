@@ -194,6 +194,10 @@ function Navbar() {
                 <Button to="/register" variant="primary">
                   {t('signUp', { ns: 'auth' })}
                 </Button>
+
+                <Button to="/github-signin" variant="primary">
+                  {t('ghSignIn', { ns: 'auth' })}
+                </Button>
               </>
             )}
 
