@@ -16,6 +16,7 @@ export default interface Resources {
     "enterUsername": "Please enter a username.",
     "examplePassword": "Example42$",
     "firstNameOptional": "First name (optional)",
+    "ghSignIn": "GitHub Sign-In",
     "hidePassword": "Hide password",
     "lastNameOptional": "Last name (optional)",
     "logIn": "Log in",
