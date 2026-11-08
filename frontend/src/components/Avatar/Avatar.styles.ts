@@ -31,10 +31,13 @@ export const AvatarFallback = styled.div`
 
 export const StatusDot = styled.span<{ $isOnline: boolean }>`
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 14px;
-  height: 14px;
+  top: 85%;
+  left: 85%;
+  transform: translate(-50%, -50%);
+
+  box-sizing: border-box;
+  width: max(11px,22%);
+  height: max(11px,22%);
   border-radius: 50%;
   border: 2px solid var(--color-surface);
   background: ${({ $isOnline }) => ($isOnline ? 'var(--color-accent)' : 'var(--color-text-secondary)')};

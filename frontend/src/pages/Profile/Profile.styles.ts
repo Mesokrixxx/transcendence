@@ -17,15 +17,21 @@ export const ProfileHeader = styled.div`
   .profile-info {
     flex: 1;
     min-width: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  h1 {
+  .profile-info h1 {
     margin: 0;
+    line-height: 1.2;
     color: var(--color-text-primary);
   }
 
-  p {
-    margin: 8px 0 0;
+  .profile-info p {
+    margin: 0;
+    line-height: 1.4;
     color: var(--color-text-secondary);
   }
 
