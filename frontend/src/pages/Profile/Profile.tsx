@@ -9,6 +9,7 @@ import { Page } from '../Home/Home.styles';
 import { ProfilePanel, ProfileHeader } from './Profile.styles';
 import EditProfileDialog from './EditProfileDialog';
 import type { LocalProfile } from './EditProfileDialog';
+import ProfileActivity from './ProfileActivity';
 
 function Profile() {
   const { t } = useTranslation();
@@ -68,6 +69,8 @@ function Profile() {
             </Button>
           </ProfileHeader>
         </ProfilePanel>
+
+         <ProfileActivity />
 
         {isEditing && user && (
           <EditProfileDialog

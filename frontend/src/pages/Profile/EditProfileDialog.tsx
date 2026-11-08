@@ -8,11 +8,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input';
-import {
-  ProfileDialog,
-  DialogHeader,
-  DialogActions,
-} from './Profile.styles';
+import { ProfileDialog, DialogHeader, DialogActions } from './Profile.styles';
 
 export type LocalProfile = {
   firstName: string;

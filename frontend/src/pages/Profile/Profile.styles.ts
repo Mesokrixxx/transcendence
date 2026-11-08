@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const ProfilePanel = styled.section`
-  margin: 48px 0;
+  margin: 48px 0 24px;
   padding: 32px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
