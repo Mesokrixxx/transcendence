@@ -13,7 +13,7 @@ import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
-import { publicPageLoader, guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
+import { publicPageLoader, guestOnlyLoader, requireAuthLoader, githubLoader, githubCallbackLoader } from '../loaders/authLoaders';
 
 const routes: RouteObject[] = [
   {
@@ -70,6 +70,14 @@ const routes: RouteObject[] = [
     path: '/login',
     element: <Login />,
     loader: guestOnlyLoader,
+  },
+  {
+    path: '/github-signin',
+    loader: githubLoader,
+  },
+  {
+    path: '/github-signin/callback',
+    loader: githubCallbackLoader,
   },
   {
     path: '/privacy',
