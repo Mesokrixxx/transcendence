@@ -92,7 +92,7 @@ export async function oauth(req: Request, res: Response) {
 
   let user = existingUser;
   if (!user) {
-    const treatedReq = createGithubUserSchema.safeParse(req.body);
+    const treatedReq = createGithubUserSchema.safeParse({ username: githubUser.login, email: githubUser.email });
     if (!treatedReq.success) {
       return res.status(400).json({
         error: 'Invalid github user',
