@@ -36,7 +36,7 @@ model User {
   username String  @unique
   email    String  @unique
   password String? // Possibly no password if User only uses OAuth 2.0
-  // OAuth 2.0 should have its own field. Would be clearer.
+  githubId Int?    @unique
 
   elo         Int @default(1400)
   gamesPlayed Int @default(0)
@@ -130,11 +130,11 @@ model Badge {
 
 // Explicit many-to-many relationship -- Needed due to Profile model id/unique usage
 model BadgesOnProfile {
-  profile    Profile  @relation(fields: [profileUserId], references: [userId])
+  profile       Profile  @relation(fields: [profileUserId], references: [userId])
   profileUserId Int
-  badge      Badge    @relation(fields: [badgeId], references: [id])
-  badgeId    Int
-  assignedAt DateTime @default(now())
+  badge         Badge    @relation(fields: [badgeId], references: [id])
+  badgeId       Int
+  assignedAt    DateTime @default(now())
 
   @@unique([profileUserId, badgeId])
 }
