@@ -49,6 +49,7 @@ export async function createGithubUser(username: string, email: string, githubId
   return get(user.id);
 }
 
+// Never used by OAuth logic
 export async function auth(email: string, password: string) {
 	const user = await prisma.user.findUnique({
 		where: { email: email },
@@ -64,7 +65,7 @@ export async function auth(email: string, password: string) {
 		return null;
 
 	if (!user.password) {
-    return null; // TODO handle OAuth 2.0
+    return null;
 	}
 
 	const passwordMatches = await bcrypt.compare(password, user.password);
