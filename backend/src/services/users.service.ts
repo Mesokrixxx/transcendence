@@ -13,17 +13,40 @@ export async function get(id: number) {
 	});
 }
 
+export async function getGithubUser(githubId: number) {
+  return await prisma.user.findUnique({
+    where: { githubId },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  });
+}
+
 export async function create(name: string, email: string, password: string) {
 	const hashedPassword = await bcrypt.hash(password, 12);
 	const user = await prisma.user.create({
 		data: {
 			username: name,
 			email: email,
-			password: hashedPassword, // TODO handle OAuth 2.0
+			password: hashedPassword,
 		}
 	});
 
 	return get(user.id);
+}
+
+export async function createGithubUser(username: string, email: string, githubId: number) {
+  const user = await prisma.user.create({
+    data: {
+      username,
+      email,
+      githubId,
+    }
+  });
+
+  return get(user.id);
 }
 
 export async function auth(email: string, password: string) {
