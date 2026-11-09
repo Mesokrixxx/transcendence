@@ -8,6 +8,7 @@ RUN npm ci
 WORKDIR /app
 
 COPY frontend ./frontend
+COPY .env ./frontend/.env
 COPY chessgame ./chessgame
 
 WORKDIR /app/frontend
