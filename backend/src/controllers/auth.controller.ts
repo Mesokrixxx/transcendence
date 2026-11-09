@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import { parseCookie, stringifySetCookie } from 'cookie';
 import * as userService from '../services/users.service.js';
 import * as authService from '../services/auth.service.js';
-import { authUserSchema } from '../validations/users.validation.js';
+import { authUserSchema, createGithubUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import { getGithubUser } from '../utils/github.js';
@@ -79,8 +79,49 @@ export async function oauth(req: Request, res: Response) {
   const { code } = req.query;
   if (typeof code !== 'string')
     return res.sendStatus(400);
+  
   const githubUser = await getGithubUser(code);
   if (githubUser === null)
     return res.status(400).json('Github authentication failed');
-  return res.json(githubUser);
+
+  const { result: existingUser, error } = await query(() => userService.getGithubUser(githubUser.id));
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+
+  let user = existingUser;
+  if (!user) {
+    const treatedReq = createGithubUserSchema.safeParse(req.body);
+    if (!treatedReq.success) {
+      return res.status(400).json({
+        error: 'Invalid github user',
+        details: treatedReq.error.issues
+      });
+    }
+
+    const { username, email } = treatedReq.data;
+    const { result, error } = await query(() => userService.createGithubUser(username, email, githubUser.id));
+    if (error) {
+      const treatedErr = treatError(error);
+
+      return res.status(treatedErr.status).json(treatedErr.error);
+    }
+	  if (!result)
+      return res.status(500).json({ error: 'user creation failed' });
+    user = result;
+  }
+
+  const { result: session, error: sessionError } = await query(() => authService.createSession(user.id));
+  if (sessionError) {
+    const treatedErr = treatError(sessionError);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!session)
+    return res.status(500).json({ error: 'session creation failed' });
+  res.setHeader(
+    'Set-Cookie',
+    sessionCookie(session.token, authService.SESSION_DURATION_SECONDS)
+  );
+  return res.status(200).json(user);
 }
