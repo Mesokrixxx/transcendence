@@ -84,35 +84,3 @@ export const ErrorActions = styled.div`
     flex-direction: column;
   }
 `;
-
-export const ErrorBoard = styled.div`
-  width: clamp(88px, 20vw, 128px);
-  flex-shrink: 0;
-  margin: 16px 8px;
-  pointer-events: none;
-
-  && > .chessboard {
-    position: relative;
-    width: 100%;
-    max-width: none;
-    overflow: visible;
-    transform: rotate(-25deg);
-  }
-
-  && > .chessboard > button {
-    position: static;
-  }
-
-  && > .chessboard > button > img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    width: 55%;
-    height: 55%;
-    max-width: none;
-    object-fit: contain;
-    transform: translate(-50%, -50%) rotate(55deg);
-    filter: drop-shadow(0 6px 6px rgb(0 0 0 / 30%));
-  }
-`;
