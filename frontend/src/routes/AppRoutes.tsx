@@ -11,6 +11,7 @@ import Rankings from '../pages/Rankings/Rankings';
 import Chat from '../pages/Chat/Chat';
 import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
+import ErrorPage from '../pages/Errors/ErrorPage';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
 import { publicPageLoader, guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
@@ -82,6 +83,26 @@ const routes: RouteObject[] = [
   {
     path: '/test-api',
     element: <ApiTest />,
+  },
+    {
+    path: '/test-api',
+    element: <ApiTest />,
+  },
+  {
+    path: '/401',
+    element: <ErrorPage code={401} />,
+  },
+  {
+    path: '/403',
+    element: <ErrorPage code={403} />,
+  },
+  {
+    path: '/404',
+    element: <ErrorPage code={404} />,
+  },
+  {
+    path: '/500',
+    element: <ErrorPage code={500} />,
   },
 ];
 

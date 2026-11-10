@@ -132,6 +132,19 @@ export default interface Resources {
     "unknownError": "Something went wrong.",
     "you": "You"
   },
+  "errors": {
+    "backHome": "Back to home",
+    "forbiddenDescription": "Your account does not have permission to access this page.",
+    "forbiddenTitle": "Access denied",
+    "notFoundDescription": "The page you are looking for does not exist or has been moved.",
+    "notFoundTitle": "Page not found",
+    "serverErrorDescription": "Something went wrong on our side. Please try again in a few moments.",
+    "serverErrorTitle": "Something went wrong",
+    "signIn": "Log in",
+    "tryAgain": "Try again",
+    "unauthorizedDescription": "Please log in to access this page.",
+    "unauthorizedTitle": "Login required"
+  },
   "home": {
     "chessMoveBrand": "Chess<1>Move</1>",
     "getStarted": "Get started",

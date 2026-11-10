@@ -1,0 +1,13 @@
+{
+  "backHome": "Volver al inicio",
+  "forbiddenDescription": "Tu cuenta no tiene permiso para acceder a esta página.",
+  "forbiddenTitle": "Acceso denegado",
+  "notFoundDescription": "La página que buscas no existe o ha cambiado de ubicación.",
+  "notFoundTitle": "Página no encontrada",
+  "serverErrorDescription": "Se ha producido un problema de nuestro lado. Vuelve a intentarlo en unos instantes.",
+  "serverErrorTitle": "Se ha producido un error",
+  "signIn": "Iniciar sesión",
+  "tryAgain": "Volver a intentar",
+  "unauthorizedDescription": "Inicia sesión para acceder a esta página.",
+  "unauthorizedTitle": "Inicio de sesión necesario"
+}

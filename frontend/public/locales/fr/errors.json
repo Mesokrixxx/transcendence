@@ -1,0 +1,13 @@
+{
+  "backHome": "Retour à l’accueil",
+  "forbiddenDescription": "Ton compte ne dispose pas des autorisations nécessaires pour accéder à cette page.",
+  "forbiddenTitle": "Accès interdit",
+  "notFoundDescription": "La page que tu recherches n’existe pas ou a été déplacée.",
+  "notFoundTitle": "Page introuvable",
+  "serverErrorDescription": "Un problème est survenu de notre côté. Réessaie dans quelques instants.",
+  "serverErrorTitle": "Une erreur est survenue",
+  "signIn": "Se connecter",
+  "tryAgain": "Réessayer",
+  "unauthorizedDescription": "Connecte-toi pour accéder à cette page.",
+  "unauthorizedTitle": "Connexion requise"
+}

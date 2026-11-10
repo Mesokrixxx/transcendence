@@ -13,6 +13,7 @@ const namespaces = [
   'home',
   'rankings',
   'legal',
+  'errors',
 ];
 
 const supportedLanguages = ['en', 'fr', 'es'];
