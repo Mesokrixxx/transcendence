@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import Messaging from '../Chat/Messaging';
+import FriendsPanel from '../../components/Friends/FriendsPanel/FriendsPanel';
 import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent } from './ProfileActivity.styles';
 
 const tabs = ['history', 'friends', 'messages'] as const;
@@ -85,7 +86,7 @@ function ProfileActivity() {
         hidden={activeTab !== 'friends'}
         tabIndex={0}
       >
-        <p>{t('friendsPlaceholder')}</p>
+        <FriendsPanel embedded />
       </ActivityContent>
 
       <ActivityContent

@@ -14,6 +14,7 @@ const namespaces = [
   'rankings',
   'legal',
   'errors',
+  'friends'
 ];
 
 const supportedLanguages = ['en', 'fr', 'es'];
