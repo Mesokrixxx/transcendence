@@ -23,6 +23,7 @@ export default interface Resources {
     "loggedInAs": "Logged in as {{username}}",
     "loggingIn": "Logging in...",
     "noAccountYet": "Don't have an account yet?",
+    "or": "or",
     "password": "Password",
     "passwordPatternMessage": "Use 8–100 characters, including an uppercase letter, a lowercase letter, a number and a special character.",
     "passwordRequirements": "Password requirements:",

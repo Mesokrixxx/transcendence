@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import Form from '../../components/Form/Form';
+import GitHubSignIn from '../../components/GitHubSignIn/GitHubSignIn';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
@@ -73,7 +74,7 @@ function Login() {
       <AuthContent className="container">
         <AuthPanel>
           <h1>{t('welcomeBack', { ns: 'auth' })}</h1>
-
+          <GitHubSignIn />
           <Form
             onSubmit={(event) => {
               void handleSubmit(event);

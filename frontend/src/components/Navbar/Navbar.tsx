@@ -37,14 +37,6 @@ function Navbar() {
   const menuId = useId();
   const languageId = useId();
 
-  const githubClientId = import.meta.env.VITE_OAUTH_CLIENT_ID;
-  const githubRedirectURI = import.meta.env.VITE_OAUTH_REDIRECT_URI;
-  const githubSignInEnabled =
-    typeof githubClientId === 'string' &&
-    typeof githubRedirectURI === 'string' &&
-    githubClientId.length > 0 &&
-    githubRedirectURI.length > 0;
-
   function closeMenus() {
     setShowMenu(false);
     setShowLanguages(false);
@@ -203,11 +195,6 @@ function Navbar() {
                   {t('signUp', { ns: 'auth' })}
                 </Button>
 
-                {githubSignInEnabled && (
-                  <Button to="/github-signin" variant="primary">
-                    {t('ghSignIn', { ns: 'auth' })}
-                  </Button>
-                )}
               </>
             )}
 
