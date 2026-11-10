@@ -37,6 +37,13 @@ async function githubLoader() {
 
   const client_id = import.meta.env.VITE_OAUTH_CLIENT_ID;
   const redirect_uri = import.meta.env.VITE_OAUTH_REDIRECT_URI;
+  if (
+    typeof client_id !== 'string' ||
+    typeof redirect_uri !== 'string' ||
+    !(client_id.length > 0) ||
+    !(redirect_uri.length > 0)
+  )
+    return redirect('/');
   const state = crypto.randomUUID();
   localStorage.set('githubState', state);
   return redirect(
