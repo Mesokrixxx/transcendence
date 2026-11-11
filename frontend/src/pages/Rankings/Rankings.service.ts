@@ -75,7 +75,7 @@ function getErrorMessage(error: APIError): string {
   return typeof error === 'string' ? error : error.error;
 }
 
-const USE_FAKE_DATA = true;
+const USE_FAKE_DATA = false;
 
 export async function getRankings(): Promise<Player[]> {
   if (USE_FAKE_DATA){
@@ -83,7 +83,7 @@ export async function getRankings(): Promise<Player[]> {
   }
 
   const response = await fetchAPI<Player[]>({
-    path: '/rankings',
+    path: '/users',
     method: 'get',
   })
 

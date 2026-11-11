@@ -37,12 +37,6 @@ export const PanelHeader = styled.div`
     margin-bottom: 24px;
 `
 
-export const PanelTitle = styled.h2`
-    margin: 0;
-    font-size: 20px;
-    font-weight: 800;
-`
-
 export const CloseButton = styled.button`
     display: inline-flex;
     align-items: center;

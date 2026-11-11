@@ -14,7 +14,6 @@ import { getFriends,
 import {
     Panel,
     PanelHeader,
-    PanelTitle,
     CloseButton,
     Message,
     ActionButton
@@ -200,10 +199,6 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
     return (
         <Panel $embedded={embedded} id="friends-panel" aria-labelledby="friends-panel-title">
             <PanelHeader>
-                <PanelTitle id="friends-panel-title">
-                    {t('panelTitle')}
-                </PanelTitle>
-
                 {!embedded && onClose && (
                     <CloseButton
                         type="button"
