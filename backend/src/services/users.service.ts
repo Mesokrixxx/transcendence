@@ -33,6 +33,11 @@ export async function create(name: string, email: string, password: string) {
 			username: name,
 			email: email,
 			password: hashedPassword,
+      profile: {
+        create: {
+          displayName: name
+        }
+      }
 		}
 	});
 
@@ -62,6 +67,11 @@ export async function createGithubUser(login: string, email: string, githubId: n
           username,
           email,
           githubId,
+          profile: {
+            create: {
+              displayName: login
+            }
+          }
         }
       });
 
