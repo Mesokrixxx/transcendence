@@ -33,6 +33,11 @@ export const createUserSchema = z.object({
     password: passwordSchema,
 });
 
+export const createGithubUserSchema = z.object({
+  username: z.string().trim(),
+  email: z.email(),
+});
+
 export const authUserSchema = z.object({
     email: z.email(),
     password: z.string().min(8).max(100),

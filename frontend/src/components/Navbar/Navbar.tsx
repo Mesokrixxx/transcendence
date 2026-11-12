@@ -194,6 +194,7 @@ function Navbar() {
                 <Button to="/register" variant="primary">
                   {t('signUp', { ns: 'auth' })}
                 </Button>
+
               </>
             )}
 
