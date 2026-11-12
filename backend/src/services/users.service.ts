@@ -1,6 +1,8 @@
 import prisma from '../db/prisma.js'
 import bcrypt from 'bcrypt'
 import { BackendError } from '../types/backendError.types.js';
+import { randomBytes } from 'node:crypto';
+import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
 
 export async function get(id: number) {
 	return await prisma.user.findUnique({
@@ -37,16 +39,40 @@ export async function create(name: string, email: string, password: string) {
 	return get(user.id);
 }
 
-export async function createGithubUser(username: string, email: string, githubId: number) {
-  const user = await prisma.user.create({
-    data: {
-      username,
-      email,
-      githubId,
-    }
-  });
+export async function createGithubUser(login: string, email: string, githubId: number) {
+  const maxUsernameLength = 32;
+  const randomSize = Math.floor(maxUsernameLength / 3);
 
-  return get(user.id);
+  function getRandomUsername(): string {
+    const base = login.slice(0, Math.min(login.length, maxUsernameLength - randomSize));
+    const random = randomBytes(Math.floor(randomSize / 2)).toString('hex');
+    return base + random;
+  }
+
+  login = login.trim();
+  if (login.length === 0) login = getRandomUsername();
+  else if (login.length > maxUsernameLength) login = login.slice(0, maxUsernameLength);
+
+  for (let tries = 0; tries < 42; tries++) {
+    const username = !tries ? login : getRandomUsername();
+
+    try {
+      const user = await prisma.user.create({
+        data: {
+          username,
+          email,
+          githubId,
+        }
+      });
+
+      return get(user.id);
+    } catch (e: unknown) {
+      if (!(e instanceof PrismaClientKnownRequestError) || e.code !== 'P2002')
+        throw e;
+    }
+  }
+
+  throw new BackendError(500, 'unable to create GitHub user');
 }
 
 // Never used by OAuth logic
