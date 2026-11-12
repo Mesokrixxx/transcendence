@@ -32,6 +32,8 @@ services:
     networks:
       - network-backend-db
       - network-frontend-backend
+    volumes:
+      - ./certs/backend:/app/backend/certs:ro
 
   frontend:
     build:
@@ -59,6 +61,8 @@ services:
     networks:
       - network-nginx-frontend
       - network-frontend-backend
+    volumes:
+      - ./certs/nginx:/etc/nginx/certs:ro
 
 volumes:
   postgres_data:

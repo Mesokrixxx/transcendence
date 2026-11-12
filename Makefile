@@ -4,7 +4,7 @@ IMAGE = localhost/transcendence_backend:latest
 
 all: up db
 
-up:
+up: certs
 	$(COMPOSE) up --build --force-recreate -d
 
 db:
@@ -19,4 +19,7 @@ clean: down
 
 re: down all
 
-.PHONY: all up down clean re
+certs:
+	./scripts/generate-certs.sh
+
+.PHONY: all up down clean re certs
