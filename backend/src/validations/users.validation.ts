@@ -34,7 +34,7 @@ export const createUserSchema = z.object({
 });
 
 export const createGithubUserSchema = z.object({
-  username: z.string().trim().min(1).max(32),
+  username: z.string().trim(),
   email: z.email(),
 });
 
