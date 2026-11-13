@@ -5,14 +5,26 @@ import { randomBytes } from 'node:crypto';
 import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
 
 export async function get(id: number) {
-	return await prisma.user.findUnique({
-		where: { id: id },
-		select: {
-			id: true,
-			username: true,
-			email: true
-		}
-	});
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      profile: {
+        select: { avatar: true },
+      },
+    },
+  });
+
+  if (!user) return null;
+
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    avatar: user.profile?.avatar ?? null,
+  };
 }
 
 export async function getGithubUser(githubId: number) {

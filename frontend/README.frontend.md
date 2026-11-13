@@ -1,5 +1,6 @@
 # ChessMove — Frontend
 
+Ce document explique comment lancer le frontend de ChessMove, comment le code est organisé et comment l’interface communique avec le backend. Les tâches et leur avancement sont suivis dans Trello.
 
 ## Technologies utilisées
 
@@ -10,70 +11,70 @@
 | Vite | Lancer le serveur de développement et générer le build |
 | React Router | Gérer la navigation entre les pages |
 | Styled Components | Définir les styles des composants React |
+| i18next et react-i18next | Gérer les traductions de l’interface |
 
-Les dépendances sont déclarées dans `package.json`.
-Le fichier `package-lock.json` conserve les versions installées.
+Les dépendances sont déclarées dans `package.json`. Le fichier `package-lock.json` conserve les versions installées.
 
 ## Lancer le frontend
 
-Depuis le dossier `frontend` :
+Depuis le dossier `frontend/` :
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Ouvrir l’adresse affichée par Vite.
+Ouvrir l’adresse affichée par Vite. Pour arrêter le serveur : `Ctrl + C`.
 
-Pour arrêter le serveur : `Ctrl + C`.
-
-Pour vérifier que le frontend compile :
+Pour vérifier la compilation et les traductions :
 
 ```bash
 npm run build
+npm run i18n:check
 ```
 
+Pour tester les fonctionnalités qui dépendent du backend et de la base de données, démarrer l’application complète depuis la racine du dépôt. Avec la configuration locale des conteneurs, l’application est accessible sur [https://localhost:4243](https://localhost:4243).
 
 ## Organisation des fichiers
 
-- `src/components/` : composants réutilisables.
-- `src/pages/` : pages de l’application.
-- `src/routes/AppRoutes.tsx` : définition des routes.
-- `src/styles/global.css` : styles communs et reset CSS.
-- `src/styles/variables.css` : couleurs de l’application.
-- `public/icons/` : icônes, notamment la tour du logo.
-- `public/pieces/kosal/` : pièces d’échecs au format SVG.
-- `src/services/passwordValidation.ts` : validation des mots de passe.
-- `src/services/fetchAPI.ts` : fonction commune pour les appels HTTP, adaptée du modèle de Noa.
-- `src/types/fetch.ts` : types TypeScript des requêtes, des réponses et des erreurs API.
+| Chemin | Rôle |
+| --- | --- |
+| `src/components/` | Composants réutilisables |
+| `src/pages/` | Pages de l’application |
+| `src/routes/AppRoutes.tsx` | Définition des routes |
+| `src/context/` | État partagé, notamment l’utilisateur connecté |
+| `src/styles/global.css` | Styles communs et reset CSS |
+| `src/styles/variables.css` | Couleurs de l’application |
+| `src/services/passwordValidation.ts` | Validation des mots de passe |
+| `src/services/fetchAPI.ts` | Fonction commune pour les requêtes HTTP en JSON |
+| `src/services/avatar.ts` | Envoi de la photo de profil |
+| `src/types/fetch.ts` | Types des requêtes, réponses et erreurs de l’API |
+| `public/icons/` | Icônes, notamment la tour du logo |
+| `public/avatars/` | Avatars fournis avec l’application |
+| `public/pieces/kosal/` | Pièces d’échecs au format SVG |
+| `public/locales/` | Fichiers de traduction |
 
-Les composants migrés vers Styled Components utilisent
-un fichier `.styles.ts` à côté de leur fichier `.tsx`.
-
+Les composants stylés utilisent généralement un fichier `.styles.ts` à côté de leur fichier `.tsx`.
 
 ## Communication avec le backend
 
-La fonction commune `fetchAPI` est implémentée dans `src/services/fetchAPI.ts`, à partir du modèle proposé par Noa.
+La fonction commune `fetchAPI`, dans `src/services/fetchAPI.ts`, s’appuie sur le modèle proposé par Noa. Elle centralise :
 
-Elle centralise :
-
-- Les méthodes HTTP `get`, `post`, `put` et `delete`.
-- L’envoi des données au format JSON.
+- Les appels HTTP à l’API.
+- L’envoi des données au format JSON lorsque la requête contient un corps.
 - L’option `credentials: 'include'` pour les cookies de session.
 - La lecture des réponses JSON et des réponses sans contenu.
 - Le traitement des erreurs HTTP, des erreurs réseau et des réponses JSON invalides.
 
 ### Configuration de l’URL
 
-Le modèle initial prévoyait `VITE_API_URL`. Dans la configuration actuelle, la fonction utilise directement `/api`, avec le proxy défini dans `vite.config.ts`.
+Le frontend utilise le préfixe `/api`. Par exemple, un appel avec le chemin `/auth/login` envoie une requête à `/api/auth/login`.
 
-Les appels utilisent donc un chemin comme `/auth/login`, pour obtenir `/api/auth/login`.
-
-Dans les conteneurs, le proxy transmet les requêtes au service `backend:8080`.
+En développement, le proxy est défini dans `vite.config.ts`. Dans les conteneurs, Nginx transmet les requêtes `/api` au service `backend:8080`.
 
 ### Types des réponses
 
-Les types sont activés et exportés dans `src/types/fetch.ts` :
+Les types sont définis dans `src/types/fetch.ts` :
 
 - `Method`
 - `RequestOptions`
@@ -82,119 +83,107 @@ Les types sont activés et exportés dans `src/types/fetch.ts` :
 - `SuccessfulResponse`
 - `ErrorResponse`
 
-La fonction renvoie une réponse contenant `result` et `error`.
+`fetchAPI` renvoie une réponse contenant `result` et `error`. `APIError` accepte les deux formats utilisés par le backend : une chaîne ou un objet contenant `error` et éventuellement `details`.
 
-Le type `APIError` accepte les deux formats observés dans le backend : une chaîne JSON ou un objet contenant `error` et éventuellement `details`.
+### Session utilisateur
 
-### État des tests
+Les formulaires d’inscription et de connexion utilisent l’API. Le frontend récupère l’utilisateur connecté via `/api/auth/me` et partage ces informations dans le contexte d’authentification. La barre de navigation s’appuie sur ce contexte pour afficher soit les boutons de connexion et d’inscription, soit le menu du compte.
 
-- [x] Vérifier la compilation du frontend.
-- [x] Envoyer une requête POST vers `/api/auth/login`.
-- [x] Vérifier la réception d’une erreur de validation et de ses détails.
-- [ ] Tester une réponse réussie.
-- [ ] Vérifier la création et la réutilisation du cookie de session.
-- [ ] Tester la réponse sans contenu du logout.
-- [ ] Tester une erreur renvoyée sous forme de chaîne JSON.
-- [ ] Tester une erreur réseau.
+La connexion via GitHub est proposée lorsque la configuration OAuth est disponible. Voir la [documentation OAuth](../OAuth.README.md).
 
-Une page temporaire `ApiTest`, accessible via `/test-api`, sert aux vérifications. Elle sera retirée avec sa route une fois les tests terminés.
+### Envoi de la photo de profil
 
-Les formulaires de connexion et d’inscription restent à relier au backend.
+Dans **Profil → Modifier le profil**, sélectionner une image affiche un aperçu immédiat. Au clic sur **Enregistrer**, `src/services/avatar.ts` envoie le fichier dans un `FormData` à `POST /api/users/me/avatar`. Cette requête utilise une fonction dédiée ; `fetchAPI` continue de gérer les échanges en JSON.
 
-## Pages réalisées
+Le formulaire accepte les images JPEG, PNG et WebP jusqu’à 2 Mio. Le serveur vérifie aussi le fichier. Après un envoi réussi, l’URL renvoyée met à jour l’avatar dans le profil et la barre de navigation. Après un rechargement, le frontend retrouve cette URL via `/api/auth/me`.
 
-- `Home` : landing page avec titre, bouton Get Started et échiquier.
-- `Login` : formulaire de connexion.
-- `Register` : formulaire d'inscription avec validation du mot de passe.
-- `Profile` : interface du profil joueur avec avatar et bouton Edit.
-- `Rankings` : classement des joueurs, développé par un membre de l'équipe.
-- `PrivacyPolicy` : politique de confidentialité.
-- `TermsOfService` : conditions d'utilisation et crédits.
-- `Play` : partie locale connectée au moteur `chessgame`, avec coups possibles, promotion, état de la partie et chat local.
-- `Watch` : liste de démonstration des parties, avec échiquiers miniatures et noms des joueurs.
-- `WatchGame` : vue spectateur en lecture seule, avec inversion de l’orientation et chat local.
-- `Chat` : interface de chat avec messages locaux.
-- `ApiTest` : page temporaire de test des appels API.
+Cliquer sur **Annuler** ferme le formulaire sans envoyer la photo sélectionnée. Voir la [documentation de l’avatar](../docs/avatar-upload.md) pour le traitement et le stockage côté serveur.
 
-La route `/watch/:gameId` est définie. Le chargement de la partie correspondant à cet identifiant depuis le backend reste à réaliser.
+## Pages de l’application
 
-## Composants réalisés
+| Page | Rôle |
+| --- | --- |
+| `Home` | Page d’accueil avec présentation, bouton Get Started et échiquier |
+| `Login` | Formulaire de connexion |
+| `Register` | Formulaire d’inscription avec validation du mot de passe |
+| `Profile` | Profil du joueur, édition du pseudo et de l’avatar, onglets d’activité |
+| `Rankings` | Classement des joueurs avec avatars, médailles et recherche par pseudo |
+| `Play` | Interface de jeu avec échiquier interactif, coups possibles, promotion et état de la partie |
+| `Training` | Page d’entraînement |
+| `Watch` | Liste des parties présentées dans l’interface spectateur |
+| `WatchGame` | Échiquier en lecture seule, avec possibilité d’inverser l’orientation |
+| `Chat` | Interface de messagerie |
+| `PrivacyPolicy` | Politique de confidentialité |
+| `TermsOfService` | Conditions d’utilisation et crédits |
+| `ErrorPage` | Composant partagé pour les pages 401, 403, 404 et 500 |
+
+La route `/watch/:gameId` identifie la partie à afficher dans la vue spectateur.
+
+## Composants réutilisables
 
 ### Navbar
 
-Affiche le logo ChessMove, les liens de navigation et les boutons
-Log in et Sign up.
+Affiche le logo ChessMove, les liens de navigation et le sélecteur de langue. Quand le joueur est connecté, `UserMenu` affiche son avatar, son pseudo et les actions de compte. Sur petit écran, la navigation s’ouvre depuis un bouton de menu.
 
 ### Footer
 
-Affiche les liens vers les pages légales et l’année courante,
-obtenue avec `new Date().getFullYear()`.
+Affiche les liens vers les pages légales et l’année courante, obtenue avec `new Date().getFullYear()`.
 
 ### Button
 
 Composant partagé avec trois variantes :
 
-- `primary` : fond violet, utilisé pour Sign up.
-- `secondary` : fond transparent et contour violet, utilisé pour Log in.
-- `accent` : fond vert citron, utilisé pour Start.
+- `primary` : fond violet, par exemple pour Sign up.
+- `secondary` : fond transparent et contour violet, par exemple pour Log in.
+- `accent` : fond vert citron, par exemple pour Start.
 
-Avec la propriété `to`, il utilise un lien React Router.
-Sans `to`, il utilise un bouton HTML et peut recevoir une action `onClick`.
+Avec la propriété `to`, le composant utilise un lien React Router. Sans `to`, il utilise un bouton HTML et peut recevoir une action `onClick`.
 
 ### ChessBoard
 
-Composant partagé entre Home, Play et les vues spectateur.
+Composant partagé entre l’accueil, le jeu et les vues spectateur. Il affiche une grille de 64 cases et les pièces SVG.
 
-Il affiche une grille de 64 cases et les pièces SVG :
-
-- Sur Home, il affiche la position initiale.
-- Sur Play, il reçoit la position du moteur `chessgame`.
+- Sur l’accueil, il affiche la position initiale.
+- Dans le jeu, il reçoit la position de la partie.
 - Les destinations autorisées sont indiquées par des points et les captures possibles par des cercles.
 - L’orientation peut être blanche ou noire.
 - La propriété `readOnly` empêche les interactions dans les vues spectateur et les miniatures.
 
-Les règles de déplacement sont fournies par le moteur de Noa. La page Play gère l’état de la partie locale, la sélection et la promotion.
-
-L’avatar, l’état de la partie et le chat sont disposés autour de l’échiquier par la page Play.
-
-L’ancien composant `PlayableChessBoard` a été supprimé.
+Le moteur `chessgame`, développé par Noa, fournit les règles du jeu. L’interface gère notamment la sélection des pièces et le choix de promotion.
 
 ### GameStatus
 
-Reçoit la partie et affiche :
-
-- Le joueur dont c’est le tour.
-- L’échec.
-- L’échec et mat et le gagnant.
-- Le match nul.
-
-Ce composant est partagé entre Play et WatchGame.
+Affiche le joueur dont c’est le tour, l’échec, l’échec et mat avec le gagnant, ou le match nul. Le composant est partagé entre `Play` et `WatchGame`.
 
 ### ChatBox
 
-Affiche un titre, une liste de messages et un formulaire d’envoi.
-
-Les messages sont actuellement gérés dans l’état local du composant. L’enregistrement, l’historique et les échanges en temps réel restent à connecter au backend.
+Affiche un titre, une liste de messages et un formulaire d’envoi. Le composant regroupe les éléments d’interface du chat ; la source des messages dépend de la page qui l’utilise.
 
 ### Avatar
 
-Composant réutilisable permettant d'afficher l'avatar d'un joueur.
+Affiche l’image d’un joueur avec une taille configurable et, si demandé, un indicateur de statut. Le composant est utilisé dans plusieurs écrans, notamment le profil et le classement. Le profil et le menu du compte affichent `/avatars/default.svg` lorsque l’utilisateur n’a pas choisi de photo.
 
-Il accepte notamment une image, un pseudo, une taille et un statut de connexion. Si aucune image n'est fournie, il affiche une initiale.
+### Formulaires d’authentification
 
-Il est destiné à être utilisé dans le profil, le classement et la liste d'amis.
+Les pages de connexion et d’inscription utilisent des composants de formulaire réutilisables. L’inscription vérifie les critères du mot de passe et sa confirmation. Les champs concernés permettent d’afficher ou de masquer le mot de passe.
 
-### Formulaires d'authentification
+## Internationalisation
 
-Les pages de connexion et d'inscription utilisent des composants de formulaire réutilisables.
+L’interface est disponible en français (`fr`), anglais (`en`) et espagnol (`es`). Les traductions sont rangées dans `public/locales/`, par langue et par thème : `auth`, `profile`, `navigation`, `errors`, etc. La barre de navigation permet de changer de langue.
 
-L'inscription comprend la vérification des critères du mot de passe, sa confirmation et la possibilité d'afficher ou de masquer les mots de passe.
+Depuis `frontend/`, après avoir ajouté ou modifié des clés :
 
-La connexion au backend reste à réaliser.
+```bash
+npm run i18n:extract
+npm run i18n:types
+npm run i18n:check
+```
+
+Compléter les valeurs dans les trois langues avant de lancer la vérification finale.
 
 ## Charte graphique
 
-Police utilisée : Poppins, chargée depuis Google Fonts.
+La police utilisée est **Poppins**, chargée depuis Google Fonts. Les couleurs sont définies sous forme de variables CSS dans `src/styles/variables.css`.
 
 | Couleur | Valeur |
 | --- | --- |
@@ -208,29 +197,21 @@ Police utilisée : Poppins, chargée depuis Google Fonts.
 | Case claire | `#E8E1D5` |
 | Case sombre | `#82798A` |
 
-Les couleurs sont définies comme variables CSS dans `variables.css`.
-
 ## Mise en page responsive
 
-La classe commune container définit une largeur maximale de 1200 px et un padding de 24 px. Certaines pages, notamment Home, possèdent leurs propres règles de dimensionnement. Le responsive mobile et tablette reste en cours d'amélioration.
+La classe commune `.container` limite la largeur du contenu à 1200 px et ajoute une marge intérieure de 24 px. Certaines pages, notamment l’accueil, possèdent leurs propres règles de dimensionnement.
 
-Sur grand écran, la landing page utilise trois colonnes :
-texte, échiquier et espace latéral.
-
-À partir de 900 px et en dessous, le contenu passe sur une colonne
-et le titre est centré.
+Sur grand écran, l’accueil utilise trois colonnes : le texte, l’échiquier et un espace latéral. À 900 px et en dessous, le contenu passe sur une colonne et le titre est centré.
 
 ## Notions React utilisées
 
-### Props (ButtonProps)
+### Props
 
-Les props transmettent des informations à un composant :
-texte, destination ou variante d’un bouton.
+Les props transmettent des informations à un composant. Par exemple, `Button` reçoit une destination avec `to` et peut recevoir une variante avec `variant`.
 
 ### children
 
-`children` représente le contenu placé entre les balises
-d’un composant.
+`children` représente le contenu placé entre les balises d’un composant :
 
 ```tsx
 <Button to="/register">Sign up</Button>
@@ -238,151 +219,31 @@ d’un composant.
 
 Ici, `children` correspond à « Sign up ».
 
-### useState
+### Hooks React utilisés
 
-`useState` appartient à React : ce n’est pas une dépendance supplémentaire.
+| Hook | À quoi il sert dans ChessMove |
+| --- | --- |
+| `useState` | Gérer la saisie des formulaires, l’ouverture des menus et la sélection des pièces. Dans le formulaire de profil, il conserve aussi le fichier choisi jusqu’au clic sur Enregistrer. |
+| `useEffect` | Gérer ce qui doit être mis en place puis nettoyé : par exemple, ajouter et retirer les écouteurs clavier de la navigation, ou libérer l’URL temporaire de l’aperçu quand le formulaire de profil se ferme. |
+| `useRef` | Accéder à un élément HTML ou conserver une valeur sans redessiner le composant. Le formulaire l’utilise pour ouvrir la boîte de dialogue et garder une référence à l’URL temporaire de l’aperçu. |
+| `useId` | Générer des identifiants stables pour relier les boutons de navigation aux menus qu’ils contrôlent, avec `aria-controls`. |
+| `useContext` | Lire l’état partagé de l’utilisateur connecté. Le hook `useAuth`, propre au projet, s’appuie dessus pour donner accès au compte dans le profil et la barre de navigation. |
 
-https://react.dev/reference/react/useState
+### Propriétés de style avec `$`
 
-Il mémorise une information et déclenche une mise à jour
-de l’affichage quand elle change.
-
-Nous l'utilisons notamment pour gérer la sélection des pièces sur l'échiquier et les interactions des formulaires.
-
-### Propriétés de style avec $
-
-Les propriétés comme `$isLight` et `$variant` servent aux styles.
-Le préfixe `$` évite de les transmettre comme attributs HTML.
+Dans Styled Components, les propriétés comme `$isLight` et `$variant` servent à choisir un style. Le préfixe `$` évite qu’elles soient transmises comme attributs HTML.
 
 ## Accessibilité
 
 - Utilisation d’éléments HTML comme `main`, `nav` et `footer`.
-- Nom accessible pour la navigation et l’échiquier.
-- Images décoratives avec `alt=""`.
-- Séparateurs décoratifs du footer avec `aria-hidden="true"`.
-- Indicateur de focus sur les boutons.
-- Respect de la préférence de réduction des animations.
-
-L’accessibilité reste à vérifier au fur et à mesure du développement.
+- Noms accessibles pour la navigation, les boutons à icône et l’échiquier.
+- Images décoratives avec `alt=""` et séparateurs décoratifs masqués avec `aria-hidden="true"`.
+- Indicateurs de focus visibles sur les boutons.
+- Prise en compte de la préférence de réduction des animations.
+- Fermeture au clavier de certains menus et du formulaire de profil.
 
 ## Crédits des pièces
 
-Les pièces SVG proviennent du jeu Kosal créé par Philatype.
+Les pièces SVG proviennent du jeu [Kosal de Philatype](https://github.com/philatype/kosal), sous licence [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-- Source : https://github.com/philatype/kosal
-- Licence : Creative Commons Attribution 4.0
-- Licence complète : https://creativecommons.org/licenses/by/4.0/
-
-Le fichier `LICENSE.txt` est conservé dans `public/pieces/kosal/`.
-Le crédit est également affiché dans la page Terms of Service.
-
-## Prochaines étapes
-
-
-### Interface et authentification
-- [x] Créer les formulaires d’inscription et de connexion.
-- [x] Afficher les critères du mot de passe pendant la saisie.
-- [x] Vérifier la confirmation du mot de passe.
-- [x] Ajouter la possibilité d’afficher ou de masquer les mots de passe.
-- [x] Bloquer l’inscription si les critères du mot de passe ne sont pas respectés.
-- [ ] Relier le formulaire Login au backend via `fetchAPI`.
-- [ ] Confirmer la route et les champs attendus pour l’inscription.
-- [ ] Relier le formulaire Sign up au backend via `fetchAPI`.
-- [ ] Afficher les erreurs, les confirmations et l’état de chargement des formulaires.
-- [ ] Gérer l’état de connexion de l’utilisateur dans le frontend.
-- [ ] Adapter la Navbar une fois connecté et ajouter la déconnexion.
-
-
-### Échiquier et logique de jeu
-- [ ] Rendre l'échiquier responsive et adapter sa taille aux différentes résolutions d'écran (Mac et écrans de l'école).
-- [x] Ajouter et tester l’effet de sélection des pièces.
-- [x] Intégrer le moteur `chessgame` développé par Noa.
-- [x] Connecter les interactions aux déplacements et aux règles du jeu.
-- [x] Réutiliser le composant `ChessBoard` sur Home, Play et Watch.
-- [x] Afficher les destinations autorisées et les captures possibles.
-- [x] Gérer le choix de promotion dans Play.
-- [x] Créer le composant partagé `GameStatus`.
-- [x] Adapter l’orientation selon le tour du joueur en mode local.
-- [x] Ajouter un délai de 700 ms avant le changement d’orientation.
-- [ ] Fixer l’orientation selon la couleur attribuée au joueur connecté (`playerColor`).
-- [ ] Synchroniser les parties entre les joueurs via le backend.
-
-### Mode spectateur
-- [x] Créer une liste de démonstration avec miniatures et noms des joueurs.
-- [x] Ajouter la navigation vers `/watch/:gameId`.
-- [x] Afficher les joueurs et l’état de la partie dans `WatchGame`.
-- [x] Empêcher les spectateurs de déplacer les pièces.
-- [x] Permettre aux spectateurs d’inverser l’orientation.
-- [ ] Charger la liste réelle des parties en cours depuis le backend.
-- [ ] Charger la partie correspondant à `gameId`.
-- [ ] Actualiser le plateau et l’état de la partie en temps réel.
-
-
-### Espace joueur
-- [x] Créer le composant Avatar réutilisable.
-- [x] Ajouter le bouton Edit au profil.
-- [x] Permettre de choisir un avatar et d’en afficher un aperçu.
-- [x] Ajouter les champs facultatifs prénom et nom.
-- [x] Permettre de modifier localement le pseudo, le prénom et le nom.
-- [ ] Ajouter les actions Enregistrer et Annuler.
-- [ ] Charger les informations du joueur connecté depuis le backend.
-- [ ] Enregistrer les modifications du profil et de l’avatar via le backend.
-- [ ] Afficher les confirmations et les erreurs.
-- [ ] Afficher l’historique des parties.
-- [ ] Intégrer l’accès à la liste d’amis.
-
-### Liste d’amis
-- [ ] Afficher les amis avec avatar, pseudo et statut de connexion.
-- [ ] Envoyer une demande d’ami.
-- [ ] Accepter ou refuser une demande.
-- [ ] Annuler une demande envoyée.
-- [ ] Supprimer un ami.
-- [ ] Bloquer et débloquer un joueur.
-- [ ] Permettre d’ouvrir et de fermer le panneau des amis.
-- [ ] Relier les données et les actions au backend.
-- [ ] Afficher les confirmations et les erreurs.
-
-### Classement
-- [x] Créer l’interface du classement avec des données fictives.
-- [x] Intégrer les avatars et les médailles.
-- [ ] Adapter le classement aux écrans mobiles : tableau lisible, colonnes accessibles et aucun débordement de la page.
-- [ ] Relier le classement aux données du backend.
-- [x] Intégrer le composant Avatar au ranking.
-
-#### ce dont ranking a besoin cote backend
-    - Une route qui envoie la liste des joeurs triee
-        format suggere : [{id, username, wins, games}]
-    - classement par victoire ou par Elo (score de niveau, selon resultat et niv de l'adversaire)?
-
-### Chat
-- [x] Créer le composant ChatBox avec envoi de messages locaux.
-- [x] Intégrer le chat dans Play et WatchGame.
-- [ ] Charger l’historique depuis le backend.
-- [ ] Envoyer et recevoir les messages en temps réel.
-
-#### ce dont chat a besoin cote backend
-    - Enregistrer les messages en base, et renvoyer l’historique a quelqu’un qui arrive dans un chat (route ou inclusion dans la reponse existante : a decider ensemble).
-    - Valider le format des messages (pas vide, longueur maximale).
-    - Identifier l’auteur cote serveur (via un jeton), jamais a partir d’un champ envoye par le navigateur. Cela vaut aussi pour la connexion WebSocket.
-    - Droits d’acces au chat des joueurs et a celui des spectateurs, verifies a chaque message et pas seulement a l’entree.
-    - Temps reel (WebSocket) : diffuser chaque nouveau message, aussitot enregistre, aux participants connectes a ce chat, et gerer proprement les connexions et deconnexions.
-    - Securite et finitions : limiter le debit (anti-spam, max 5 message toutes les 10 sec par user), fermer les routes qui ne doivent pas etre publiques, et decider du sort du chat e la fin d’une partie (conserve ou supprime).
-
-### Communication avec le backend
-- [x] Adapter l’utilitaire `fetchAPI` à partir du modèle de Noa.
-- [x] Activer les types et définir `APIError`.
-- [x] Confirmer l’utilisation de `/api` avec le proxy existant.
-- [x] Implémenter l’envoi JSON et l’option pour les cookies de session.
-- [x] Implémenter le traitement des réponses, y compris sans contenu, et des erreurs.
-- [x] Tester une erreur de validation renvoyée par le backend.
-- [ ] Tester une réponse réussie et les cookies de session.
-- [ ] Tester le logout sans contenu.
-- [ ] Tester les erreurs réseau et les erreurs renvoyées sous forme de chaîne JSON.
-- [ ] Retirer la page temporaire ApiTest et sa route après les tests.
-
-### Internationalisation
-- [ ] Brancher les traductions en français, anglais et espagnol.
-
-### Si le temps le permet
-- [ ] Ajouter le parcours « Mot de passe oublié », avec le backend.
-
+Le fichier de licence est conservé dans [`public/pieces/kosal/LICENSE.txt`](public/pieces/kosal/LICENSE.txt). Le crédit figure aussi dans la page Terms of Service.

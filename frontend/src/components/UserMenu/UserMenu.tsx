@@ -2,20 +2,18 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Avatar from '../Avatar/Avatar';
-import {
-  AccountMenu,
-  AccountButton,
-  AccountOptions,
-} from './UserMenu.styles';
+import { AccountMenu, AccountButton, AccountOptions } from './UserMenu.styles';
 
 type UserMenuProps = {
   username: string;
+  avatar?: string | null;
   isLoggingOut: boolean;
   onLogout: () => Promise<void>;
 };
 
 function UserMenu({
   username,
+  avatar,
   isLoggingOut,
   onLogout,
 }: UserMenuProps) {
@@ -72,7 +70,7 @@ function UserMenu({
         onClick={() => setIsOpen((open) => !open)}
       >
         <span aria-hidden="true">
-          <Avatar username={username} size={36} isOnline={true} />
+          <Avatar src={avatar || '/avatars/default.svg'} username={username} size={36} isOnline={true} />
         </span>
 
         <span className="username">{username}</span>

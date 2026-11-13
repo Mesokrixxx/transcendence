@@ -182,6 +182,7 @@ function Navbar() {
             {user ? (
               <UserMenu
                 username={user.username}
+                avatar={user.avatar}
                 isLoggingOut={isLoggingOut}
                 onLogout={handleLogout}
               />

@@ -239,6 +239,7 @@ export default interface Resources {
     "localProfileNotice": "Your username is saved to your account. Your first name, last name and image are temporary and disappear when you reload.",
     "profileActivity": "Profile activity",
     "profileInformationAndAvatar": "Profile information and avatar",
+    "resetAvatar": "Use default avatar",
     "saveChanges": "Save changes",
     "saveError": "Unable to save your changes. Please try again.",
     "saving": "Saving...",

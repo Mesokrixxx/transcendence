@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
@@ -20,14 +20,6 @@ function Profile() {
     lastName: '',
   });
 
-  useEffect(() => {
-    const avatar = localProfile.avatar;
-
-    return () => {
-      if (avatar) URL.revokeObjectURL(avatar);
-    };
-  }, [localProfile.avatar]);
-
   const fullName = [
     localProfile.firstName,
     localProfile.lastName,
@@ -46,7 +38,7 @@ function Profile() {
         <ProfilePanel>
           <ProfileHeader>
             <Avatar
-              src={localProfile.avatar}
+              src={user?.avatar || '/avatars/default.svg'}
               username={user?.username ?? ''}
               isOnline={true}
               size={96}
@@ -70,7 +62,7 @@ function Profile() {
           </ProfileHeader>
         </ProfilePanel>
 
-         <ProfileActivity />
+        <ProfileActivity />
 
         {isEditing && user && (
           <EditProfileDialog

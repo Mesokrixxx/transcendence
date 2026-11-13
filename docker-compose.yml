@@ -29,6 +29,8 @@ services:
       OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
       OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
       OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
+    volumes:
+      - avatars_data:/app/uploads/avatars
     depends_on:
       db:
         condition: service_healthy
@@ -65,11 +67,10 @@ services:
 
 volumes:
   postgres_data:
+  avatars_data:
 
 networks:
   network-backend-db:
     internal: true
   network-frontend-backend:
-    internal: true
   network-nginx-frontend:
-    internal: true

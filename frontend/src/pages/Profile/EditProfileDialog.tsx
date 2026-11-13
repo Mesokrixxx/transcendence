@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import type { AuthUser } from '../../types/auth';
 import fetchAPI from '../../services/fetchAPI';
+import { uploadAvatar } from '../../services/avatar';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input';
-import { ProfileDialog, DialogHeader, DialogActions } from './Profile.styles';
+import { ProfileDialog, DialogHeader,DialogActions } from './Profile.styles';
 
 export type LocalProfile = {
   firstName: string;
@@ -35,12 +36,18 @@ function EditProfileDialog({
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
-  const [avatarSrc, setAvatarSrc] = useState(profile.avatar);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [removeAvatarOnSave, setRemoveAvatarOnSave] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(
+    user.avatar || '/avatars/default.svg',
+  );
 
   const [avatarError, setAvatarError] = useState<
     'chooseImageFormat' | 'imageTooLarge' | ''
   >('');
+
   const [error, setError] = useState<
     'usernameInUse' | 'enterUsername' | 'saveError' | ''
   >('');
@@ -91,20 +98,27 @@ function EditProfileDialog({
     }
 
     const previewUrl = URL.createObjectURL(file);
+
     draftAvatarRef.current = previewUrl;
     setAvatarSrc(previewUrl);
+    setAvatarFile(file);
+    setRemoveAvatarOnSave(false);
     setAvatarError('');
-  }
+    setError('');
 
-  function applyChanges() {
-    // La page conserve désormais l’image validée.
-    draftAvatarRef.current = undefined;
+    }
 
-    onSave({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      avatar: avatarSrc,
-    });
+  function handleResetAvatar() {
+    if (draftAvatarRef.current) {
+      URL.revokeObjectURL(draftAvatarRef.current);
+      draftAvatarRef.current = undefined;
+    }
+
+    setAvatarFile(null);
+    setAvatarSrc('/avatars/default.svg');
+    setRemoveAvatarOnSave(Boolean(user.avatar));
+    setAvatarError('');
+    setError('');
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -120,37 +134,68 @@ function EditProfileDialog({
     }
 
     setError('');
-
-    if (nextUsername === user.username) {
-      applyChanges();
-      return;
-    }
-
     setIsSaving(true);
 
+    let updatedUser = user;
+
     try {
-      const response = await fetchAPI<AuthUser>({
-        path: '/users/me',
-        method: 'patch',
-        body: { username: nextUsername },
-      });
+      if (nextUsername !== user.username) {
+        const response = await fetchAPI<AuthUser>({
+          path: '/users/me',
+          method: 'patch',
+          body: { username: nextUsername },
+        });
 
-      if (response.error === true) {
-        const message =
-          typeof response.result === 'string'
-            ? response.result
-            : response.result.error;
+        if (response.error === true) {
+          const message =
+            typeof response.result === 'string'
+              ? response.result
+              : response.result.error;
 
-        setError(
-          message === 'username already exists'
-            ? 'usernameInUse'
-            : 'saveError',
-        );
-        return;
+          setError(
+            message === 'username already exists'
+              ? 'usernameInUse'
+              : 'saveError',
+          );
+          return;
+        }
+
+        updatedUser = {
+          ...response.result,
+          avatar: response.result.avatar ?? user.avatar,
+        };
+
+        setUser(updatedUser);
       }
 
-      setUser(response.result);
-      applyChanges();
+      if (removeAvatarOnSave) {
+        const response = await fetch('/api/users/me/avatar', {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Avatar removal failed');
+        }
+
+        updatedUser = { ...updatedUser, avatar: null };
+        setUser(updatedUser);
+      } else if (avatarFile) {
+        const avatar = await uploadAvatar(avatarFile);
+
+        updatedUser = { ...updatedUser, avatar };
+        setUser(updatedUser);
+        setAvatarFile(null);
+        setAvatarSrc(avatar);
+      }
+
+      onSave({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        avatar: updatedUser.avatar ?? undefined,
+      });
+    } catch {
+      setError('saveError');
     } finally {
       setIsSaving(false);
     }
@@ -210,6 +255,12 @@ function EditProfileDialog({
           <p id="avatar-help" className="profile-help">
             {t('jpgPngOrWebpMaximum2Mb', { ns: 'profile' })}
           </p>
+
+           {(avatarFile || (user.avatar && !removeAvatarOnSave)) && (
+            <Button type="button" variant="secondary" onClick={handleResetAvatar}>
+              {t('resetAvatar', { ns: 'profile' })}
+            </Button>
+          )}
 
           {avatarError && (
             <p id="avatar-error" role="alert">
