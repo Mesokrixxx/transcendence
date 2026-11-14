@@ -104,6 +104,35 @@ export async function get(id: number) {
 	});
 }
 
+export async function getAll(userId: number) {
+  return await prisma.game.findMany({
+    where: {
+      OR: [
+        {
+          whiteId: userId,
+        },
+        {
+          blackId: userId,
+        }
+      ],
+    },
+    include: {
+      white: {
+        select: {
+          username: true,
+          elo: true,
+        }
+      },
+      black: {
+        select: {
+          username: true,
+          elo: true,
+        }
+      },
+    }
+  });
+}
+
 export async function canAccess(id: number, userId: number) {
 	const game = await prisma.game.findUnique({
 		where: { id },
