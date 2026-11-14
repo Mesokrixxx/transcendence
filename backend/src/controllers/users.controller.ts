@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express';
 import * as userService from '../services/users.service.js';
+import { getAll as getGamesByUserId } from '../services/games.service.js';
 import { createUserSchema, updateUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
@@ -20,6 +21,24 @@ export async function getUser(req: Request, res: Response) {
 		return res.status(404).json({ error: 'user not found' });
 
 	res.status(200).json(result);
+}
+
+export async function getUserGames(req: Request, res: Response) {
+  const id = Number(req.params.id);
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be a positive integer' });
+
+  const { result, error } = await query(() => getGamesByUserId(id));
+  if (error) {
+    const treatedErr = treatError(error);
+
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+
+  if (!result)
+    return res.status(404).json({ error: 'user not found' });
+
+  res.status(200).json(result);
 }
 
 export async function createUser(req: Request, res: Response) {
