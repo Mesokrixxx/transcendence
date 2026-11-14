@@ -58,19 +58,24 @@ async function githubCallbackLoader({ request }: { request: Request }) {
   const searchParams = new URL(request.url).searchParams;
   const code = searchParams.get('code');
   const state = searchParams.get('state');
+  const expectedState = localStorage.get('githubState');
 
-  if (
-    code !== null &&
-    state !== null &&
-    state === localStorage.get('githubState')
-  ) {
-    await fetchAPI({
-      path: `/auth/oauth?code=${code}`,
-      method: 'post',
-    });
-  }
+
   localStorage.remove('githubState');
-  return redirect('/');
+
+  if (!code || !state || state !== expectedState) {
+    return redirect('/');
+  }
+    const response = await fetchAPI({
+    path: `/auth/oauth?code=${encodeURIComponent(code)}`,
+    method: 'post',
+  });
+
+  if (response.error) {
+    return redirect('/');
+  }
+
+  return redirect('/profile');
 }
 
 export {
