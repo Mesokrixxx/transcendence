@@ -82,18 +82,46 @@ describe('user routes', () => {
   it('updates the authenticated user', async () => {
     vi.mocked(userService.update).mockResolvedValue({
       ...authenticatedUser,
-      username: 'new-alice',
+      displayName: 'Alice',
+      avatar: 'avatar.png',
     });
 
     const response = await request(app)
       .patch('/api/users/me')
-      .send({ username: 'new-alice' });
+      .send({ displayName: 'Alice', avatar: 'avatar.png' });
 
     expect(response.status).toBe(200);
-    expect(response.body.username).toBe('new-alice');
+    expect(response.body.displayName).toBe('Alice');
     expect(userService.update).toHaveBeenCalledWith(1, {
-      username: 'new-alice',
+      displayName: 'Alice',
+      avatar: 'avatar.png',
     });
+  });
+
+  it('updates only the display name', async () => {
+    vi.mocked(userService.update).mockResolvedValue({
+      ...authenticatedUser,
+      displayName: 'Alice',
+    });
+
+    const response = await request(app)
+      .patch('/api/users/me')
+      .send({ displayName: 'Alice' });
+
+    expect(response.status).toBe(200);
+    expect(userService.update).toHaveBeenCalledWith(1, {
+      displayName: 'Alice',
+    });
+  });
+
+  it('rejects username and password updates', async () => {
+    const response = await request(app)
+      .patch('/api/users/me')
+      .send({ username: 'new-alice', password: 'ValidPassword1!' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('invalid request body');
+    expect(userService.update).not.toHaveBeenCalled();
   });
 
   it('rejects an empty update body', async () => {

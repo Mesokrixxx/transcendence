@@ -54,16 +54,14 @@ export async function updateUser(req: Request, res: Response) {
 		});
 	}
 
-	const { username, password, currentPassword } = treatedReq.data;
+	const { displayName, avatar } = treatedReq.data;
 	
 	const updateData: {
-		username?: string,
-		password?: string,
-		currentPassword?: string,
+		displayName?: string,
+		avatar?: string,
 	} = {};
-	if (username) updateData.username = username;
-	if (password) updateData.password = password;
-	if (currentPassword) updateData.currentPassword = currentPassword;
+	if (displayName !== undefined) updateData.displayName = displayName;
+	if (avatar !== undefined) updateData.avatar = avatar;
 
 	const { result, error } = await query(() => userService.update(user.id, updateData));
 	if (error) {

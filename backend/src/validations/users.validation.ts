@@ -39,16 +39,9 @@ export const authUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-    username: z.string().trim().min(1).max(32).optional(),
-    password: passwordSchema.optional(),
-    currentPassword: z.string().min(1).optional(),
-}).refine(
-    data => data.username !== undefined || data.password !== undefined,
+    displayName: z.string().trim().min(1).max(32).optional(),
+    avatar: z.string().trim().min(1).max(2048).optional(),
+}).strict().refine(
+    data => data.displayName !== undefined || data.avatar !== undefined,
     { message: 'at least one field must be updated' }
-).refine(
-    data => data.password === undefined || data.currentPassword !== undefined,
-    {
-        message: 'currentPassword is required to change password',
-        path: ['currentPassword'],
-    }
 );

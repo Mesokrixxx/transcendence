@@ -1,6 +1,5 @@
 import prisma from '../db/prisma.js'
 import bcrypt from 'bcrypt'
-import { BackendError } from '../types/backendError.types.js';
 
 export async function get(id: number) {
 	return await prisma.user.findUnique({
@@ -8,9 +7,21 @@ export async function get(id: number) {
 		select: {
 			id: true,
 			username: true,
-			email: true
+			email: true,
+			profile: {
+				select: {
+					displayName: true,
+					avatar: true,
+				},
+			},
 		}
-	});
+	}).then((user) => user && ({
+		id: user.id,
+		username: user.username,
+		email: user.email,
+		displayName: user.profile?.displayName ?? '',
+		avatar: user.profile?.avatar ?? '',
+	}));
 }
 
 export async function create(name: string, email: string, password: string) {
@@ -60,33 +71,24 @@ export async function auth(email: string, password: string) {
 export async function update(
 	id: number,
 	data: {
-		username?: string;
-		password?: string;
-		currentPassword?: string;
+		displayName?: string;
+		avatar?: string;
 	}
 ) {
-	if (data.password !== undefined) {
-		const user = await prisma.user.findUnique({
-			where: { id },
-			select: { password: true }
-		});
-
-		if (!user?.password || !data.currentPassword ||
-			!await bcrypt.compare(data.currentPassword, user.password))
-			throw new BackendError(401, 'current password is incorrect');
-	}
-
-	const updatedUser = await prisma.user.update({
-		where: { id },
-		data: {
-			...(data.username !== undefined ? { username: data.username } : {}),
-			...(data.password !== undefined
-				? { password: await bcrypt.hash(data.password, 12) }
-				: {})
-		}
+	await prisma.profile.upsert({
+		where: { userId: id },
+		create: {
+			userId: id,
+			...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+			...(data.avatar !== undefined ? { avatar: data.avatar } : {}),
+		},
+		update: {
+			...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+			...(data.avatar !== undefined ? { avatar: data.avatar } : {}),
+		},
 	});
 
-	return get(updatedUser.id);
+	return get(id);
 }
 
 export async function getAll() {
