@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import type { AuthUser } from '../../types/auth';
 import { uploadAvatar } from '../../services/avatar';
+import { updateProfileNames } from '../../services/profile';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Form from '../../components/Form/Form';
@@ -41,6 +42,7 @@ function EditProfileDialog({
   const [avatarSrc, setAvatarSrc] = useState(
     user.avatar || '/avatars/default.svg',
   );
+
   const [avatarError, setAvatarError] = useState<
     'chooseImageFormat' | 'imageTooLarge' | ''
   >('');
@@ -119,12 +121,22 @@ function EditProfileDialog({
 
     if (isSaving || avatarError) return;
 
+    const nextFirstName = firstName.trim();
+    const nextLastName = lastName.trim();
+
     setError('');
     setIsSaving(true);
 
     let updatedUser = user;
 
     try {
+      if (
+        nextFirstName !== profile.firstName ||
+        nextLastName !== profile.lastName
+      ) {
+        await updateProfileNames(nextFirstName, nextLastName);
+      }
+
       if (removeAvatarOnSave) {
         const response = await fetch('/api/users/me/avatar', {
           method: 'DELETE',
@@ -148,9 +160,9 @@ function EditProfileDialog({
       }
 
       onSave({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        avatar: updatedUser.avatar ?? undefined,
+        firstName: nextFirstName,
+        lastName: nextLastName,
+        ...(updatedUser.avatar ? { avatar: updatedUser.avatar } : {}),
       });
     } catch {
       setError('saveError');
@@ -226,7 +238,6 @@ function EditProfileDialog({
             <span>{t('username', { ns: 'auth' })}</span>
             <p>{user.username}</p>
           </div>
-
 
           <Input
             id="profile-firstname"

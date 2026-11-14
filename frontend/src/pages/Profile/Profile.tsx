@@ -13,12 +13,12 @@ import ProfileActivity from './ProfileActivity';
 
 function Profile() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user , setUser} = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [localProfile, setLocalProfile] = useState<LocalProfile>({
-    firstName: '',
-    lastName: '',
-  });
+  const localProfile: LocalProfile = {
+    firstName: user?.firstName ?? '',
+    lastName: user?.lastName ?? '',
+  };
 
   const fullName = [
     localProfile.firstName,
@@ -26,9 +26,17 @@ function Profile() {
   ].filter(Boolean).join(' ');
 
   function handleSave(profile: LocalProfile) {
-    setLocalProfile(profile);
-    setIsEditing(false);
+    if (user) {
+      setUser({
+        ...user,
+        firstName: profile.firstName || null,
+        lastName: profile.lastName || null,
+        avatar: profile.avatar ?? null,
+      });
   }
+
+  setIsEditing(false);
+}
 
   return (
     <Page>

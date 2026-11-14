@@ -50,7 +50,7 @@ pour les données du formulaire qui accompagnent le fichier. La limite de
 ## Vérification en local
 
 - Choisir une photo et vérifier que l’aperçu s’affiche avant l’enregistrement.
-- Enregistrer la photo sans changer le pseudo. Elle doit apparaître sur le
+- Enregistrer la photo, elle doit apparaître sur le
   profil et dans la barre de navigation.
 - Recharger la page : la même photo doit rester visible.
 - Choisir une autre photo, puis annuler : la photo enregistrée doit rester.

@@ -40,7 +40,7 @@ export async function getSession(token: string) {
           username: true,
           email: true,
           profile: {
-            select: { avatar: true },
+            select: { avatar: true, firstName: true, lastName: true },
           },
         },
       },
@@ -62,5 +62,7 @@ export async function getSession(token: string) {
     username: session.user.username,
     email: session.user.email,
     avatar: session.user.profile?.avatar ?? null,
+    firstName: session.user.profile?.firstName ?? null,
+lastName: session.user.profile?.lastName ?? null,
   };
 }

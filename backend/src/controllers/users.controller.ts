@@ -46,6 +46,7 @@ export async function updateUser(req: Request, res: Response) {
 	const user = req.user;
 	if (!user)
 		return res.status(401).json({ error: 'user must be logged in' });
+
 	const treatedReq = updateUserSchema.safeParse(req.body);
 	if (!treatedReq.success) {
 		return res.status(400).json({
@@ -54,18 +55,11 @@ export async function updateUser(req: Request, res: Response) {
 		});
 	}
 
-	const { username, password, currentPassword } = treatedReq.data;
-	
-	const updateData: {
-		username?: string,
-		password?: string,
-		currentPassword?: string,
-	} = {};
-	if (username) updateData.username = username;
-	if (password) updateData.password = password;
-	if (currentPassword) updateData.currentPassword = currentPassword;
+	const updateData = treatedReq.data;
+	const { result, error } = await query(() =>
+		userService.update(user.id, updateData),
+	);
 
-	const { result, error } = await query(() => userService.update(user.id, updateData));
 	if (error) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);

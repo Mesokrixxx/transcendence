@@ -3,4 +3,6 @@ export type AuthUser = {
   username: string;
   email: string;
   avatar?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
 };

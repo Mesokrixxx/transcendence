@@ -38,6 +38,7 @@ services:
       - network-backend-db
       - network-frontend-backend
     volumes:
+      - avatars_data:/app/uploads/avatars
       - ./certs/backend:/app/backend/certs:ro
 
   frontend:

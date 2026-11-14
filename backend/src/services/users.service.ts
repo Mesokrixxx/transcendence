@@ -130,35 +130,56 @@ export async function auth(email: string, password: string) {
 }
 
 export async function update(
-	id: number,
-	data: {
-		username?: string;
-		password?: string;
-		currentPassword?: string;
-	}
+  id: number,
+  data: {
+    username?: string | undefined;
+    password?: string | undefined;
+    currentPassword?: string | undefined;
+    firstName?: string | null | undefined;
+    lastName?: string | null | undefined;
+  },
 ) {
-	if (data.password !== undefined) {
-		const user = await prisma.user.findUnique({
-			where: { id },
-			select: { password: true }
-		});
+  if (data.password !== undefined) {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { password: true },
+    });
 
-		if (!user?.password || !data.currentPassword ||
-			!await bcrypt.compare(data.currentPassword, user.password))
-			throw new BackendError(401, 'current password is incorrect');
-	}
+    if (
+      !user?.password ||
+      !data.currentPassword ||
+      !(await bcrypt.compare(data.currentPassword, user.password))
+    ) {
+      throw new BackendError(401, 'current password is incorrect');
+    }
+  }
 
-	const updatedUser = await prisma.user.update({
-		where: { id },
-		data: {
-			...(data.username !== undefined ? { username: data.username } : {}),
-			...(data.password !== undefined
-				? { password: await bcrypt.hash(data.password, 12) }
-				: {})
-		}
-	});
+  const profileData = {
+    ...(data.firstName !== undefined ? { firstName: data.firstName } : {}),
+    ...(data.lastName !== undefined ? { lastName: data.lastName } : {}),
+  };
 
-	return get(updatedUser.id);
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: {
+      ...(data.username !== undefined ? { username: data.username } : {}),
+      ...(data.password !== undefined
+        ? { password: await bcrypt.hash(data.password, 12) }
+        : {}),
+      ...(Object.keys(profileData).length > 0
+        ? {
+            profile: {
+              upsert: {
+                create: profileData,
+                update: profileData,
+              },
+            },
+          }
+        : {}),
+    },
+  });
+
+  return get(updatedUser.id);
 }
 
 export async function getAll() {
