@@ -110,6 +110,19 @@ export const ProfileDialog = styled.dialog`
     background: rgb(0 0 0 /65%);
   }
 
+  .profile-username-display {
+  cursor: default;
+  opacity: 0.7;
+  }
+
+  .profile-username-display p {
+    margin: 0.5rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
   @media (max-width: 600px) {
     padding: 20px;
   }

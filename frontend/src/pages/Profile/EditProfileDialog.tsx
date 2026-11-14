@@ -3,13 +3,12 @@ import type { ChangeEvent, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import type { AuthUser } from '../../types/auth';
-import fetchAPI from '../../services/fetchAPI';
 import { uploadAvatar } from '../../services/avatar';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input';
-import { ProfileDialog, DialogHeader,DialogActions } from './Profile.styles';
+import { ProfileDialog, DialogHeader, DialogActions } from './Profile.styles';
 
 export type LocalProfile = {
   firstName: string;
@@ -33,7 +32,6 @@ function EditProfileDialog({
   const { t } = useTranslation();
   const { setUser } = useAuth();
 
-  const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
   const [isSaving, setIsSaving] = useState(false);
@@ -43,14 +41,10 @@ function EditProfileDialog({
   const [avatarSrc, setAvatarSrc] = useState(
     user.avatar || '/avatars/default.svg',
   );
-
   const [avatarError, setAvatarError] = useState<
     'chooseImageFormat' | 'imageTooLarge' | ''
   >('');
-
-  const [error, setError] = useState<
-    'usernameInUse' | 'enterUsername' | 'saveError' | ''
-  >('');
+  const [error, setError] = useState<'saveError' | ''>('');
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const draftAvatarRef = useRef<string | undefined>(undefined);
@@ -105,8 +99,7 @@ function EditProfileDialog({
     setRemoveAvatarOnSave(false);
     setAvatarError('');
     setError('');
-
-    }
+  }
 
   function handleResetAvatar() {
     if (draftAvatarRef.current) {
@@ -126,48 +119,12 @@ function EditProfileDialog({
 
     if (isSaving || avatarError) return;
 
-    const nextUsername = username.trim();
-
-    if (!nextUsername) {
-      setError('enterUsername');
-      return;
-    }
-
     setError('');
     setIsSaving(true);
 
     let updatedUser = user;
 
     try {
-      if (nextUsername !== user.username) {
-        const response = await fetchAPI<AuthUser>({
-          path: '/users/me',
-          method: 'patch',
-          body: { username: nextUsername },
-        });
-
-        if (response.error === true) {
-          const message =
-            typeof response.result === 'string'
-              ? response.result
-              : response.result.error;
-
-          setError(
-            message === 'username already exists'
-              ? 'usernameInUse'
-              : 'saveError',
-          );
-          return;
-        }
-
-        updatedUser = {
-          ...response.result,
-          avatar: response.result.avatar ?? user.avatar,
-        };
-
-        setUser(updatedUser);
-      }
-
       if (removeAvatarOnSave) {
         const response = await fetch('/api/users/me/avatar', {
           method: 'DELETE',
@@ -180,6 +137,7 @@ function EditProfileDialog({
 
         updatedUser = { ...updatedUser, avatar: null };
         setUser(updatedUser);
+        setRemoveAvatarOnSave(false);
       } else if (avatarFile) {
         const avatar = await uploadAvatar(avatarFile);
 
@@ -234,11 +192,7 @@ function EditProfileDialog({
       >
         <fieldset disabled={isSaving}>
           <div className="avatar-editor">
-            <Avatar
-              src={avatarSrc}
-              username={username || user.username}
-              size={80}
-            />
+            <Avatar src={avatarSrc} username={user.username} size={80} />
 
             <Input
               id="profile-avatar"
@@ -256,7 +210,7 @@ function EditProfileDialog({
             {t('jpgPngOrWebpMaximum2Mb', { ns: 'profile' })}
           </p>
 
-           {(avatarFile || (user.avatar && !removeAvatarOnSave)) && (
+          {(avatarFile || (user.avatar && !removeAvatarOnSave)) && (
             <Button type="button" variant="secondary" onClick={handleResetAvatar}>
               {t('resetAvatar', { ns: 'profile' })}
             </Button>
@@ -268,20 +222,11 @@ function EditProfileDialog({
             </p>
           )}
 
-          <Input
-            id="profile-username"
-            name="username"
-            label={t('username', { ns: 'auth' })}
-            type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(event) => {
-              setUsername(event.currentTarget.value);
-              setError('');
-            }}
-            maxLength={32}
-            required
-          />
+          <div className="profile-username-display">
+            <span>{t('username', { ns: 'auth' })}</span>
+            <p>{user.username}</p>
+          </div>
+
 
           <Input
             id="profile-firstname"
@@ -303,22 +248,10 @@ function EditProfileDialog({
             onChange={(event) => setLastName(event.currentTarget.value)}
           />
 
-          {error && (
-            <p role="alert">
-              {error === 'saveError'
-                ? t('saveError', { ns: 'profile' })
-                : error === 'usernameInUse'
-                  ? t('usernameInUse', { ns: 'auth' })
-                  : t('enterUsername', { ns: 'auth' })}
-            </p>
-          )}
+          {error && <p role="alert">{t('saveError', { ns: 'profile' })}</p>}
 
           <DialogActions>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={closeEditor}
-            >
+            <Button type="button" variant="secondary" onClick={closeEditor}>
               {t('cancel', { ns: 'common' })}
             </Button>
 
