@@ -3,7 +3,7 @@ import * as friendsService from '../services/friends.service.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import { isOnline } from '../services/presence.service.js';
-import { friendParamsSchema } from '../validations/friends.validation.js';
+import { friendParamsSchema, friendRequestSchema } from '../validations/friends.validation.js';
 
 function getFriendId(req: Request, res: Response) {
 	const parsed = friendParamsSchema.safeParse(req.params);
@@ -95,6 +95,42 @@ export async function addFriend(req: Request, res: Response) {
 	}
 
 	if (!result) 
+		return res.status(404).json({ error: 'user not found' });
+
+	return res.status(201).json({ ...result, online: isOnline(result.id) });
+}
+
+export async function addFriendByUsername(req: Request, res: Response) {
+	const user = req.user;
+	if (!user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const parsed = friendRequestSchema.safeParse(req.body);
+	if (!parsed.success) {
+		return res.status(400).json({
+			error: 'invalid request body',
+			details: parsed.error.issues,
+		});
+	}
+
+	const { result: friend, error: lookupError } = await query(() =>
+		friendsService.getByUsername(parsed.data.username),
+	);
+	if (lookupError) {
+		const treatedErr = treatError(lookupError);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!friend)
+		return res.status(404).json({ error: 'user not found' });
+	if (friend.id === user.id)
+		return res.status(400).json({ error: 'cannot add yourself as a friend' });
+
+	const { result, error } = await query(() => friendsService.addFriend(user.id, friend.id));
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
 		return res.status(404).json({ error: 'user not found' });
 
 	return res.status(201).json({ ...result, online: isOnline(result.id) });

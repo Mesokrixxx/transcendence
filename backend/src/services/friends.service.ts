@@ -4,12 +4,16 @@ type FriendRelation = {
 	id: number;
 	username: string;
 	email: string;
+	profile: { avatar: string | null } | null;
 };
 
 const relationSelect = {
 	id: true,
 	username: true,
 	email: true,
+	profile: {
+		select: { avatar: true },
+	},
 } as const;
 
 export async function getList(userId: number) {
@@ -43,7 +47,10 @@ export async function getList(userId: number) {
 		const isFriend = outgoing.has(id) && incoming.has(id);
 
 		return {
-			...friend,
+			id: friend.id,
+			username: friend.username,
+			email: friend.email,
+			avatar: friend.profile?.avatar ?? '',
 			status: isFriend
 				? 'friend'
 				: outgoing.has(id)
@@ -63,7 +70,19 @@ export async function getBlocked(userId: number) {
 		where: { id: userId },
 		select: { blockedUsers: { select: relationSelect } },
 	});
-	return user?.blockedUsers ?? null;
+	return user?.blockedUsers.map((friend) => ({
+		id: friend.id,
+		username: friend.username,
+		email: friend.email,
+		avatar: friend.profile?.avatar ?? '',
+	})) ?? null;
+}
+
+export async function getByUsername(username: string) {
+	return prisma.user.findUnique({
+		where: { username },
+		select: { id: true },
+	});
 }
 
 export async function addFriend(userId: number, friendId: number) {
@@ -92,6 +111,7 @@ export async function addFriend(userId: number, friendId: number) {
 		id: friend.id,
 		username: friend.username,
 		email: friend.email,
+		avatar: friend.profile?.avatar ?? '',
 	};
 }
 
@@ -114,7 +134,12 @@ export async function acceptFriend(userId: number, friendId: number) {
 	return prisma.user.findUnique({
 		where: { id: friendId },
 		select: relationSelect,
-	});
+	}).then((friend) => friend && ({
+		id: friend.id,
+		username: friend.username,
+		email: friend.email,
+		avatar: friend.profile?.avatar ?? '',
+	}));
 }
 
 export async function delFriend(userId: number, friendId: number) {
@@ -136,7 +161,12 @@ export async function delFriend(userId: number, friendId: number) {
 		})
 	]);
 
-	return friend;
+	return {
+		id: friend.id,
+		username: friend.username,
+		email: friend.email,
+		avatar: friend.profile?.avatar ?? '',
+	};
 }
 
 export async function block(userId: number, blockedId: number) {
@@ -164,7 +194,12 @@ export async function block(userId: number, blockedId: number) {
 		}),
 	]);
 
-	return blocked;
+	return {
+		id: blocked.id,
+		username: blocked.username,
+		email: blocked.email,
+		avatar: blocked.profile?.avatar ?? '',
+	};
 }
 
 export async function unblock(userId: number, blockedId: number) {
@@ -180,5 +215,10 @@ export async function unblock(userId: number, blockedId: number) {
 		data: { blockedUsers: { disconnect: { id: blockedId } } },
 	});
 
-	return blocked;
+	return {
+		id: blocked.id,
+		username: blocked.username,
+		email: blocked.email,
+		avatar: blocked.profile?.avatar ?? '',
+	};
 }
