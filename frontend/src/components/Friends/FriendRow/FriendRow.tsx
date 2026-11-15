@@ -12,7 +12,7 @@ function FriendRow({ user, children }: FriendRowProps) {
     return (
         <Row>
             <Avatar
-                src={user.avatar}
+                src={user.avatar || '/avatars/default.svg'}
                 username={user.username}
                 isOnline={user.isOnline}
                 size={40}

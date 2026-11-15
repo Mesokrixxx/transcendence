@@ -103,9 +103,9 @@ function Rankings() {
                               <td>
                                   <PlayerCell>
                                       <Avatar
-                                          src={player.avatar}
+                                          src={player.avatar||'/avatars/default.svg'}
                                           username={player.username}
-                                          isOnline={player.isOnline}
+                                          isOnline={player.online}
                                           size={48}
                                       />
                                       <span title={player.username}>{player.username}</span>

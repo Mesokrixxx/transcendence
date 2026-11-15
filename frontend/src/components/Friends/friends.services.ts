@@ -1,3 +1,6 @@
+import fetchAPI from "../../services/fetchAPI"
+import type { APIError } from "../../types/fetch"
+
 export type FriendUser = {
     id: number
     username: string
@@ -12,51 +15,99 @@ export type FriendsData = {
     blocked: FriendUser[]
 }
 
-const fakeData: FriendsData = {
-    friends: [
-        {id: 1, username: 'alice', avatar: '/avatars/rook.svg', isOnline: true},
-        {id: 2, username: 'bob', avatar: '/avatars/knight.svg', isOnline: false},
-    ],
-    received: [{id: 3, username: 'charlie', avatar: '/avatars/pawn.svg'}],
-    sent: [{id: 4, username: 'diana'}],
-    blocked: [{id: 5, username: 'sophia'}],
+type FriendsFromAPI = {
+    id: number
+    username: string
+    avatar?: string
+    status?: 'friend' | 'pending_outgoing' | 'pending_incoming'
+    online?: boolean
 }
 
-function wait(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+function getErrorMessage(error: APIError): string {
+    return typeof error === 'string' ? error : error.error
+}
+
+async function getAPIData<Data>(path: string): Promise<Data> {
+    const response = await fetchAPI<Data>({
+        path,
+        method: 'get'
+    })
+
+    if (response.error) {
+        throw new Error(getErrorMessage(response.result))
+    }
+
+    return response.result
+}
+
+async function sendAction(
+    path: string,
+    method: 'post' | 'delete',
+    body?: object
+): Promise<void> {
+    const response = await fetchAPI<void>({
+        path,
+        method,
+        body
+    })
+
+    if (response.error) {
+        throw new Error(getErrorMessage(response.result))
+    }
+}
+
+function toPerson(user: FriendsFromAPI) : FriendUser {
+    return {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar || undefined}
+}
+
+function toFriend(user: FriendsFromAPI) : FriendUser {
+    return { ...toPerson(user), isOnline: user.online ?? false}
 }
 
 export async function getFriends(): Promise<FriendsData> {
-    await wait(500)
-    return fakeData
-}
+    const [relations, blockedUsers] = await Promise.all([
+        getAPIData<FriendsFromAPI[]>('/friends/me'),
+        getAPIData<FriendsFromAPI[]>('/friends/blocked'),
+    ])
 
-export async function sendFriendRequest(username: string): Promise<FriendUser> {
-    await wait(500)
+    return {
+        friends: relations
+            .filter(user => user.status === 'friend')
+            .map(toFriend),
+        received: relations
+            .filter(user => user.status === 'pending_incoming')
+            .map(toPerson),
+        sent: relations
+            .filter(user => user.status === 'pending_outgoing')
+            .map(toPerson),
 
-    if (username.toLocaleLowerCase() === 'nobody') {
-        throw new Error('User not found')
+        blocked: blockedUsers.map(toPerson)
     }
-
-    return { id: Date.now(), username}
 }
 
-export async function acceptFriendRequest(_userId: number): Promise<void> {
-    await wait(300)
+export async function acceptFriendRequest(userId: number): Promise<void> {
+    return sendAction(`/friends/${userId}/accept`, 'post')
 }
 
-export async function removeFriendRequest(_userId: number): Promise<void> {
-    await wait(300)
+export async function removeFriendRequest(userId: number): Promise<void> {
+    return sendAction(`/friends/${userId}`, 'delete')
 }
 
-export async function removeFriend(_userId: number): Promise<void> {
-    await wait(300)
+export async function removeFriend(userId: number): Promise<void> {
+    return sendAction(`/friends/${userId}`, 'delete')
 }
 
-export async function blockUser(_userId: number): Promise<void> {
-    await wait(300)
+export async function blockUser(userId: number): Promise<void> {
+    return sendAction(`/friends/${userId}/block`, 'post')
 }
 
-export async function unblockUser(_userId: number): Promise<void> {
-    await wait(300)
+export async function unblockUser(userId: number): Promise<void> {
+    return sendAction(`/friends/${userId}/block`, 'delete')
+}
+
+export async function sendFriendRequest(username: string): Promise<void> {
+    return sendAction('/friends/requests', 'post', { username })
 }
