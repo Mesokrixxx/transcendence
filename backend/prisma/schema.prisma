@@ -57,6 +57,7 @@ model User {
   chats    Chat[]
   messages Message[]
   sessions Session[]
+  achievements UserAchievement[]
 }
 
 model Session {
@@ -77,8 +78,6 @@ model Profile {
   creationDate DateTime          @default(now())
   user         User              @relation(fields: [userId], references: [id])
   userId       Int               @unique
-  level        Int               @default(0)
-  xp           Int               @default(0)
   badges       BadgesOnProfile[]
 }
 
@@ -90,6 +89,7 @@ model Game {
   createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
+  gamificationProcessed Boolean @default(false)
   moves      Json
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
@@ -123,6 +123,7 @@ model Message {
 
 model Badge {
   id          Int               @id @default(autoincrement())
+  code        String            @unique
   name        String
   description String
   ownedBy     BadgesOnProfile[]
@@ -134,7 +135,27 @@ model BadgesOnProfile {
   profileUserId Int
   badge      Badge    @relation(fields: [badgeId], references: [id])
   badgeId    Int
+  record     Int      @default(0)
+  featured   Boolean  @default(false)
   assignedAt DateTime @default(now())
 
   @@unique([profileUserId, badgeId])
+}
+
+model Achievement {
+  id          Int               @id @default(autoincrement())
+  code        String             @unique
+  name        String
+  description String
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  achievementId Int
+  unlockedAt    DateTime   @default(now())
+
+  @@id([userId, achievementId])
 }
