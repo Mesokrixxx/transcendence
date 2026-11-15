@@ -10,7 +10,7 @@ import { getFriends,
     blockUser,
     unblockUser,
     type FriendUser,
-    type FriendsData } from "../friends.services"
+    type FriendsData } from "../../../services/friends"
 import {
     Panel,
     PanelHeader,

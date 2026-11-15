@@ -1,6 +1,6 @@
 import { type ReactNode } from "react"
 import Avatar from "../../Avatar/Avatar"
-import type { FriendUser } from "../friends.services"
+import type { FriendUser } from "../../../services/friends"
 import { Row, Name, Actions } from './FriendRow.styles'
 
 type FriendRowProps = {

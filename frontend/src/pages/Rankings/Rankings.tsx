@@ -17,7 +17,7 @@ import {
 } from './Rankings.styles';
 import Avatar from '../../components/Avatar/Avatar';
 import { useTranslation, Trans } from 'react-i18next';
-import { getRankings , type Player } from './Rankings.service'
+import { getRankings , type Player } from '../../services/rankings'
 
 function getWinRate(wins: number, games: number): number {
   if (games === 0) return 0;

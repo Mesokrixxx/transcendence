@@ -1,5 +1,5 @@
-import fetchAPI from "../../services/fetchAPI"
-import type { APIError } from "../../types/fetch"
+import fetchAPI from "./fetchAPI"
+import type { APIError } from "../types/fetch"
 
 export type Player = {
   id: number
