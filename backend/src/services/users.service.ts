@@ -27,6 +27,31 @@ export async function get(id: number) {
   };
 }
 
+export async function getPlayerProfile(id: number) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      elo: true,
+      gamesPlayed: true,
+      profile: {
+        select: { avatar: true },
+      },
+    },
+  });
+
+  if (!user) return null;
+
+  return {
+    id: user.id,
+    username: user.username,
+    avatar: user.profile?.avatar ?? null,
+    elo: user.elo,
+    gamesPlayed: user.gamesPlayed,
+  };
+}
+
 export async function getGithubUser(githubId: number) {
   return await prisma.user.findUnique({
     where: { githubId },

@@ -10,7 +10,7 @@ export async function getUser(req: Request, res: Response) {
 	if (!Number.isInteger(id) || id <= 0)
 		return res.status(400).json({ error: 'id shall be a positive integer' });
 
-	const { result, error } = await query(() => userService.get(id));
+	const { result, error } = await query(() => userService.getPlayerProfile(id));
 	if (error) {
 		const treatedErr = treatError(error);
 
