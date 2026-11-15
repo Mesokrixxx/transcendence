@@ -18,6 +18,7 @@ vi.mock('../../src/middlewares/auth.middleware.js', () => ({
 
 vi.mock('../../src/services/friends.service.js', () => ({
   getList: vi.fn(),
+  getByUsername: vi.fn(),
   addFriend: vi.fn(),
   delFriend: vi.fn(),
 }));
@@ -28,6 +29,7 @@ const friend = { id: 2, username: 'bob', email: 'bob@example.com' };
 describe('friend routes', () => {
   beforeEach(() => {
     vi.mocked(friendsService.getList).mockReset();
+    vi.mocked(friendsService.getByUsername).mockReset();
     vi.mocked(friendsService.addFriend).mockReset();
     vi.mocked(friendsService.delFriend).mockReset();
   });
@@ -52,7 +54,21 @@ describe('friend routes', () => {
     const response = await request(app).post('/api/friends/2');
 
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(friend);
+    expect(response.body).toEqual({ ...friend, online: false });
+    expect(friendsService.addFriend).toHaveBeenCalledWith(1, 2);
+  });
+
+  it('adds a friend by username', async () => {
+    vi.mocked(friendsService.getByUsername).mockResolvedValue({ id: 2 });
+    vi.mocked(friendsService.addFriend).mockResolvedValue(friend);
+
+    const response = await request(app)
+      .post('/api/friends/requests')
+      .send({ username: 'bob' });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({ ...friend, online: false });
+    expect(friendsService.getByUsername).toHaveBeenCalledWith('bob');
     expect(friendsService.addFriend).toHaveBeenCalledWith(1, 2);
   });
 

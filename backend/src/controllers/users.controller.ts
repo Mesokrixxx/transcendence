@@ -3,6 +3,7 @@ import * as userService from '../services/users.service.js';
 import { createUserSchema, updateUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
+import { isOnline } from '../services/presence.service.js';
 
 export async function getUser(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -88,5 +89,8 @@ export async function getUsersByRanking(req: Request, res: Response) {
 	if (!result)
 		return res.status(200).json({});
 
-	return res.status(200).json(result);
+	return res.status(200).json(result.map((rankingUser) => ({
+		...rankingUser,
+		online: isOnline(rankingUser.id),
+	})));
 }
