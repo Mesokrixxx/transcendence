@@ -35,7 +35,7 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
-    const [hasActionError, sethasActionError] = useState(false)
+    const [hasActionError, setHasActionError] = useState(false)
 
 
     useEffect(() => {
@@ -46,11 +46,9 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
     }, [])
 
     function handleSend(username: string): Promise<void> {
-        return sendFriendRequest(username).then((user) => {
-            setData((current) =>
-                current === null ? current : { ...current, sent: [...current.sent, user]}
-            )
-        })
+        return sendFriendRequest(username)
+            .then(() => getFriends())
+            .then((result) => setData(result))
     }
 
     function runAction(
@@ -58,13 +56,13 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
         update: (current : FriendsData) => FriendsData
     ) {
         setIsBusy(true)
-        sethasActionError(false)
+        setHasActionError(false)
 
         action()
             .then(() => {
                 setData((current) => (current === null ? current : update(current)))
             })
-            .catch(() => sethasActionError(true))
+            .catch(() => setHasActionError(true))
             .finally(() => setIsBusy(false))
     }
 
@@ -133,7 +131,7 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
     let content: ReactNode
     if (isLoading) {
         content = <Message>{t('loading')}</Message>
-    } else if (hasError || data == null) {
+    } else if (hasError || data === null) {
         content = <Message role="alert">{t('loadError')}</Message>
     } else {
         content = (

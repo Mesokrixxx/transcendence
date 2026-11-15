@@ -87,7 +87,7 @@ export async function getUsersByRanking(req: Request, res: Response) {
 	}
 
 	if (!result)
-		return res.status(200).json({});
+		return res.status(200).json([]);
 
 	return res.status(200).json(result.map((rankingUser) => ({
 		...rankingUser,

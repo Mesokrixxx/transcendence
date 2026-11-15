@@ -105,7 +105,7 @@ function Rankings() {
                                       <Avatar
                                           src={player.avatar}
                                           username={player.username}
-                                          isOnline={player.isOnline}
+                                          isOnline={player.online}
                                           size={48}
                                       />
                                       <span title={player.username}>{player.username}</span>

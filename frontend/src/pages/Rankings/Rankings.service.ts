@@ -8,7 +8,7 @@ export type Player = {
   wins: number
   games: number
   avatar?: string
-  isOnline?: boolean
+  online?: boolean
 }
 
 const fakePlayers: Player[] = [
@@ -18,7 +18,7 @@ const fakePlayers: Player[] = [
     rating: 1842,
     wins: 42,
     games: 60,
-    isOnline: true,
+    online: true,
     avatar: '/avatars/queen.svg',
   },
   {
@@ -27,7 +27,7 @@ const fakePlayers: Player[] = [
     rating: 1755,
     wins: 35,
     games: 55,
-    isOnline: false,
+    online: false,
     avatar: '/avatars/king.svg',
   },
   {
@@ -44,7 +44,7 @@ const fakePlayers: Player[] = [
     rating: 1440,
     wins: 15,
     games: 35,
-    isOnline: true,
+    online: true,
   },
   {
     id: 5,
@@ -52,7 +52,7 @@ const fakePlayers: Player[] = [
     rating: 1300,
     wins: 12,
     games: 30,
-    isOnline: false,
+    online: false,
   },
   { id: 6,
     username: 'sofia',
