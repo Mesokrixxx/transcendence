@@ -3,6 +3,7 @@ import * as gamificationService from '../services/gamification.service.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import { z } from 'zod';
+import * as presenceService from '../services/presence.service.js';
 
 export async function getProgress(req: Request, res: Response) {
   if (!req.user)
@@ -38,5 +39,9 @@ export async function setBadgeFeatured(req: Request, res: Response) {
     return res.status(treated.status).json(treated.error);
   }
   if (!result) return res.status(404).json({ error: 'badge not found' });
+  presenceService.send(req.user.id, {
+    type: 'gamification.updated',
+    progress: await gamificationService.getProgress(req.user.id),
+  });
   return res.status(200).json(result);
 }

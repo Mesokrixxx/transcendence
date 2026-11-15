@@ -96,7 +96,8 @@ function longestConsecutiveDays(dates: string[]) {
 }
 
 export async function recordGameResult(gameId: number) {
-	await prisma.$transaction(async (tx) => {
+	return prisma.$transaction(async (tx) => {
+		const changedUsers = new Set<number>();
 		const game = await tx.game.findUnique({ where: { id: gameId } });
 		if (
 			!game ||
@@ -104,7 +105,7 @@ export async function recordGameResult(gameId: number) {
 			!game.result ||
 			game.gamificationProcessed
 		)
-			return;
+			return [];
 
 		await tx.game.update({
 			where: { id: gameId },
@@ -169,10 +170,11 @@ export async function recordGameResult(gameId: number) {
 				return user.elo >= 1800;
 			});
 			for (const achievement of earnedAchievements) {
-				await tx.userAchievement.createMany({
+				const created = await tx.userAchievement.createMany({
 					data: [{ userId: playerId, achievementId: achievement.id }],
 					skipDuplicates: true,
 				});
+				if (created.count > 0) changedUsers.add(playerId);
 			}
 
 			const orderedGames = [...playerGames].reverse();
@@ -221,8 +223,10 @@ export async function recordGameResult(gameId: number) {
 					},
 					update: { record },
 				});
+				changedUsers.add(playerId);
 			}
 		}
+		return [...changedUsers];
 	});
 }
 

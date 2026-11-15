@@ -2,7 +2,20 @@ import prisma from '../db/prisma.js';
 import { BackendError } from '../types/backendError.types.js';
 import ChessGame from '../../../chessgame/src/chessgame.js';
 import type { Move } from '../../../chessgame/src/chessgame.types.js';
-import { recordGameResult } from './gamification.service.js';
+import * as gamificationService from './gamification.service.js';
+import * as presenceService from './presence.service.js';
+
+async function notifyGamification(gameId: number) {
+	const changedUsers = await gamificationService.recordGameResult(gameId);
+	await Promise.all(
+		changedUsers.map(async (userId) => {
+			presenceService.send(userId, {
+				type: 'gamification.updated',
+				progress: await gamificationService.getProgress(userId),
+			});
+		}),
+	);
+}
 
 function readMoves(moves: unknown): Move[] {
   try {
@@ -156,7 +169,7 @@ export async function playMove(id: number, userId: number, move: Move) {
     });
     return updated;
   });
-  if (updated.status === 'OVER') await recordGameResult(updated.id);
+  if (updated.status === 'OVER') await notifyGamification(updated.id);
   return gameView(updated);
 }
 
@@ -181,7 +194,7 @@ export async function resign(id: number, userId: number) {
     },
   });
   const view = gameView(updated);
-  await recordGameResult(updated.id);
+  await notifyGamification(updated.id);
   return view;
 }
 
@@ -204,6 +217,6 @@ export async function draw(id: number, userId: number) {
       endedAt: new Date(),
     },
   });
-  await recordGameResult(updated.id);
+  await notifyGamification(updated.id);
   return gameView(updated);
 }
