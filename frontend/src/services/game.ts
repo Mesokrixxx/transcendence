@@ -47,5 +47,5 @@ export function getFakeGames(size: number = 100): Game[] {
     });
   }
 
-  return getFakeGames();
+  return games;
 }
