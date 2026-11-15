@@ -11,6 +11,7 @@ import Rankings from '../pages/Rankings/Rankings';
 import Chat from '../pages/Chat/Chat';
 import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
+import PlayerProfilePage from '../pages/Profile/PlayerProfilePage';
 import ErrorPage from '../pages/Errors/ErrorPage';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
@@ -57,6 +58,10 @@ const routes: RouteObject[] = [
         element: <Profile />,
       },
       {
+        path: '/profile/:id',
+        element: <PlayerProfilePage />,
+      },
+      {
         path: '/chat',
         element: <Chat />,
       },
@@ -89,10 +94,6 @@ const routes: RouteObject[] = [
     element: <TermsOfService />,
   },
   {
-    path: '/test-api',
-    element: <ApiTest />,
-  },
-    {
     path: '/test-api',
     element: <ApiTest />,
   },

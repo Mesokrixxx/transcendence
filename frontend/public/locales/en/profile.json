@@ -18,5 +18,10 @@
   "saveChanges": "Save changes",
   "saveError": "Unable to save your changes. Please try again.",
   "saving": "Saving...",
-  "yourUsername": "Your username"
+  "yourUsername": "Your username",
+  "playerProfileLoading": "Loading player profile…",
+  "playerNotFound": "Player not found.",
+  "playerProfileLoadError": "Unable to load the player profile.",
+  "playerElo": "Elo: {{elo}}",
+  "playerGamesPlayed": "Games played: {{games}}"
 }

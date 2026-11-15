@@ -18,5 +18,10 @@
   "saveChanges": "Enregistrer",
   "saveError": "Impossible d’enregistrer les modifications. Réessaie.",
   "saving": "Enregistrement...",
-  "yourUsername": "Votre nom d'utilisateur"
+  "yourUsername": "Votre nom d'utilisateur",
+  "playerProfileLoading": "Chargement du profil…",
+  "playerNotFound": "Joueur introuvable.",
+  "playerProfileLoadError": "Impossible de charger le profil.",
+  "playerElo": "Elo : {{elo}}",
+  "playerGamesPlayed": "Parties jouées : {{games}}"
 }

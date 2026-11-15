@@ -18,5 +18,10 @@
   "saveChanges": "Guardar cambios",
   "saveError": "No se han podido guardar los cambios. Inténtalo de nuevo.",
   "saving": "Guardando...",
-  "yourUsername": "Tu nombre de usuario"
+  "yourUsername": "Tu nombre de usuario",
+  "playerProfileLoading": "Cargando el perfil…",
+  "playerNotFound": "Jugador no encontrado.",
+  "playerProfileLoadError": "No se ha podido cargar el perfil.",
+  "playerElo": "Elo: {{elo}}",
+  "playerGamesPlayed": "Partidas jugadas: {{games}}"
 }
