@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import Navbar from '../../components/Navbar/Navbar';
-import Footer from '../../components/Footer/Footer';
-import { Page } from '../Home/Home.styles';
+import { Link } from 'react-router-dom'
+import Navbar from '../../components/Navbar/Navbar'
+import Footer from '../../components/Footer/Footer'
+import { Page } from '../Home/Home.styles'
 import {
   Content,
   Header,
@@ -108,7 +109,9 @@ function Rankings() {
                                           isOnline={player.online}
                                           size={48}
                                       />
-                                      <span title={player.username}>{player.username}</span>
+                                      <Link to={`/profile/${player.id}`}>
+                                        {player.username}
+                                      </Link>
                                   </PlayerCell>
                               </td>
                               <td>{player.rating}</td>

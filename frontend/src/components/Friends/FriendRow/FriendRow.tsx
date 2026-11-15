@@ -1,4 +1,5 @@
 import { type ReactNode } from "react"
+import { Link } from 'react-router-dom'
 import Avatar from "../../Avatar/Avatar"
 import type { FriendUser } from "../../../services/friends"
 import { Row, Name, Actions } from './FriendRow.styles'
@@ -17,7 +18,9 @@ function FriendRow({ user, children }: FriendRowProps) {
                 isOnline={user.isOnline}
                 size={40}
             />
-            <Name title={user.username}>{user.username}</Name>
+            <Name as={Link} to={`/profile/${user.id}`} title={user.username}>
+                {user.username}
+            </Name>
             {children && <Actions>{children}</Actions>}
         </Row>
     )

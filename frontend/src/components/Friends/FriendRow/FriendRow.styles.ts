@@ -17,6 +17,13 @@ export const Name = styled.span`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: inherit;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        text-decoration: underline;
+    }
 `
 
 export const Actions = styled.div`

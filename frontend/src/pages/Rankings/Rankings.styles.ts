@@ -94,11 +94,19 @@ export const PlayerCell = styled.div`
   align-items: center;
   gap: 12px;
 
-  span {
+  > a {
+    min-width: 0;
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  > a:hover,
+  > a:focus-visible {
+    text-decoration: underline;
   }
 
   @media (max-width: 700px) {
@@ -109,7 +117,7 @@ export const PlayerCell = styled.div`
       height: 40px;
     }
 
-    span {
+    > a {
       max-width: 90px;
     }
   }
@@ -133,7 +141,7 @@ export const MedalSlot = styled.span`
 
   img {
     width: 100%;
-    height: 100%
+    height: 100%;
     display: block;
   }
 `;
