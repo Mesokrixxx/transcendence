@@ -24,6 +24,17 @@ function gameView(game: {
 	endedAt: Date | null;
 	whiteId: number;
 	blackId: number;
+	specChatId: number;
+	white?: {
+		id: number;
+		username: string;
+		profile: { avatar: string | null } | null;
+	};
+	black?: {
+		id: number;
+		username: string;
+		profile: { avatar: string | null } | null;
+	};
 	moves: unknown;
 }) {
 	const engine = new ChessGame(readMoves(game.moves));
@@ -35,6 +46,16 @@ function gameView(game: {
 		engineStatus: engine.getGameStatus(),
 		check: engine.isCheck(),
 		drawClaims: engine.canClaimDraw(),
+		...(game.white ? { white: {
+			id: game.white.id,
+			username: game.white.username,
+			avatar: game.white.profile?.avatar ?? null,
+		} } : {}),
+		...(game.black ? { black: {
+			id: game.black.id,
+			username: game.black.username,
+			avatar: game.black.profile?.avatar ?? null,
+		} } : {}),
 	};
 }
 

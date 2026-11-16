@@ -8,9 +8,22 @@ export async function get(id: number) {
 		where: { id: id },
 		include: {
 			messages: {
-				orderBy: { creationDate: 'asc' }
+				orderBy: { creationDate: 'asc' },
+				include: {
+					user: {
+						select: {
+							id: true,
+							username: true,
+						},
+					},
+				},
 			},
-			users: true
+			users: {
+				select: {
+					id: true,
+					username: true,
+				},
+			},
 		}
 	});
 }
@@ -40,17 +53,21 @@ export async function add(chatId: number, userIds: number[]) {
 }
 
 export async function isMember(chatId: number, userId: number) {
-	const membership = await prisma.chat.findUnique({
+	const access = await prisma.chat.findUnique({
 		where: { id: chatId },
 		select: {
 			users: {
 				where: { id: userId },
 				select: { id: true }
-			}
+			},
+			spectatorGame: {
+				select: { id: true },
+			},
 		}
 	});
 
-	return membership !== null && membership.users.length > 0;
+	return access !== null &&
+		(access.users.length > 0 || access.spectatorGame !== null);
 }
 
 export async function append(message: string, chatId: number, userId: number) {
@@ -58,7 +75,7 @@ export async function append(message: string, chatId: number, userId: number) {
 	if (!chat)
 		return null;
 
-	if (!chat.users.some((chatUser) => chatUser.id === userId))
+	if (!await isMember(chatId, userId))
 		throw new BackendError(403, 'user is not a member of this chat');
 
 	const limit = checkMessageRateLimit(userId);
@@ -87,5 +104,5 @@ export async function append(message: string, chatId: number, userId: number) {
 		message: createdMessage
 	});
 
-	return await get(chatId);
+	return createdMessage;
 }

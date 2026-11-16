@@ -18,6 +18,7 @@ vi.mock('../../src/middlewares/auth.middleware.js', () => ({
 
 vi.mock('../../src/services/chats.services.js', () => ({
   get: vi.fn(),
+  isMember: vi.fn(),
   create: vi.fn(),
   append: vi.fn(),
 }));
@@ -28,18 +29,30 @@ const chat = { id: 4, messages: [], users: [authenticatedUser] };
 describe('chat routes', () => {
   beforeEach(() => {
     vi.mocked(chatService.get).mockReset();
+    vi.mocked(chatService.isMember).mockReset();
     vi.mocked(chatService.create).mockReset();
     vi.mocked(chatService.append).mockReset();
   });
 
   it('gets a chat', async () => {
+    vi.mocked(chatService.isMember).mockResolvedValue(true);
     vi.mocked(chatService.get).mockResolvedValue(chat);
 
     const response = await request(app).get('/api/chats/4');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(chat);
-    expect(chatService.get).toHaveBeenCalledWith(4);
+    expect(chatService.isMember).toHaveBeenCalledWith(4, 1);
+  });
+
+  it('rejects a chat for a non-member', async () => {
+    vi.mocked(chatService.isMember).mockResolvedValue(false);
+
+    const response = await request(app).get('/api/chats/4');
+
+    expect(response.status).toBe(403);
+    expect(response.body).toEqual({ error: 'user is not a member of this chat' });
+    expect(chatService.get).not.toHaveBeenCalled();
   });
 
   it('creates a chat', async () => {
@@ -52,14 +65,21 @@ describe('chat routes', () => {
   });
 
   it('appends a message to a chat', async () => {
-    vi.mocked(chatService.append).mockResolvedValue(chat);
+    const message = {
+      id: 8,
+      content: 'Hello!',
+      chatId: 4,
+      userId: 1,
+      user: authenticatedUser,
+    };
+    vi.mocked(chatService.append).mockResolvedValue(message);
 
     const response = await request(app)
       .put('/api/chats/4')
       .send({ message: 'Hello!' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(chat);
+    expect(response.body).toEqual(message);
     expect(chatService.append).toHaveBeenCalledWith('Hello!', 4, 1);
   });
 

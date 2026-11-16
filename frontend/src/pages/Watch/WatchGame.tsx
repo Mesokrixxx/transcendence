@@ -28,6 +28,7 @@ type Player = {
 
 type GameState = {
   moves: Move[];
+  specChatId: number;
   white: Player;
   black: Player;
 };
@@ -35,7 +36,12 @@ type GameState = {
 function isGameState(value: unknown): value is GameState {
   if (!isGameUpdate(value)) return false;
 
-  const game = value as { moves?: unknown; white?: unknown; black?: unknown };
+  const game = value as {
+    moves?: unknown;
+    specChatId?: unknown;
+    white?: unknown;
+    black?: unknown;
+  };
   const isPlayer = (player: unknown): player is Player =>
     typeof player === 'object' &&
     player !== null &&
@@ -46,7 +52,12 @@ function isGameState(value: unknown): value is GameState {
     typeof player.username === 'string' &&
     (player.avatar === null || typeof player.avatar === 'string');
 
-  return Array.isArray(game.moves) && isPlayer(game.white) && isPlayer(game.black);
+  return (
+    Array.isArray(game.moves) &&
+    typeof game.specChatId === 'number' &&
+    isPlayer(game.white) &&
+    isPlayer(game.black)
+  );
 }
 
 function isGameUpdate(value: unknown): value is { moves: Move[] } {
@@ -149,7 +160,10 @@ function WatchGame() {
           />
 
           <GameChat aria-label={t('spectatorChat', { ns: 'chat' })}>
-            <ChatBox title={t('spectatorChat', { ns: 'chat' })} />
+            <ChatBox
+              title={t('spectatorChat', { ns: 'chat' })}
+              chatId={players?.specChatId}
+            />
           </GameChat>
         </GameArea>
       </WatchContent>
