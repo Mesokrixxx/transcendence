@@ -23,5 +23,12 @@
   "playerNotFound": "Joueur introuvable.",
   "playerProfileLoadError": "Impossible de charger le profil.",
   "playerElo": "Elo : {{elo}}",
-  "playerGamesPlayed": "Parties jouées : {{games}}"
+  "playerGamesPlayed": "Parties jouées : {{games}}",
+  "progressTitle": "Succès et badges",
+  "progressLoading": "Chargement des succès et des badges…",
+  "progressLoadError": "Impossible de charger les succès et les badges.",
+  "progressAchievements": "Succès",
+  "progressNoAchievements": "Aucun succès débloqué pour le moment.",
+  "progressBadges": "Badges",
+  "progressNoBadges": "Aucun badge pour le moment."
 }

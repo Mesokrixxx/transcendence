@@ -23,5 +23,12 @@
   "playerNotFound": "Jugador no encontrado.",
   "playerProfileLoadError": "No se ha podido cargar el perfil.",
   "playerElo": "Elo: {{elo}}",
-  "playerGamesPlayed": "Partidas jugadas: {{games}}"
+  "playerGamesPlayed": "Partidas jugadas: {{games}}",
+  "progressTitle": "Logros e insignias",
+  "progressLoading": "Cargando logros e insignias…",
+  "progressLoadError": "No se han podido cargar los logros y las insignias.",
+  "progressAchievements": "Logros",
+  "progressNoAchievements": "Aún no has desbloqueado ningún logro.",
+  "progressBadges": "Insignias",
+  "progressNoBadges": "Aún no tienes insignias."
 }

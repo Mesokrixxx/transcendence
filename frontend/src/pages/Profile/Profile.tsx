@@ -10,6 +10,8 @@ import { ProfilePanel, ProfileHeader } from './Profile.styles';
 import EditProfileDialog from './EditProfileDialog';
 import type { LocalProfile } from './EditProfileDialog';
 import ProfileActivity from './ProfileActivity';
+import ProfileProgress from './ProfileProgress';
+
 
 function Profile() {
   const { t } = useTranslation();
@@ -69,7 +71,7 @@ function Profile() {
             </Button>
           </ProfileHeader>
         </ProfilePanel>
-
+        {user && <ProfileProgress />}
         <ProfileActivity />
 
         {isEditing && user && (

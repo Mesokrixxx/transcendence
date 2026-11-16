@@ -23,5 +23,12 @@
   "playerNotFound": "Player not found.",
   "playerProfileLoadError": "Unable to load the player profile.",
   "playerElo": "Elo: {{elo}}",
-  "playerGamesPlayed": "Games played: {{games}}"
+  "playerGamesPlayed": "Games played: {{games}}",
+  "progressTitle": "Achievements and badges",
+  "progressLoading": "Loading achievements and badges…",
+  "progressLoadError": "Unable to load achievements and badges.",
+  "progressAchievements": "Achievements",
+  "progressNoAchievements": "No achievements yet.",
+  "progressBadges": "Badges",
+  "progressNoBadges": "No badges yet."
 }
