@@ -9,6 +9,18 @@ export async function getChat(req: Request, res: Response) {
 	if (!Number.isInteger(id) || id <= 0)
 		return res.status(400).json({ error: 'id shall be a positive integer' });
 
+	const user = req.user;
+	if (!user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const isMember = await query(() => chatService.isMember(id, user.id));
+	if (isMember.error) {
+		const treatedErr = treatError(isMember.error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!isMember.result)
+		return res.status(403).json({ error: 'user is not a member of this chat' });
+
 	const { result, error } = await query(() => chatService.get(id));
 	if (error) {
 		const treatedErr = treatError(error);

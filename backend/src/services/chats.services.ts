@@ -8,9 +8,22 @@ export async function get(id: number) {
 		where: { id: id },
 		include: {
 			messages: {
-				orderBy: { creationDate: 'asc' }
+				orderBy: { creationDate: 'asc' },
+				include: {
+					user: {
+						select: {
+							id: true,
+							username: true,
+						},
+					},
+				},
 			},
-			users: true
+			users: {
+				select: {
+					id: true,
+					username: true,
+				},
+			},
 		}
 	});
 }
@@ -87,5 +100,5 @@ export async function append(message: string, chatId: number, userId: number) {
 		message: createdMessage
 	});
 
-	return await get(chatId);
+	return createdMessage;
 }
