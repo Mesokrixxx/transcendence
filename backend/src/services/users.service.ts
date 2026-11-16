@@ -12,7 +12,7 @@ export async function get(id: number) {
       username: true,
       email: true,
       profile: {
-        select: { avatar: true },
+        select: { avatar: true, firstName: true, lastName: true },
       },
     },
   });
@@ -24,6 +24,8 @@ export async function get(id: number) {
     username: user.username,
     email: user.email,
     avatar: user.profile?.avatar ?? null,
+    firstName: user.profile?.firstName ?? null,
+    lastName: user.profile?.lastName ?? null,
   };
 }
 

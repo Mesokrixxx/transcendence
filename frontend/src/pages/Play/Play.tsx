@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import ChessGame from '../../../../chessgame/src/chessgame';
 import type {
   Move,
@@ -15,6 +16,8 @@ import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
 import { PlayContent, GameArea, GameInfo, GameChat } from './Play.styles';
 import { useTranslation } from 'react-i18next';
+import fetchAPI from '../../services/fetchAPI';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 
 type PromotionLabelKey =
   'promotionQueen' | 'promotionRook' | 'promotionBishop' | 'promotionKnight';
@@ -26,7 +29,21 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
   knight: 'promotionKnight',
 };
 
+type RemoteGameState = {
+  moves: Move[];
+};
+
+function isRemoteGameState(value: unknown): value is RemoteGameState {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'moves' in value &&
+    Array.isArray(value.moves)
+  );
+}
+
 function Play() {
+  const { gameId: gameIdParam } = useParams();
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
   const { t: tChat } = useTranslation('chat');
@@ -36,6 +53,8 @@ function Play() {
   const [selectedSquare, setSelectedSquare] = useState<SquareName | null>(null);
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [error, setError] = useState('');
+  const gameId = Number(gameIdParam);
+  const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
 
   const board = game.getBoard();
 
@@ -54,8 +73,56 @@ function Play() {
     return () => clearTimeout(timer);
   }, [game, orientation]);
 
-  function playMove(move: Move) {
+  useEffect(() => {
+    if (!isRemoteGame) return;
+
+    let active = true;
+    fetchAPI<RemoteGameState>({
+      path: `/games/${gameId}`,
+      method: 'get',
+    }).then((response) => {
+      if (!active) return;
+      if (response.error || !isRemoteGameState(response.result)) {
+        setError(tChess('unableToPlayThisMove'));
+        return;
+      }
+      setGame(new ChessGame(response.result.moves));
+    });
+
+    function handleGameEvent(event: RealtimeEvent) {
+      if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
+      setGame(new ChessGame(event.game.moves));
+      setSelectedSquare(null);
+      setPromotionMoves([]);
+      setIsRotating(false);
+    }
+
+    const leaveGame = realtimeSocket.joinGame(gameId, handleGameEvent);
+    return () => {
+      active = false;
+      leaveGame();
+    };
+  }, [gameId, isRemoteGame, tChess]);
+
+  async function playMove(move: Move) {
     try {
+      if (isRemoteGame) {
+        const response = await fetchAPI<RemoteGameState>({
+          path: `/games/${gameId}/moves`,
+          method: 'post',
+          body: move,
+        });
+        if (response.error || !isRemoteGameState(response.result)) {
+          setError(tChess('unableToPlayThisMove'));
+          return;
+        }
+        setGame(new ChessGame(response.result.moves));
+        setSelectedSquare(null);
+        setPromotionMoves([]);
+        setError('');
+        return;
+      }
+
       const nextGame = new ChessGame([...game.getHistory(), move]);
 
       setGame(nextGame);

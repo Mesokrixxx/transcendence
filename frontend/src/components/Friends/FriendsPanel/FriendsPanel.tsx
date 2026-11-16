@@ -78,17 +78,53 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
                 typeof event.online !== 'boolean'
             ) return
 
+            const userId = event.userId
+            const online = event.online
             setData((current) => current && ({
                 ...current,
                 friends: current.friends.map((friend) =>
-                    friend.id === event.userId
-                        ? { ...friend, isOnline: event.online as boolean }
+                    friend.id === userId
+                        ? { ...friend, isOnline: online }
                         : friend
                 ),
             }))
         }
 
         return realtimeSocket.subscribe(updatePresence)
+    }, [])
+
+    useEffect(() => {
+        function updateProfile(event: RealtimeEvent) {
+            if (
+                event.type !== 'profile.changed' ||
+                typeof event.userId !== 'number' ||
+                typeof event.username !== 'string' ||
+                (event.avatar !== null && typeof event.avatar !== 'string')
+            ) return
+
+            const userId = event.userId
+            const username = event.username
+            const avatar = event.avatar ?? undefined
+            setData((current) => {
+                if (!current) return current
+                const update = (user: FriendUser) => user.id === userId
+                    ? {
+                        ...user,
+                        username,
+                        avatar,
+                    }
+                    : user
+                return {
+                    ...current,
+                    friends: current.friends.map(update),
+                    received: current.received.map(update),
+                    sent: current.sent.map(update),
+                    blocked: current.blocked.map(update),
+                }
+            })
+        }
+
+        return realtimeSocket.subscribe(updateProfile)
     }, [])
 
     function handleSend(username: string): Promise<void> {

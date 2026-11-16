@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import multer from 'multer';
 import sharp from 'sharp';
 import prisma from '../db/prisma.js';
+import { broadcastProfileChanged } from '../services/profilePresence.service.js';
 
 export const avatarDirectory = '/app/uploads/avatars';
 
@@ -117,6 +118,21 @@ export async function uploadAvatar(req: Request, res: Response) {
     }
   }
 
+  const updatedUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      username: true,
+      profile: { select: { firstName: true, lastName: true } },
+    },
+  });
+  if (updatedUser) await broadcastProfileChanged({
+    userId,
+    username: updatedUser.username,
+    avatar,
+    firstName: updatedUser.profile?.firstName ?? null,
+    lastName: updatedUser.profile?.lastName ?? null,
+  });
+
   return res.status(200).json({ avatar });
 }
 export async function removeAvatar(req: Request, res: Response) {
@@ -156,6 +172,21 @@ export async function removeAvatar(req: Request, res: Response) {
         });
       }
     }
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        username: true,
+        profile: { select: { firstName: true, lastName: true } },
+      },
+    });
+    if (updatedUser) await broadcastProfileChanged({
+      userId,
+      username: updatedUser.username,
+      avatar: null,
+      firstName: updatedUser.profile?.firstName ?? null,
+      lastName: updatedUser.profile?.lastName ?? null,
+    });
 
     return res.status(204).send();
   } catch (error) {

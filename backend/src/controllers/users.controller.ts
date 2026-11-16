@@ -4,6 +4,7 @@ import { createUserSchema, updateUserSchema } from '../validations/users.validat
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
 import { isOnline } from '../services/presence.service.js';
+import { broadcastProfileChanged } from '../services/profilePresence.service.js';
 
 export async function getUser(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -65,6 +66,14 @@ export async function updateUser(req: Request, res: Response) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
+
+	if (result) await broadcastProfileChanged({
+		userId: result.id,
+		username: result.username,
+		avatar: result.avatar,
+		firstName: result.firstName,
+		lastName: result.lastName,
+	});
 
 	return res.status(200).json(result);
 }

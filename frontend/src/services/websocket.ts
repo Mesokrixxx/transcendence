@@ -9,6 +9,7 @@ class RealtimeSocket {
   private socket: WebSocket | null = null;
   private readonly listeners = new Set<Listener>();
   private readonly chatIds = new Set<number>();
+  private readonly gameIds = new Set<number>();
   private reconnectTimer: number | null = null;
 
   subscribe(listener: Listener) {
@@ -29,6 +30,18 @@ class RealtimeSocket {
     return () => {
       this.chatIds.delete(chatId);
       this.send({ type: 'chat.leave', chatId });
+      unsubscribe();
+    };
+  }
+
+  joinGame(gameId: number, listener: Listener) {
+    const unsubscribe = this.subscribe(listener);
+    this.gameIds.add(gameId);
+    this.send({ type: 'game.join', gameId });
+
+    return () => {
+      this.gameIds.delete(gameId);
+      this.send({ type: 'game.leave', gameId });
       unsubscribe();
     };
   }
@@ -56,6 +69,8 @@ class RealtimeSocket {
     socket.addEventListener('open', () => {
       for (const chatId of this.chatIds)
         this.send({ type: 'chat.join', chatId });
+      for (const gameId of this.gameIds)
+        this.send({ type: 'game.join', gameId });
     });
 
     socket.addEventListener('message', (message) => {
@@ -89,6 +104,7 @@ class RealtimeSocket {
     this.socket?.close();
     this.socket = null;
     this.chatIds.clear();
+    this.gameIds.clear();
   }
 }
 
