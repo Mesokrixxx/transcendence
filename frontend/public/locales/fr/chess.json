@@ -11,6 +11,8 @@
   "drawStatus": "Partie nulle",
   "emptySquare": "Case vide",
   "flipBoard": "Retourner l’échiquier",
+  "gameForSpectators": "Partie pour les spectateurs",
+  "gameNotFound": "Partie introuvable.",
   "gameHistoryAndScores": "Historique et scores des parties",
   "gameInformation": "Informations sur la partie",
   "gameInProgress": "Partie en cours",

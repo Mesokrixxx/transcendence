@@ -112,8 +112,34 @@ export async function canAccess(id: number, userId: number) {
 	return game !== null && (game.whiteId === userId || game.blackId === userId);
 }
 
+export async function canSpectate(id: number) {
+	const game = await prisma.game.findUnique({
+		where: { id },
+		select: { id: true },
+	});
+	return game !== null;
+}
+
 export async function getState(id: number) {
-	const game = await get(id);
+	const game = await prisma.game.findUnique({
+		where: { id },
+		include: {
+			white: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true } },
+				},
+			},
+			black: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true } },
+				},
+			},
+		},
+	});
 	if (!game) return null;
 	return gameView(game);
 }

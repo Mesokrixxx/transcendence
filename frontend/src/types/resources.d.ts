@@ -68,6 +68,8 @@ export default interface Resources {
     "drawStatus": "Draw",
     "emptySquare": "Empty square",
     "flipBoard": "Flip board",
+    "gameForSpectators": "Game for spectators",
+    "gameNotFound": "Game not found.",
     "gameHistoryAndScores": "Game history and scores",
     "gameInProgress": "Game in progress",
     "gameInformation": "Game information",

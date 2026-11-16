@@ -11,6 +11,8 @@
   "drawStatus": "Draw",
   "emptySquare": "Empty square",
   "flipBoard": "Flip board",
+  "gameForSpectators": "Game for spectators",
+  "gameNotFound": "Game not found.",
   "gameHistoryAndScores": "Game history and scores",
   "gameInformation": "Game information",
   "gameInProgress": "Game in progress",

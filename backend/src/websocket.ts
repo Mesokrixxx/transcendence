@@ -101,10 +101,10 @@ async function onConnection(socket: WebSocket, userId: number) {
 
 		try {
 			if (message.type === 'game.join' || message.type === 'game.leave') {
-				if (!(await gameService.canAccess(id, userId))) {
+				if (!(await gameService.canSpectate(id))) {
 					send(socket, {
 						type: 'error',
-						error: 'user is not a player in this game',
+						error: 'game not found',
 					});
 					return;
 				}
