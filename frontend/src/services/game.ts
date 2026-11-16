@@ -11,7 +11,7 @@ export async function getUserGames(userId: number):  Promise<Game[] | null> {
   return (response.result);
 }
 
-export function getFakeGames(size: number = 100): Game[] {
+export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: number }): Game[] {
   function getFakeGameUser() {
     return {
       username: faker.internet.username(),
@@ -41,9 +41,9 @@ export function getFakeGames(size: number = 100): Game[] {
       endedAt,
       moves: '',
       white: getFakeGameUser(),
-      whiteId: faker.number.int(),
+      whiteId: i % 2 === 0 && userId !== undefined ? userId : faker.number.int(),
       black: getFakeGameUser(),
-      blackId: faker.number.int(),
+      blackId: i % 2 !== 0 && userId !== undefined ? userId : faker.number.int(),
     });
   }
 
