@@ -25,11 +25,22 @@ function GameResultsStats({ games }: { games: Game[] }) {
     },
   ];
 
+  const displayedSegments = segments.filter((s) => s.value > 0);
+
   return (
-    <S.StyledGameResultsStats>
-      <SegmentedBar segments={segments} />
-      <SegmentedBarLegend segments={segments} total={games.length} />
-    </S.StyledGameResultsStats>
+    <S.GameResultsStats>
+      {displayedSegments.length > 0 ? (
+        <>
+          <SegmentedBar segments={displayedSegments} />
+          <SegmentedBarLegend
+            segments={displayedSegments}
+            total={games.length}
+          />
+        </>
+      ) : (
+        <S.InsufficientData>No games played yet.</S.InsufficientData>
+      )}
+    </S.GameResultsStats>
   );
 }
 
