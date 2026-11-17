@@ -8,6 +8,8 @@ import * as friendsService from './services/friends.service.js';
 import * as presenceService from './services/presence.service.js';
 import * as gamePresenceService from './services/gamePresence.service.js';
 import * as gameService from './services/games.service.js';
+import { moveSchema } from './validations/game-play.validation.js';
+import { treatError } from './utils/errors.js';
 
 const webSocketServer = new WebSocketServer({ noServer: true });
 
@@ -75,7 +77,10 @@ async function onConnection(socket: WebSocket, userId: number) {
 			message.type !== 'chat.join' &&
 			message.type !== 'chat.leave' &&
 			message.type !== 'game.join' &&
-			message.type !== 'game.leave'
+			message.type !== 'game.leave' &&
+			message.type !== 'game.move' &&
+			message.type !== 'game.resign' &&
+			message.type !== 'game.draw'
 		) {
 			send(socket, {
 				type: 'error',
@@ -113,9 +118,46 @@ async function onConnection(socket: WebSocket, userId: number) {
 					send(socket, { type: 'game.joined', gameId: id });
 					const state = await gameService.getState(id);
 					if (state) send(socket, { type: 'game.updated', game: state });
-				} else {
+				} else if (message.type === 'game.leave') {
 					gamePresenceService.unsubscribe(id, socket);
 					send(socket, { type: 'game.left', gameId: id });
+				} else {
+					if (!(await gameService.canAccess(id, userId))) {
+						send(socket, {
+							type: 'error',
+							error: 'user is not a player in this game',
+						});
+						return;
+					}
+					let result;
+					if (message.type === 'game.move') {
+						const move = moveSchema.safeParse(payload);
+						if (!move.success) {
+							send(socket, {
+								type: 'error',
+								error: 'invalid chess move',
+								details: move.error.issues,
+							});
+							return;
+						}
+						const gameMove =
+							move.data.promotion === undefined
+								? { from: move.data.from, to: move.data.to }
+								: {
+										from: move.data.from,
+										to: move.data.to,
+										promotion: move.data.promotion,
+									};
+						result = await gameService.playMove(id, userId, gameMove);
+					} else if (message.type === 'game.resign') {
+						result = await gameService.resign(id, userId);
+					} else {
+						result = await gameService.draw(id, userId);
+					}
+					gamePresenceService.broadcast(id, {
+						type: 'game.updated',
+						game: result,
+					});
 				}
 				return;
 			}
@@ -135,8 +177,9 @@ async function onConnection(socket: WebSocket, userId: number) {
 				send(socket, { type: 'chat.left', chatId: id });
 			}
 		} catch (error: unknown) {
-			console.error('WebSocket chat subscription error', error);
-			send(socket, { type: 'error', error: 'chat subscription unavailable' });
+			console.error('WebSocket message error', error);
+			const treatedError = treatError(error);
+			send(socket, { type: 'error', error: treatedError.error });
 		}
 	});
 
