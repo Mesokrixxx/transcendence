@@ -8,7 +8,10 @@ export async function get(id: number) {
 		select: {
 			id: true,
 			username: true,
-			email: true
+			email: true,
+			elo: true,
+			gamesPlayed: true,
+			maxElo: true,
 		}
 	});
 }
@@ -33,6 +36,9 @@ export async function auth(email: string, password: string) {
 			id: true,
 			username: true,
 			email: true,
+			elo: true,
+			gamesPlayed: true,
+			maxElo: true,
 			password: true
 		}
 	});
@@ -53,7 +59,10 @@ export async function auth(email: string, password: string) {
 	return {
 		id: user.id,
 		username: user.username,
-		email: user.email
+		email: user.email,
+		elo: user.elo,
+		gamesPlayed: user.gamesPlayed,
+		maxElo: user.maxElo,
 	};
 }
 

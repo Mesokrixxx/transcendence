@@ -5,6 +5,35 @@ import { moveSchema } from '../validations/game-play.validation.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import { broadcast } from '../services/gamePresence.service.js';
+import { send as sendToUser } from '../services/presence.service.js';
+
+type GameResult = {
+	game: unknown;
+	stats: Array<{
+		userId: number;
+		elo: number;
+		gamesPlayed: number;
+		maxElo: number;
+	}>;
+};
+
+function normalizeGameResult(result: GameResult | unknown): GameResult {
+	if (
+		typeof result === 'object' &&
+		result !== null &&
+		'game' in result &&
+		'stats' in result &&
+		Array.isArray(result.stats)
+	)
+		return result as GameResult;
+	return { game: result, stats: [] };
+}
+
+function broadcastGameResult(gameId: number, result: GameResult) {
+	broadcast(gameId, { type: 'game.updated', game: result.game });
+	for (const stats of result.stats)
+		sendToUser(stats.userId, { type: 'stats.updated', stats });
+}
 
 export async function getGame(req: Request, res: Response) {
 	const id = Number(req.params.id);
@@ -80,8 +109,11 @@ export async function playMove(req: Request, res: Response) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
-	broadcast(id, { type: 'game.updated', game: result });
-	return res.status(200).json(result);
+	if (!result)
+		return res.status(500).json({ error: 'game result unavailable' });
+	const gameResult = normalizeGameResult(result);
+	broadcastGameResult(id, gameResult);
+	return res.status(200).json(gameResult.game);
 }
 
 export async function resign(req: Request, res: Response) {
@@ -97,8 +129,11 @@ export async function resign(req: Request, res: Response) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
-	broadcast(id, { type: 'game.updated', game: result });
-	return res.status(200).json(result);
+	if (!result)
+		return res.status(500).json({ error: 'game result unavailable' });
+	const gameResult = normalizeGameResult(result);
+	broadcastGameResult(id, gameResult);
+	return res.status(200).json(gameResult.game);
 }
 
 export async function draw(req: Request, res: Response) {
@@ -114,6 +149,9 @@ export async function draw(req: Request, res: Response) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
-	broadcast(id, { type: 'game.updated', game: result });
-	return res.status(200).json(result);
+	if (!result)
+		return res.status(500).json({ error: 'game result unavailable' });
+	const gameResult = normalizeGameResult(result);
+	broadcastGameResult(id, gameResult);
+	return res.status(200).json(gameResult.game);
 }
