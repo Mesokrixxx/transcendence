@@ -113,6 +113,10 @@ const routes: RouteObject[] = [
     path: '/500',
     element: <ErrorPage code={500} />,
   },
+  {
+    path: '*',
+    element: <ErrorPage code={404} />,
+  },
 ];
 
 export default routes;
