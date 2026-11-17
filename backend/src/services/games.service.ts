@@ -2,6 +2,29 @@ import prisma from '../db/prisma.js';
 import { BackendError } from '../types/backendError.types.js';
 import ChessGame from '../../../chessgame/src/chessgame.js';
 import type { Move } from '../../../chessgame/src/chessgame.types.js';
+import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
+
+const transactionOptions = { isolationLevel: 'Serializable' as const };
+
+function isSerializationConflict(error: unknown) {
+	return error instanceof PrismaClientKnownRequestError && error.code === 'P2034';
+}
+
+type GameTransactionClient = Pick<typeof prisma, 'game'>;
+
+async function serializableGameTransaction<T>(
+	callback: (tx: GameTransactionClient) => Promise<T>,
+): Promise<T> {
+	for (let attempt = 0; attempt < 3; attempt++) {
+		try {
+			return await prisma.$transaction(callback, transactionOptions);
+		} catch (error: unknown) {
+			if (!isSerializationConflict(error) || attempt === 2) throw error;
+		}
+	}
+
+	throw new Error('unreachable transaction retry state');
+}
 
 function readMoves(moves: unknown): Move[] {
 	try {
@@ -166,7 +189,7 @@ export async function getState(id: number) {
 }
 
 export async function playMove(id: number, userId: number, move: Move) {
-	return await prisma.$transaction(async (tx) => {
+	return await serializableGameTransaction(async (tx) => {
 		const game = await tx.game.findUnique({ where: { id } });
 		if (!game) throw new BackendError(404, 'game not found');
 		if (game.status === 'OVER') throw new BackendError(409, 'game is over');
@@ -205,47 +228,51 @@ export async function playMove(id: number, userId: number, move: Move) {
 }
 
 export async function resign(id: number, userId: number) {
-	const game = await prisma.game.findUnique({ where: { id } });
-	if (!game) throw new BackendError(404, 'game not found');
-	if (game.status === 'OVER') throw new BackendError(409, 'game is over');
-	const result =
-		game.whiteId === userId
-			? 'BLACK'
-			: game.blackId === userId
-				? 'WHITE'
-				: null;
-	if (!result) throw new BackendError(403, 'user is not a game player');
-	const updated = await prisma.game.update({
-		where: { id },
-		data: {
-			status: 'OVER',
-			result,
-			endType: 'FORFEIT',
-			endedAt: new Date(),
-		},
-	});
-	return gameView(updated);
-}
-
-export async function draw(id: number, userId: number) {
-	const game = await prisma.game.findUnique({ where: { id } });
-	if (!game) throw new BackendError(404, 'game not found');
-	if (game.status === 'OVER') throw new BackendError(409, 'game is over');
-	if (game.whiteId !== userId && game.blackId !== userId)
-		throw new BackendError(403, 'user is not a game player');
-	const engine = new ChessGame(readMoves(game.moves));
-
-	const reason = engine.canClaimDraw()[0];
-	if (!reason) throw new BackendError(409, 'no draw can be claimed');
-	return gameView(
-		await prisma.game.update({
+	return await serializableGameTransaction(async (tx) => {
+		const game = await tx.game.findUnique({ where: { id } });
+		if (!game) throw new BackendError(404, 'game not found');
+		if (game.status === 'OVER') throw new BackendError(409, 'game is over');
+		const result =
+			game.whiteId === userId
+				? 'BLACK'
+				: game.blackId === userId
+					? 'WHITE'
+					: null;
+		if (!result) throw new BackendError(403, 'user is not a game player');
+		const updated = await tx.game.update({
 			where: { id },
 			data: {
 				status: 'OVER',
-				result: 'DRAW',
-				endType: reason === 'fifty moves' ? 'FIFTYMOVE' : 'TRIPLEREPETITION',
+				result,
+				endType: 'FORFEIT',
 				endedAt: new Date(),
 			},
-		}),
-	);
+		});
+		return gameView(updated);
+	});
+}
+
+export async function draw(id: number, userId: number) {
+	return await serializableGameTransaction(async (tx) => {
+		const game = await tx.game.findUnique({ where: { id } });
+		if (!game) throw new BackendError(404, 'game not found');
+		if (game.status === 'OVER') throw new BackendError(409, 'game is over');
+		if (game.whiteId !== userId && game.blackId !== userId)
+			throw new BackendError(403, 'user is not a game player');
+		const engine = new ChessGame(readMoves(game.moves));
+
+		const reason = engine.canClaimDraw()[0];
+		if (!reason) throw new BackendError(409, 'no draw can be claimed');
+		return gameView(
+			await tx.game.update({
+				where: { id },
+				data: {
+					status: 'OVER',
+					result: 'DRAW',
+					endType: reason === 'fifty moves' ? 'FIFTYMOVE' : 'TRIPLEREPETITION',
+					endedAt: new Date(),
+				},
+			}),
+		);
+	});
 }

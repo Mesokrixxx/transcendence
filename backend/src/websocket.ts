@@ -111,6 +111,8 @@ async function onConnection(socket: WebSocket, userId: number) {
 				if (message.type === 'game.join') {
 					gamePresenceService.subscribe(id, socket);
 					send(socket, { type: 'game.joined', gameId: id });
+					const state = await gameService.getState(id);
+					if (state) send(socket, { type: 'game.updated', game: state });
 				} else {
 					gamePresenceService.unsubscribe(id, socket);
 					send(socket, { type: 'game.left', gameId: id });
