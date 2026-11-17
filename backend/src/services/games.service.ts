@@ -1,4 +1,5 @@
 import prisma from '../db/prisma.js';
+import type { Prisma } from '../generated/prisma/client.js';
 import { BackendError } from '../types/backendError.types.js';
 import ChessGame from '../../../chessgame/src/chessgame.js';
 import type { Move } from '../../../chessgame/src/chessgame.types.js';
@@ -50,6 +51,97 @@ function gameView(game: {
     check: engine.isCheck(),
     drawClaims: engine.canClaimDraw(),
   };
+}
+
+type GameOutcome = {
+	status: 'OVER';
+	result: 'DRAW' | 'WHITE' | 'BLACK';
+	endType: 'CHECKMATE' | 'FORFEIT' | 'TIMEFORFEIT' | 'STALEMATE' | 'INSUFMATERIAL' | 'TRIPLEREPETITION' | 'FIFTYMOVE';
+};
+
+type PlayerStats = {
+	userId: number;
+	elo: number;
+	gamesPlayed: number;
+	maxElo: number;
+};
+
+async function updateStats(
+	tx: Prisma.TransactionClient,
+	game: {
+		whiteId: number;
+		blackId: number;
+		result: 'DRAW' | 'WHITE' | 'BLACK';
+	},
+): Promise<PlayerStats[]> {
+	const users = await tx.user.findMany({
+		where: { id: { in: [game.whiteId, game.blackId] } },
+		select: { id: true, elo: true, maxElo: true, gamesPlayed: true },
+	});
+	const white = users.find((user) => user.id === game.whiteId);
+	const black = users.find((user) => user.id === game.blackId);
+	if (!white || !black)
+		throw new BackendError(500, 'game players not found');
+
+	const [whiteElo, blackElo] = getUpdatedELOs(
+		white.elo,
+		black.elo,
+		game.result === 'WHITE' ? 1 : game.result === 'BLACK' ? -1 : 0.5,
+		getKFactor(white.maxElo, white.gamesPlayed),
+		getKFactor(black.maxElo, black.gamesPlayed),
+	);
+	const whiteStats = {
+		userId: white.id,
+		elo: whiteElo,
+		gamesPlayed: white.gamesPlayed + 1,
+		maxElo: Math.max(white.maxElo, whiteElo),
+	};
+	const blackStats = {
+		userId: black.id,
+		elo: blackElo,
+		gamesPlayed: black.gamesPlayed + 1,
+		maxElo: Math.max(black.maxElo, blackElo),
+	};
+
+	await tx.user.update({
+		where: { id: white.id },
+		data: {
+			elo: whiteStats.elo,
+			gamesPlayed: whiteStats.gamesPlayed,
+			maxElo: whiteStats.maxElo,
+		},
+	});
+	await tx.user.update({
+		where: { id: black.id },
+		data: {
+			elo: blackStats.elo,
+			gamesPlayed: blackStats.gamesPlayed,
+			maxElo: blackStats.maxElo,
+		},
+	});
+	return [whiteStats, blackStats];
+}
+
+async function finishGame(
+	tx: Prisma.TransactionClient,
+	gameId: number,
+	outcome: GameOutcome,
+) {
+	const updated = await tx.game.update({
+		where: { id: gameId },
+		data: {
+			status: outcome.status,
+			result: outcome.result,
+			endType: outcome.endType,
+			endedAt: new Date(),
+		},
+	});
+	const stats = await updateStats(tx, {
+		whiteId: updated.whiteId,
+		blackId: updated.blackId,
+		result: outcome.result,
+	});
+	return { game: gameView(updated), stats };
 }
 
 function endData(engine: ChessGame) {

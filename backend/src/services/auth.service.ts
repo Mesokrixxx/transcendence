@@ -38,7 +38,10 @@ export async function getSession(token: string) {
 				select: {
 					id: true,
 					username: true,
-					email: true
+					email: true,
+					elo: true,
+					gamesPlayed: true,
+					maxElo: true,
 				}
 			}
 		}
