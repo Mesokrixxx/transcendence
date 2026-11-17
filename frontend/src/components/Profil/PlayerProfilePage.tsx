@@ -5,8 +5,8 @@ import Avatar from '../../components/Avatar/Avatar';
 import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { getPlayerProfile, type PlayerProfile } from '../../services/playerProfile';
-import { Page } from '../Home/Home.styles';
-import { ProfileHeader, ProfilePanel } from './Profile.styles';
+import { Page } from '../../pages/Home/Home.styles';
+import { ProfileHeader, ProfilePanel } from '../../pages/Profile/Profile.styles';
 
 type ProfileState =
   | { status: 'loading' }

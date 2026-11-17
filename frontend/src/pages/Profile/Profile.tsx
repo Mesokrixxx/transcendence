@@ -7,10 +7,9 @@ import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
 import { ProfilePanel, ProfileHeader } from './Profile.styles';
-import EditProfileDialog from './EditProfileDialog';
-import type { LocalProfile } from './EditProfileDialog';
-import ProfileActivity from './ProfileActivity';
-
+import EditProfileDialog from '../../components/Profil/EditProfileDialog';
+import type { LocalProfile } from '../../components/Profil/EditProfileDialog';
+import ProfileActivity from '../../components/Profil/ProfileActivity';
 function Profile() {
   const { t } = useTranslation();
   const { user , setUser} = useAuth();

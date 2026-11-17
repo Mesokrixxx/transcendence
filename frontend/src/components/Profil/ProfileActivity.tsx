@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import Messaging from '../Chat/Messaging';
+import Messaging from '../../pages/Chat/Messaging';
 import FriendsPanel from '../../components/Friends/FriendsPanel/FriendsPanel';
 import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent } from './ProfileActivity.styles';
 
