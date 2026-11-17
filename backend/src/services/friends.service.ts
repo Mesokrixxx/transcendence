@@ -1,17 +1,17 @@
 import prisma from '../db/prisma.js';
 
 type FriendRelation = {
-	id: number;
-	username: string;
-	profile: { avatar: string | null } | null;
+  id: number;
+  username: string;
+  profile: { avatar: string | null; displayName: string | null } | null;
 };
 
 const relationSelect = {
-	id: true,
-	username: true,
-	profile: {
-		select: { avatar: true },
-	},
+  id: true,
+  username: true,
+  profile: {
+    select: { avatar: true, displayName: true },
+  },
 } as const;
 
 export async function getList(userId: number) {
@@ -47,6 +47,7 @@ export async function getList(userId: number) {
 		return {
 			id: friend.id,
 			username: friend.username,
+			displayName: friend.profile?.displayName ?? null,
 			avatar: friend.profile?.avatar ?? '',
 			status: isFriend
 				? 'friend'
@@ -70,6 +71,7 @@ export async function getBlocked(userId: number) {
 	return user?.blockedUsers.map((friend) => ({
 		id: friend.id,
 		username: friend.username,
+		displayName: friend.profile?.displayName ?? null,
 		avatar: friend.profile?.avatar ?? '',
 	})) ?? null;
 }

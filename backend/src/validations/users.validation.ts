@@ -47,7 +47,7 @@ export const updateUserSchema = z.object({
     username: z.string().trim().min(1).max(32).optional(),
     password: passwordSchema.optional(),
     currentPassword: z.string().min(1).optional(),
-    displayName: z.string().trim().min(1).max(32).optional(),
+    displayName: z.string().trim().min(1).max(32).nullable().optional(),
 }).refine(
     data =>
         data.username !== undefined ||

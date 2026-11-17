@@ -3,14 +3,10 @@ import fetchAPI from './fetchAPI';
 export async function updateProfileDisplayName(displayName: string) {
   const name = displayName.trim();
 
-  if (!name || name.length > 32) {
-    throw new Error('Invalid display name');
-  }
-
   const response = await fetchAPI({
     path: '/users/me',
     method: 'patch',
-    body: { displayName: name },
+    body: { displayName: name || null },
   });
 
   if (response.error) {

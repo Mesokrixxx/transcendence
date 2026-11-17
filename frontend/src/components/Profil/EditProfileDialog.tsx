@@ -238,7 +238,6 @@ return(
             type="text"
             autoComplete="nickname"
             maxLength={32}
-            required
             value={displayName}
             onChange={(event) => setDisplayName(event.currentTarget.value)}
           />

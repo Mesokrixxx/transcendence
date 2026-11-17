@@ -4,6 +4,7 @@ import type { APIError } from "../types/fetch"
 export type FriendUser = {
     id: number
     username: string
+    displayName?: string | null
     avatar?: string
     isOnline?: boolean
 }
@@ -18,6 +19,7 @@ export type FriendsData = {
 type FriendsFromAPI = {
     id: number
     username: string
+    displayName?: string | null
     avatar?: string
     status?: 'friend' | 'pending_outgoing' | 'pending_incoming'
     online?: boolean
@@ -56,11 +58,13 @@ async function sendAction(
     }
 }
 
-function toPerson(user: FriendsFromAPI) : FriendUser {
+function toPerson(user: FriendsFromAPI): FriendUser {
     return {
         id: user.id,
         username: user.username,
-        avatar: user.avatar || undefined}
+        displayName: user.displayName ?? null,
+        avatar: user.avatar || undefined
+    }
 }
 
 function toFriend(user: FriendsFromAPI) : FriendUser {
