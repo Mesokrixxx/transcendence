@@ -6,5 +6,6 @@
   "players": "Joueurs",
   "spectatorChat": "Discussion des spectateurs",
   "spectators": "Spectateurs",
-  "writeAMessage": "Écrire un message…"
+  "writeAMessage": "Écrire un message…",
+  "noConversations": "Aucune conversation avec vos amis."
 }

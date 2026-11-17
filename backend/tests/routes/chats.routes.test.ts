@@ -20,6 +20,7 @@ vi.mock('../../src/services/chats.services.js', () => ({
   get: vi.fn(),
   isMember: vi.fn(),
   create: vi.fn(),
+  createPrivate: vi.fn(),
   append: vi.fn(),
 }));
 
@@ -31,6 +32,7 @@ describe('chat routes', () => {
     vi.mocked(chatService.get).mockReset();
     vi.mocked(chatService.isMember).mockReset();
     vi.mocked(chatService.create).mockReset();
+    vi.mocked(chatService.createPrivate).mockReset();
     vi.mocked(chatService.append).mockReset();
   });
 
@@ -56,12 +58,13 @@ describe('chat routes', () => {
   });
 
   it('creates a chat', async () => {
-    vi.mocked(chatService.create).mockResolvedValue(chat);
+    vi.mocked(chatService.createPrivate).mockResolvedValue(chat);
 
-    const response = await request(app).post('/api/chats');
+    const response = await request(app).post('/api/chats').send({ userId: 2 });
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual(chat);
+    expect(chatService.createPrivate).toHaveBeenCalledWith(1, 2);
   });
 
   it('appends a message to a chat', async () => {
