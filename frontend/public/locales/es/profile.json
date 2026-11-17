@@ -3,7 +3,7 @@
   "changeAvatar": "Cambiar avatar",
   "chooseImageFormat": "Elige una imagen JPG, PNG o WebP.",
   "editProfile": "Editar perfil",
-  "firstNameOptional": "Nombre (opcional)",
+  "displayName": "Nombre visible (opcional)",
   "friends": "Amigos",
   "friendsPlaceholder": "Tu lista de amigos aparecerá aquí.",
   "gameHistory": "Historial de partidas",

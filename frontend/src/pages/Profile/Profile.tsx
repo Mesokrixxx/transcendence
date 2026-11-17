@@ -14,22 +14,16 @@ function Profile() {
   const { t } = useTranslation();
   const { user , setUser} = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const localProfile: LocalProfile = {
-    firstName: user?.firstName ?? '',
-    lastName: user?.lastName ?? '',
-  };
 
-  const fullName = [
-    localProfile.firstName,
-    localProfile.lastName,
-  ].filter(Boolean).join(' ');
+  const localProfile: LocalProfile = {
+    displayName: user?.displayName ?? '',
+  };
 
   function handleSave(profile: LocalProfile) {
     if (user) {
       setUser({
         ...user,
-        firstName: profile.firstName || null,
-        lastName: profile.lastName || null,
+        displayName: profile.displayName || null,
         avatar: profile.avatar ?? null,
       });
   }
@@ -52,9 +46,13 @@ function Profile() {
             />
 
             <div className="profile-info">
-              <h1>{user?.username}</h1>
+              <h1>{localProfile.displayName || user?.username}</h1>
+
+              {user && localProfile.displayName && localProfile.displayName !== user.username && (
+                <p>@{user.username}</p>
+              )}
+
               <p>{t('online', { ns: 'common' })}</p>
-              {fullName && <p>{fullName}</p>}
             </div>
 
             <Button

@@ -47,10 +47,12 @@ export const updateUserSchema = z.object({
     username: z.string().trim().min(1).max(32).optional(),
     password: passwordSchema.optional(),
     currentPassword: z.string().min(1).optional(),
-    firstName: z.string().trim().min(1).max(100).nullable().optional(),
-    lastName: z.string().trim().min(1).max(100).nullable().optional(),
+    displayName: z.string().trim().min(1).max(32).optional(),
 }).refine(
-    data => data.username !== undefined || data.password !== undefined || data.firstName !== undefined || data.lastName !== undefined,
+    data =>
+        data.username !== undefined ||
+        data.password !== undefined ||
+        data.displayName !== undefined,
     { message: 'at least one field must be updated' }
 ).refine(
     data => data.password === undefined || data.currentPassword !== undefined,
