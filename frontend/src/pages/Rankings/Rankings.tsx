@@ -110,7 +110,14 @@ function Rankings() {
                                           size={48}
                                       />
                                       <Link to={`/profile/${player.id}`}>
-                                        {player.username}
+                                        <span style={{ display: 'block' }}>
+                                            {player.displayName || player.username}
+                                        </span>
+                                        {player.displayName && player.displayName !== player.username && (
+                                            <small style={{ display: 'block', opacity: 0.75 }}>
+                                                @{player.username}
+                                            </small>
+                                        )}
                                       </Link>
                                   </PlayerCell>
                               </td>

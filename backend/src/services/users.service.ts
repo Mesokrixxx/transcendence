@@ -213,7 +213,7 @@ export async function getAll() {
 			username: true,
 			elo: true,
 			profile: {
-				select: { avatar: true },
+				select: { avatar: true, displayName: true },
 			},
 			whiteGames: {
 				where: { result: { not: null } },
@@ -237,6 +237,7 @@ export async function getAll() {
 			return {
 				id: user.id,
 				username: user.username,
+				displayName: user.profile?.displayName ?? null,
 				rating: user.elo,
 				wins,
 				games,

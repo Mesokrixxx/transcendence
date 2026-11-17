@@ -19,7 +19,14 @@ function FriendRow({ user, children }: FriendRowProps) {
                 size={40}
             />
             <Name as={Link} to={`/profile/${user.id}`} title={user.username}>
-                {user.displayName || user.username}
+                <span style={{ display: 'block' }}>
+                    {user.displayName || user.username}
+                </span>
+                {user.displayName && user.displayName !== user.username && (
+                    <small style={{ display: 'block', opacity: 0.75 }}>
+                        @{user.username}
+                    </small>
+                )}
             </Name>
             {children && <Actions>{children}</Actions>}
         </Row>
