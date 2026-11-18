@@ -78,3 +78,9 @@ export const ActivityContent = styled.div`
     padding: 24px 20px;
   }
 `;
+
+export const StatusMessage = styled.div`
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+`;
