@@ -28,8 +28,8 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 
 type RemoteGameState = {
   moves: Move[];
-  white?: { id: number };
-  black?: { id: number };
+  white?: { id: number; username?: string; displayName?: string | null };
+  black?: { id: number; username?: string; displayName?: string | null };
   whiteId?: number;
   blackId?: number;
 };
@@ -54,6 +54,7 @@ function Play() {
   const [onlineSide, setOnlineSide] = useState<{
     gameId: number;
     playerColor: 'white' | 'black';
+    opponentName: string | null;
   } | null>(null);
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
@@ -69,8 +70,11 @@ function Play() {
   const boardOrientation = isRemoteGame
   ? (onlineSide?.gameId === gameId ? onlineSide.playerColor : null)
   : orientation;
+  const opponentName =
+    (isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentName : null) ??
+    tChess('opponent');
   const waitingForFriend = isRemoteGame && game.getHistory().length === 0 &&
-  !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
+    !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
 
   const board = game.getBoard();
 
@@ -116,7 +120,13 @@ function Play() {
         return;
       }
 
-      setOnlineSide({ gameId, playerColor });
+      const opponent = playerColor === 'white' ? response.result.black : response.result.white;
+
+      setOnlineSide({
+        gameId,
+        playerColor,
+        opponentName: opponent?.displayName?.trim() || opponent?.username || null,
+      });
       setGame(new ChessGame(response.result.moves));
     });
 
@@ -220,8 +230,8 @@ function Play() {
         <GameArea aria-label={tChess('localChessGame')}>
           <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
-              <Avatar username={tChess('opponent')} size={64} isOnline={true} />
-              <span>{tChess('opponent')}</span>
+              <Avatar username={opponentName} size={64} isOnline={true} />
+              <span>{opponentName}</span>
             </div>
            {boardOrientation !== null && (
               <GameStatus

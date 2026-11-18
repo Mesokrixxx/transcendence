@@ -164,28 +164,41 @@ export async function canSpectate(id: number) {
 	return game !== null;
 }
 
-export async function getState(id: number) {
-	const game = await prisma.game.findUnique({
-		where: { id },
-		include: {
-			white: {
-				select: {
-					id: true,
-					username: true,
-					profile: { select: { avatar: true } },
-				},
-			},
-			black: {
-				select: {
-					id: true,
-					username: true,
-					profile: { select: { avatar: true } },
-				},
-			},
-		},
-	});
-	if (!game) return null;
-	return gameView(game);
+export async function getState(id: number, includeDisplayNames = false) {
+  const game = await prisma.game.findUnique({
+    where: { id },
+    include: {
+      white: {
+        select: {
+          id: true,
+          username: true,
+          profile: { select: { avatar: true, displayName: true } },
+        },
+      },
+      black: {
+        select: {
+          id: true,
+          username: true,
+          profile: { select: { avatar: true, displayName: true } },
+        },
+      },
+    },
+  });
+
+  if (!game) return null;
+
+  const view = gameView(game);
+  if (!includeDisplayNames) return view;
+
+  return {
+    ...view,
+    ...(view.white
+      ? { white: { ...view.white, displayName: game.white?.profile?.displayName ?? null } }
+      : {}),
+    ...(view.black
+      ? { black: { ...view.black, displayName: game.black?.profile?.displayName ?? null } }
+      : {}),
+  };
 }
 
 export async function playMove(id: number, userId: number, move: Move) {

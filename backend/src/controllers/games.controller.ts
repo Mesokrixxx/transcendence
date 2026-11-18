@@ -25,8 +25,7 @@ export async function getGame(req: Request, res: Response) {
 	if (!canSpectate)
 		return res.status(404).json({ error: 'game not found' });
 
-	const { result, error } = await query(() => gameService.getState(id));
-	if (error) {
+	const { result, error } = await query(() => gameService.getState(id, true));	if (error) {
 		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);
