@@ -28,8 +28,8 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 
 type RemoteGameState = {
   moves: Move[];
-  white?: { id: number; username?: string; displayName?: string | null };
-  black?: { id: number; username?: string; displayName?: string | null };
+  white?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
+  black?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
   whiteId?: number;
   blackId?: number;
 };
@@ -55,6 +55,7 @@ function Play() {
     gameId: number;
     playerColor: 'white' | 'black';
     opponentName: string | null;
+    opponentAvatar: string | null;
   } | null>(null);
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
@@ -73,6 +74,8 @@ function Play() {
   const opponentName =
     (isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentName : null) ??
     tChess('opponent');
+  const opponentAvatar =
+  isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentAvatar : null;
   const waitingForFriend = isRemoteGame && game.getHistory().length === 0 &&
     !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
 
@@ -126,6 +129,7 @@ function Play() {
         gameId,
         playerColor,
         opponentName: opponent?.displayName?.trim() || opponent?.username || null,
+        opponentAvatar: opponent?.avatar ?? null,
       });
       setGame(new ChessGame(response.result.moves));
     });
@@ -230,8 +234,7 @@ function Play() {
         <GameArea aria-label={tChess('localChessGame')}>
           <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
-              <Avatar username={opponentName} size={64} isOnline={true} />
-              <span>{opponentName}</span>
+              <Avatar src={opponentAvatar ?? ''} username={opponentName} size={64} isOnline={true} />              <span>{opponentName}</span>
             </div>
            {boardOrientation !== null && (
               <GameStatus
