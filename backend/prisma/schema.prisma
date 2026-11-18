@@ -95,8 +95,10 @@ model Game {
   moves      Json
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
+  whiteElo   Int
   black      User         @relation("BlackGames", fields: [blackId], references: [id])
   blackId    Int
+  blackElo   Int
   specChat   Chat         @relation("SpectatorChat", fields: [specChatId], references: [id])
   specChatId Int          @unique
   chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
