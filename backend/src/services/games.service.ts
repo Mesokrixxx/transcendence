@@ -110,36 +110,41 @@ function endData(engine: ChessGame) {
 }
 
 export async function create(whiteId: number, blackId: number) {
-	return await prisma.$transaction(async (tx) => {
-		const users = await tx.user.findMany({
-			where: {
-				id: {
-					in: [whiteId, blackId],
-				},
-			},
-		});
+  return await prisma.$transaction(async (tx) => {
+    const users = await tx.user.findMany({
+      where: {
+        id: {
+          in: [whiteId, blackId],
+        },
+      },
+    });
 
-		if (users.length !== 2) throw new BackendError(400, 'invalid game players');
+    const white = users.find((u) => u.id === whiteId);
+    const black = users.find((u) => u.id === blackId);
 
-		const specChat = await tx.chat.create({ data: {} });
-		const gameChat = await tx.chat.create({
-			data: {
-				users: {
-					connect: [{ id: whiteId }, { id: blackId }],
-				},
-			},
-		});
+    if (users.length !== 2 || !white || !black) throw new BackendError(400, 'invalid game players');
 
-		return await tx.game.create({
-			data: {
-				whiteId: whiteId,
-				blackId: blackId,
-				chatId: gameChat.id,
-				specChatId: specChat.id,
-				moves: [],
-			},
-		});
-	});
+    const specChat = await tx.chat.create({ data: {} });
+    const gameChat = await tx.chat.create({
+      data: {
+        users: {
+          connect: [{ id: whiteId }, { id: blackId }],
+        },
+      },
+    });
+
+    return await tx.game.create({
+      data: {
+        whiteId: whiteId,
+        whiteElo: white.elo,
+        blackId: blackId,
+        blackElo: black.elo,
+        chatId: gameChat.id,
+        specChatId: specChat.id,
+        moves: [],
+      },
+    });
+  });
 }
 
 export async function get(id: number) {
@@ -157,7 +162,7 @@ export async function getAll(userId: number) {
         },
         {
           blackId: userId,
-        }
+        },
       ],
     },
     include: {
@@ -165,25 +170,27 @@ export async function getAll(userId: number) {
         select: {
           username: true,
           elo: true,
+          maxElo: true,
           profile: {
             select: {
               displayName: true,
-            }
-          }
-        }
+            },
+          },
+        },
       },
       black: {
         select: {
           username: true,
           elo: true,
+          maxElo: true,
           profile: {
             select: {
               displayName: true,
-            }
-          }
-        }
+            },
+          },
+        },
       },
-    }
+    },
   });
 }
 
