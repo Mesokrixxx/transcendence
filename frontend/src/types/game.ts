@@ -23,6 +23,7 @@ export enum GameEndType {
 interface GameUser {
   username: string;
   elo: number;
+  maxElo: number;
   profile: {
     displayName: string | null;
   } | null;
