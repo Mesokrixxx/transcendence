@@ -38,6 +38,10 @@ const routes: RouteObject[] = [
         element: <Play />,
       },
       {
+        path: '/play/:gameId',
+        element: <Play />,
+      },
+      {
         path: '/training',
         element: <Training />,
       },

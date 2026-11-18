@@ -19,6 +19,7 @@ import {
 import Avatar from '../../components/Avatar/Avatar';
 import { useTranslation, Trans } from 'react-i18next';
 import { getRankings , type Player } from '../../services/rankings'
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket'
 
 function getWinRate(wins: number, games: number): number {
   if (games === 0) return 0;
@@ -63,6 +64,26 @@ function Rankings() {
           .then((data) => setPlayers(data))
           .catch(() => setHasError(true))
           .finally(() => setIsLoading(false))
+  }, [])
+
+  useEffect(() => {
+    function updateProfile(event: RealtimeEvent) {
+      if (
+        event.type !== 'profile.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.username !== 'string' ||
+        (event.avatar !== null && typeof event.avatar !== 'string')
+      ) return
+
+      const userId = event.userId
+      const username = event.username
+      const avatar = event.avatar ?? undefined
+      setPlayers((current) => current.map((player) =>
+        player.id === userId ? { ...player, username, avatar } : player
+      ))
+    }
+
+    return realtimeSocket.subscribe(updateProfile)
   }, [])
 
   const rankedPlayers = players.map((player, index) => ({

@@ -6,6 +6,7 @@ import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { getPlayerProfile, type PlayerProfile } from '../../services/playerProfile';
 import { Page } from '../../pages/Home/Home.styles';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import { ProfileHeader, ProfilePanel } from '../../pages/Profile/Profile.styles';
 
 type ProfileState =
@@ -43,6 +44,32 @@ function PlayerProfileDetails({ id }: { id: number }) {
       active = false;
     };
     }, [id]);
+
+  useEffect(() => {
+    function updateProfile(event: RealtimeEvent) {
+      if (
+        event.type !== 'profile.changed' ||
+        event.userId !== id ||
+        typeof event.username !== 'string' ||
+        (event.avatar !== null && typeof event.avatar !== 'string')
+      ) return;
+
+      const username = event.username;
+      const avatar = event.avatar;
+      setState((current) => current.status === 'ready'
+        ? {
+            ...current,
+            player: {
+              ...current.player,
+              username,
+              avatar,
+            },
+          }
+        : current);
+    }
+
+    return realtimeSocket.subscribe(updateProfile);
+  }, [id]);
 
     if (state.status === 'loading') {
         return <p role="status">{t('playerProfileLoading')}</p>;

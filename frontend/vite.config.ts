@@ -11,6 +11,12 @@ export default defineConfig({
       '/api': {
         target: 'http://backend:8080',
         changeOrigin: true
+      },
+      '/ws': {
+        target: 'https://backend:8080',
+        changeOrigin: true,
+        secure: false,
+        ws: true
       }
     }
   },
@@ -21,6 +27,12 @@ export default defineConfig({
       '/api': {
         target: 'http://backend:8080',
         changeOrigin: true
+      },
+      '/ws': {
+        target: 'https://backend:8080',
+        changeOrigin: true,
+        secure: false,
+        ws: true
       }
     }
   }

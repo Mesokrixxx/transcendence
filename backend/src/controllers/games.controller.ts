@@ -7,10 +7,23 @@ import { treatError } from '../utils/errors.js';
 import { broadcast } from '../services/gamePresence.service.js';
 
 export async function getGame(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
 	const id = Number(req.params.id);
 
 	if (!Number.isInteger(id) || id <= 0)
 		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const { result: canSpectate, error: accessError } = await query(() =>
+		gameService.canSpectate(id),
+	);
+	if (accessError) {
+		const treatedErr = treatError(accessError);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!canSpectate)
+		return res.status(404).json({ error: 'game not found' });
 
 	const { result, error } = await query(() => gameService.getState(id));
 	if (error) {

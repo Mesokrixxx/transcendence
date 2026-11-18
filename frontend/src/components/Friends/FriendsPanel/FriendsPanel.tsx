@@ -18,6 +18,7 @@ import {
     Message,
     ActionButton
 } from "./FriendsPanel.styles"
+import realtimeSocket, { type RealtimeEvent } from '../../../services/websocket'
 
 type FriendsPanelProps = {
     onClose?: () => void;
@@ -43,6 +44,87 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
             .then((result) => setData(result))
             .catch(() => setHasError(true))
             .finally(() => setIsLoading(false))
+    }, [])
+
+    useEffect(() => {
+        function updatePresence(event: RealtimeEvent) {
+            if (event.type === 'presence.snapshot' && Array.isArray(event.users)) {
+                const onlineUsers = new Map<number, boolean>()
+                for (const user of event.users) {
+                    if (
+                        user &&
+                        typeof user === 'object' &&
+                        'userId' in user &&
+                        'online' in user &&
+                        typeof user.userId === 'number' &&
+                        typeof user.online === 'boolean'
+                    ) {
+                        onlineUsers.set(user.userId, user.online)
+                    }
+                }
+                setData((current) => current && ({
+                    ...current,
+                    friends: current.friends.map((friend) => ({
+                        ...friend,
+                        isOnline: onlineUsers.get(friend.id) ?? false,
+                    })),
+                }))
+                return
+            }
+
+            if (
+                event.type !== 'presence.changed' ||
+                typeof event.userId !== 'number' ||
+                typeof event.online !== 'boolean'
+            ) return
+
+            const userId = event.userId
+            const online = event.online
+            setData((current) => current && ({
+                ...current,
+                friends: current.friends.map((friend) =>
+                    friend.id === userId
+                        ? { ...friend, isOnline: online }
+                        : friend
+                ),
+            }))
+        }
+
+        return realtimeSocket.subscribe(updatePresence)
+    }, [])
+
+    useEffect(() => {
+        function updateProfile(event: RealtimeEvent) {
+            if (
+                event.type !== 'profile.changed' ||
+                typeof event.userId !== 'number' ||
+                typeof event.username !== 'string' ||
+                (event.avatar !== null && typeof event.avatar !== 'string')
+            ) return
+
+            const userId = event.userId
+            const username = event.username
+            const avatar = event.avatar ?? undefined
+            setData((current) => {
+                if (!current) return current
+                const update = (user: FriendUser) => user.id === userId
+                    ? {
+                        ...user,
+                        username,
+                        avatar,
+                    }
+                    : user
+                return {
+                    ...current,
+                    friends: current.friends.map(update),
+                    received: current.received.map(update),
+                    sent: current.sent.map(update),
+                    blocked: current.blocked.map(update),
+                }
+            })
+        }
+
+        return realtimeSocket.subscribe(updateProfile)
     }, [])
 
     function handleSend(username: string): Promise<void> {

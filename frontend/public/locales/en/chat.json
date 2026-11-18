@@ -6,5 +6,6 @@
   "players": "Players",
   "spectatorChat": "Spectator chat",
   "spectators": "Spectators",
-  "writeAMessage": "Write a message..."
+  "writeAMessage": "Write a message...",
+  "noConversations": "No conversations with your friends."
 }
