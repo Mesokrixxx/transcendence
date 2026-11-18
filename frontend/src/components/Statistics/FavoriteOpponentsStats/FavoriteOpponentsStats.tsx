@@ -26,11 +26,11 @@ function getFavoriteOpponents(
     let isWhite = false;
     if (g.whiteId === userId) {
       opponentId = g.blackId;
-      opponentUsername = g.black.username;
+      opponentUsername = g.black.profile?.displayName ?? g.black.username;
       isWhite = true;
     } else if (g.blackId === userId) {
       opponentId = g.whiteId;
-      opponentUsername = g.white.username;
+      opponentUsername = g.white.profile?.displayName ?? g.white.username;
     } else return;
     if (g.result === null) return;
     const isWin =
