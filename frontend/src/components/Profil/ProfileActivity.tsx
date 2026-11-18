@@ -1,17 +1,33 @@
-import { useId, useState } from 'react';
+import { useId, useState, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import Messaging from '../../pages/Chat/Messaging';
 import FriendsPanel from '../../components/Friends/FriendsPanel/FriendsPanel';
-import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent } from './ProfileActivity.styles';
+import Statistics from '../../components/Statistics/Statistics';
+import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent, StatusMessage } from './ProfileActivity.styles';
+import { getUserGames } from '../../services/game';
+import type { Game } from '../../types/game';
 
-const tabs = ['history', 'friends', 'messages'] as const;
+const tabs = ['history', 'friends', 'messages', 'stats'] as const;
 type Tab = (typeof tabs)[number];
 
-function ProfileActivity() {
+function ProfileActivity({ userId }: { userId: number }) {
   const { t } = useTranslation('profile');
   const [activeTab, setActiveTab] = useState<Tab>('history');
   const id = useId();
+  const [games, setGames] = useState<Game [] | null>(null);
+  const [gamesLoading, setGamesLoading] = useState(true);
+
+  useEffect(() => {
+    setGamesLoading(true);
+    getUserGames(userId).then((g) => {
+      setGames(g);
+    }).catch(() => {
+      setGames(null);
+    }).finally(() => {
+      setGamesLoading(false);
+    });
+  }, [userId]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const currentIndex = tabs.indexOf(activeTab);
@@ -64,7 +80,9 @@ function ProfileActivity() {
               ? t('gameHistory')
               : tab === 'friends'
                 ? t('friends')
-                : t('messages', { ns: 'chat' })}
+                : tab === 'messages'
+                  ? t('messages', { ns: 'chat' })
+                  : 'Stats'}
           </ActivityTab>
         ))}
       </ActivityTabs>
@@ -98,6 +116,22 @@ function ProfileActivity() {
         tabIndex={0}
       >
         <Messaging />
+      </ActivityContent>
+
+      <ActivityContent
+        role="tabpanel"
+        id={`${id}-stats-panel`}
+        aria-labelledby={`${id}-stats-tab`}
+        hidden={activeTab !== 'stats'}
+        tabIndex={0}
+      >
+        {gamesLoading ? (
+          <StatusMessage>{t('loading', { ns: 'common' })}</StatusMessage>
+        ) : games === null ? (
+          <StatusMessage>Could not load data.</StatusMessage>
+        ) : (
+          <Statistics games={games} userId={userId} />
+        )}
       </ActivityContent>
     </ActivityPanel>
   );
