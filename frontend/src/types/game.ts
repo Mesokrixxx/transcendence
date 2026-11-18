@@ -39,6 +39,8 @@ export interface Game {
   moves: string;
   white: GameUser;
   whiteId: number;
+  whiteElo: number;
   black: GameUser;
   blackId: number;
+  blackElo: number;
 }
