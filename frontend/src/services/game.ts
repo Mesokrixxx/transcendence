@@ -55,8 +55,10 @@ export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: n
       moves: JSON.stringify(game.getHistory()),
       white: getFakeGameUser(),
       whiteId: i % 2 === 0 && userId !== undefined ? userId : faker.number.int(),
+      whiteElo: faker.number.int({ min: 100, max: 3000 }),
       black: getFakeGameUser(),
       blackId: i % 2 !== 0 && userId !== undefined ? userId : faker.number.int(),
+      blackElo: faker.number.int({ min: 100, max: 3000 }),
     });
   }
 
