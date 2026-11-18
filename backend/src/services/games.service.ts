@@ -165,12 +165,22 @@ export async function getAll(userId: number) {
         select: {
           username: true,
           elo: true,
+          profile: {
+            select: {
+              displayName: true,
+            }
+          }
         }
       },
       black: {
         select: {
           username: true,
           elo: true,
+          profile: {
+            select: {
+              displayName: true,
+            }
+          }
         }
       },
     }
