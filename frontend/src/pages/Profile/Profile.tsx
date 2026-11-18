@@ -67,7 +67,7 @@ function Profile() {
           </ProfileHeader>
         </ProfilePanel>
 
-        <ProfileActivity />
+        { user && <ProfileActivity userId={user.id} /> }
 
         {isEditing && user && (
           <EditProfileDialog
