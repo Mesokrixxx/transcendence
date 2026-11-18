@@ -16,9 +16,11 @@ export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: n
   function getFakeGameUser() {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
+    const elo = faker.number.int({ min: 100, max: 3000 });
     return {
       username: faker.internet.username({ firstName, lastName }),
-      elo: faker.number.int({ min: 100, max: 3000 }),
+      elo,
+      maxElo: faker.number.int({ min: elo, max: 3000 }),
       profile: {
         displayName: faker.person.fullName({ firstName, lastName })
       }
