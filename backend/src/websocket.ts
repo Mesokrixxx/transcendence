@@ -31,28 +31,6 @@ function send(socket: WebSocket, message: unknown) {
 
 async function onConnection(socket: WebSocket, userId: number) {
 	presenceService.connect(userId, socket);
-	let ids: number[];
-	try {
-		ids = await friendIds(userId);
-	} catch (error: unknown) {
-		presenceService.disconnect(userId, socket);
-		throw error;
-	}
-
-	send(socket, {
-		type: 'presence.snapshot',
-		users: ids.map((id) => ({
-			userId: id,
-			online: presenceService.isOnline(id),
-		})),
-	});
-
-	for (const friendId of ids)
-		presenceService.send(friendId, {
-			type: 'presence.changed',
-			userId,
-			online: true,
-		});
 
 	socket.on('message', async (data: Buffer) => {
 		let message: unknown;
@@ -91,31 +69,36 @@ async function onConnection(socket: WebSocket, userId: number) {
 
 		const resourceId = message.type.startsWith('game.') ? 'gameId' : 'chatId';
 		const payload = message as Record<string, unknown>;
-		if (
-			typeof payload[resourceId] !== 'number' ||
-			!Number.isInteger(payload[resourceId]) ||
-			payload[resourceId] <= 0
-		) {
+		const id = payload[resourceId];
+
+		if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
 			send(socket, {
 				type: 'error',
 				error: `${resourceId} shall be a positive integer`,
 			});
 			return;
 		}
-		const id = payload[resourceId];
 
 		try {
-			if (message.type === 'game.join' || message.type === 'game.leave') {
-				if (!(await gameService.canSpectate(id))) {
+			if (resourceId === 'gameId') {
+				if (
+					(message.type === 'game.join' || message.type === 'game.leave') &&
+					!(await gameService.canSpectate(id))
+				) {
 					send(socket, {
 						type: 'error',
 						error: 'game not found',
 					});
 					return;
 				}
+
 				if (message.type === 'game.join') {
-					gamePresenceService.subscribe(id, socket);
+					const isPlayer = await gameService.canAccess(id, userId);
+					if (socket.readyState !== socket.OPEN) return;
+
+					gamePresenceService.subscribe(id, socket, isPlayer ? userId : null);
 					send(socket, { type: 'game.joined', gameId: id });
+
 					const state = await gameService.getState(id);
 					if (state) send(socket, { type: 'game.updated', game: state });
 				} else if (message.type === 'game.leave') {
@@ -129,6 +112,7 @@ async function onConnection(socket: WebSocket, userId: number) {
 						});
 						return;
 					}
+
 					let result;
 					if (message.type === 'game.move') {
 						const move = moveSchema.safeParse(payload);
@@ -140,6 +124,7 @@ async function onConnection(socket: WebSocket, userId: number) {
 							});
 							return;
 						}
+
 						const gameMove =
 							move.data.promotion === undefined
 								? { from: move.data.from, to: move.data.to }
@@ -148,12 +133,14 @@ async function onConnection(socket: WebSocket, userId: number) {
 										to: move.data.to,
 										promotion: move.data.promotion,
 									};
+
 						result = await gameService.playMove(id, userId, gameMove);
 					} else if (message.type === 'game.resign') {
 						result = await gameService.resign(id, userId);
 					} else {
 						result = await gameService.draw(id, userId);
 					}
+
 					gamePresenceService.broadcast(id, {
 						type: 'game.updated',
 						game: result,
@@ -161,6 +148,7 @@ async function onConnection(socket: WebSocket, userId: number) {
 				}
 				return;
 			}
+
 			if (!(await chatService.isMember(id, userId))) {
 				send(socket, {
 					type: 'error',
@@ -189,16 +177,36 @@ async function onConnection(socket: WebSocket, userId: number) {
 		if (!presenceService.disconnect(userId, socket)) return;
 
 		try {
-			for (const friendId of await friendIds(userId))
+			for (const friendId of await friendIds(userId)) {
 				presenceService.send(friendId, {
 					type: 'presence.changed',
 					userId,
 					online: false,
 				});
+			}
 		} catch (error: unknown) {
 			console.error('WebSocket presence disconnect error', error);
 		}
 	});
+
+	const ids = await friendIds(userId);
+	if (socket.readyState !== socket.OPEN) return;
+
+	send(socket, {
+		type: 'presence.snapshot',
+		users: ids.map((id) => ({
+			userId: id,
+			online: presenceService.isOnline(id),
+		})),
+	});
+
+	for (const friendId of ids) {
+		presenceService.send(friendId, {
+			type: 'presence.changed',
+			userId,
+			online: true,
+		});
+	}
 }
 
 export function attachWebSocket(server: Server) {

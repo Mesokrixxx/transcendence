@@ -2,9 +2,9 @@ import type ChessGame from '../../../../chessgame/src/chessgame';
 import { useTranslation } from 'react-i18next';
 import { StatusBox } from './GameStatus.styles';
 
-type GameStatusProps = { game: ChessGame };
+type GameStatusProps = { game: ChessGame; message?: string | undefined};
 
-function GameStatus({ game }: GameStatusProps) {
+function GameStatus({ game, message }: GameStatusProps) {
   const { t } = useTranslation();
   const currentColor =
     game.getTurn() === 'white'
@@ -26,7 +26,7 @@ function GameStatus({ game }: GameStatusProps) {
       status = t('checkStatus', { ns: 'chess', turnStatus: status });
   }
 
-  return <StatusBox role="status">{status}</StatusBox>;
+  return <StatusBox role="status">{message ?? status}</StatusBox>;
 }
 
 export default GameStatus;

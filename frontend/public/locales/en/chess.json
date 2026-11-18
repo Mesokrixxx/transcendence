@@ -54,6 +54,7 @@
   "toMove": "{{color}} to move",
   "trainingDescription": "Practise by playing both sides.",
   "unableToPlayThisMove": "Unable to play this move.",
+  "waitingForFriend": "Waiting for your friend…",
   "watchGame": "Watch game",
   "white": "White"
 }

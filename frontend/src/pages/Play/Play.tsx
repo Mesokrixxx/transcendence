@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import ChessGame from '../../../../chessgame/src/chessgame';
-import type {
-  Move,
-  DeepReadonly,
-  Square as SquareName,
-} from '../../../../chessgame/src/chessgame.types';
+import type { Move, DeepReadonly, Square as SquareName } from '../../../../chessgame/src/chessgame.types';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
@@ -31,6 +28,10 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 
 type RemoteGameState = {
   moves: Move[];
+  white?: { id: number };
+  black?: { id: number };
+  whiteId?: number;
+  blackId?: number;
 };
 
 function isRemoteGameState(value: unknown): value is RemoteGameState {
@@ -44,6 +45,16 @@ function isRemoteGameState(value: unknown): value is RemoteGameState {
 
 function Play() {
   const { gameId: gameIdParam } = useParams();
+  const [gamePresence, setGamePresence] = useState<{
+    gameId: number;
+    bothPlayersPresent: boolean;
+  } | null>(null);
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [onlineSide, setOnlineSide] = useState<{
+    gameId: number;
+    playerColor: 'white' | 'black';
+  } | null>(null);
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
   const { t: tChat } = useTranslation('chat');
@@ -55,6 +66,11 @@ function Play() {
   const [error, setError] = useState('');
   const gameId = Number(gameIdParam);
   const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
+  const boardOrientation = isRemoteGame
+  ? (onlineSide?.gameId === gameId ? onlineSide.playerColor : null)
+  : orientation;
+  const waitingForFriend = isRemoteGame && game.getHistory().length === 0 &&
+  !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
 
   const board = game.getBoard();
 
@@ -63,33 +79,54 @@ function Play() {
     legalMoves = game.getMoves(selectedSquare);
   }
 
-  useEffect(() => {
-    if (orientation === game.getTurn()) return;
+ useEffect(() => {
+    if (isRemoteGame || orientation === game.getTurn()) return;
+
     const timer = setTimeout(() => {
       setOrientation(game.getTurn());
       setIsRotating(false);
     }, 700);
 
     return () => clearTimeout(timer);
-  }, [game, orientation]);
+  }, [game, orientation, isRemoteGame]);
 
-  useEffect(() => {
-    if (!isRemoteGame) return;
+ useEffect(() => {
+    if (!isRemoteGame || userId == null) return;
 
     let active = true;
+
     fetchAPI<RemoteGameState>({
       path: `/games/${gameId}`,
       method: 'get',
     }).then((response) => {
       if (!active) return;
+
       if (response.error || !isRemoteGameState(response.result)) {
         setError(tChess('unableToPlayThisMove'));
         return;
       }
+
+      const whiteId = response.result.white?.id ?? response.result.whiteId;
+      const blackId = response.result.black?.id ?? response.result.blackId;
+      const playerColor =
+        userId === whiteId ? 'white' : userId === blackId ? 'black' : null;
+
+      if (playerColor === null) {
+        setError(tChess('unableToPlayThisMove'));
+        return;
+      }
+
+      setOnlineSide({ gameId, playerColor });
       setGame(new ChessGame(response.result.moves));
     });
 
     function handleGameEvent(event: RealtimeEvent) {
+      if (event.type === 'game.presence') {
+        if (event.gameId === gameId && typeof event.bothPlayersPresent === 'boolean') {
+          setGamePresence({ gameId, bothPlayersPresent: event.bothPlayersPresent });
+        }
+        return;
+      }
       if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
       setGame(new ChessGame(event.game.moves));
       setSelectedSquare(null);
@@ -98,13 +135,14 @@ function Play() {
     }
 
     const leaveGame = realtimeSocket.joinGame(gameId, handleGameEvent);
+
     return () => {
       active = false;
       leaveGame();
     };
-  }, [gameId, isRemoteGame, tChess]);
+  }, [gameId, isRemoteGame, tChess, userId]);
 
-  async function playMove(move: Move) {
+ async function playMove(move: Move) {
     try {
       if (isRemoteGame) {
         const response = await fetchAPI<RemoteGameState>({
@@ -185,8 +223,12 @@ function Play() {
               <Avatar username={tChess('opponent')} size={64} isOnline={true} />
               <span>{tChess('opponent')}</span>
             </div>
-
-            <GameStatus game={game} />
+           {boardOrientation !== null && (
+              <GameStatus
+                game={game}
+                message={waitingForFriend ? tChess('waitingForFriend') : undefined}
+              />
+            )}
 
             {promotionMoves.length > 0 && (
               <div role="group" aria-label={tChess('choosePromotionPiece')}>
@@ -217,15 +259,16 @@ function Play() {
             {error && <p role="alert">{error}</p>}
           </GameInfo>
 
-          <ChessBoard
-            board={board}
-            orientation={orientation}
-            // orientation={playerColor}
-            selectedSquare={selectedSquare}
-            onSquareClick={handleSquareClick}
-            legalMoves={legalMoves}
-            disabled={game.isOver() || promotionMoves.length > 0 || isRotating}
-          />
+          {boardOrientation !== null && (
+            <ChessBoard
+              board={board}
+              orientation={boardOrientation}
+              selectedSquare={selectedSquare}
+              onSquareClick={handleSquareClick}
+              legalMoves={legalMoves}
+              disabled={ waitingForFriend || game.isOver() || promotionMoves.length > 0 || isRotating}
+            />
+          )}
           <GameChat aria-label={tChat('gameChat')}>
             <ChatBox title={tChat('gameChat')} />
           </GameChat>

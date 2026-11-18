@@ -54,6 +54,7 @@
   "toMove": "Aux {{color}} de jouer",
   "trainingDescription": "Entraîne-toi en jouant les deux camps.",
   "unableToPlayThisMove": "Impossible de jouer ce coup.",
+  "waitingForFriend": "En attente de ton ami…",
   "watchGame": "Regarder la partie",
   "white": "Blancs"
 }
