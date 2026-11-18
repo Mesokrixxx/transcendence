@@ -1,13 +1,13 @@
 export enum GameStatus {
   WAITING,
   PLAYING,
-  OVER
+  OVER,
 }
 
 export enum GameResult {
   DRAW,
   WHITE,
-  BLACK
+  BLACK,
 }
 
 export enum GameEndType {
@@ -17,25 +17,28 @@ export enum GameEndType {
   STALEMATE,
   INSUFMATERIAL,
   TRIPLEREPETITION,
-  FIFTYMOVE
+  FIFTYMOVE,
 }
 
 interface GameUser {
-  username: string,
-  elo: number,
+  username: string;
+  elo: number;
+  profile: {
+    displayName: string | null;
+  } | null;
 }
 
 export interface Game {
-  id: number,
-  status: GameStatus,
-  result: GameResult | null,
-  endType: GameEndType | null,
-  createdAt: Date,
-  startedAt: Date,
-  endedAt: Date | null,
-  moves: string,
-  white: GameUser,
-  whiteId: number,
-  black: GameUser,
-  blackId: number,
-};
+  id: number;
+  status: GameStatus;
+  result: GameResult | null;
+  endType: GameEndType | null;
+  createdAt: Date;
+  startedAt: Date;
+  endedAt: Date | null;
+  moves: string;
+  white: GameUser;
+  whiteId: number;
+  black: GameUser;
+  blackId: number;
+}
