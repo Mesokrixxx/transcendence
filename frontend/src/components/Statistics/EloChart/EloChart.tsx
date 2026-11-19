@@ -1,3 +1,5 @@
+import * as S from './EloChart.styles';
+
 interface Chart {
   width: number;
   height: number;
@@ -89,48 +91,40 @@ function EloChart({ evolution }: { evolution: number[] }) {
   const lastPoint = points.at(-1);
 
   return (
-    <svg viewBox="0 0 800 300">
+    <S.Chart viewBox="0 0 800 300">
       {ticks.map((t) => {
         const y = getY(t, chart);
 
         return (
           <g key={t}>
-            <line
+            <S.GridLine
               x1={chart.padding.left}
               x2={chart.padding.left + chart.width}
               y1={y}
               y2={y}
             />
-            <text
+            <S.AxisLabel
               x={chart.padding.left - 10}
               y={y}
               textAnchor="end"
               dominantBaseline="middle"
             >
               {t}
-            </text>
+            </S.AxisLabel>
           </g>
         );
       })}
 
-      <polyline
-        points={pointsString}
-        fill="none"
-        stroke="white"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <S.EvolutionLine points={pointsString} />
       
       { lastPoint && (
-        <circle
+        <S.CurrentPoint
           cx={lastPoint.x}
           cy={lastPoint.y}
-          r={4}
-          fill="white"
+          r={5}
         />
       )}
-    </svg>
+    </S.Chart>
   );
 }
 
