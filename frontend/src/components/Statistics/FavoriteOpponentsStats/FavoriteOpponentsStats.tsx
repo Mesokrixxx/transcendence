@@ -67,7 +67,7 @@ function FavoriteOpponentsStats({
         favoriteOpponents.map((o, i) => {
           const winRate = (o.wins / o.total) * 100;
           return (
-            <S.Opponent key={o.username}>
+            <S.Opponent key={o.id}>
               <S.Rank>{i + 1}</S.Rank>
               <S.Info>
                 <S.Username>{o.username}</S.Username>
