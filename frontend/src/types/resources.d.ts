@@ -79,9 +79,11 @@ export default interface Resources {
     "gameNotFound": "Game not found.",
     "gameOver": "Game over",
     "games": "Games",
+    "joinGame": "Join game",
     "legalCapture": "Legal capture",
     "legalMove": "Legal move",
     "localChessGame": "Local chess game",
+    "noGamesInProgress": "No games in progress.",
     "offerDraw": "Offer draw",
     "opponent": "Opponent",
     "pieceBishop": "Bishop",
@@ -117,12 +119,14 @@ export default interface Resources {
     "squareLabel": "{{square}}: {{squareLabel}}",
     "toMove": "{{color}} to move",
     "trainingDescription": "Practise by playing both sides.",
+    "unableToLoadGames": "Unable to load games.",
     "unableToPlayThisMove": "Unable to play this move.",
     "unableToSendDrawRequest": "Unable to send the draw request.",
     "waitingForFriend": "Waiting for your friend…",
     "watchGame": "Watch game",
     "white": "White",
-    "winnerStatus": "{{winner}} won"
+    "winnerStatus": "{{winner}} won",
+    "yourGame": "Your game"
   },
   "common": {
     "apiTestTitle": "API test — backend",

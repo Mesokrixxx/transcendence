@@ -218,6 +218,43 @@ export async function create(whiteId: number, blackId: number) {
 	});
 }
 
+export async function listActive(userId: number) {
+	const games = await prisma.game.findMany({
+		where: { status: { in: ['WAITING', 'PLAYING'] } },
+		orderBy: [
+			{ status: 'desc' },
+			{ createdAt: 'desc' },
+		],
+		include: {
+			white: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true, displayName: true } },
+				},
+			},
+			black: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true, displayName: true } },
+				},
+			},
+		},
+	});
+
+	return games
+		.map((game) => ({
+			...gameView(game),
+			isPlayer: game.whiteId === userId || game.blackId === userId,
+		}))
+		.sort((left, right) =>
+			Number(right.isPlayer) - Number(left.isPlayer) ||
+			Number(right.status === 'PLAYING') - Number(left.status === 'PLAYING') ||
+			right.createdAt.getTime() - left.createdAt.getTime(),
+		);
+}
+
 export async function getActiveWithFriend(userId: number, friendId: number) {
 	return await prisma.game.findFirst({
 		where: {

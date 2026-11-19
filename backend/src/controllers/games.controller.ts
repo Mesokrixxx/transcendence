@@ -7,6 +7,20 @@ import { treatError } from '../utils/errors.js';
 import { broadcast } from '../services/gamePresence.service.js';
 import * as presenceService from '../services/presence.service.js';
 
+export async function listGames(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const { result, error } = await query(() =>
+		gameService.listActive(req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	return res.status(200).json({ games: result });
+}
+
 export async function getGame(req: Request, res: Response) {
 	if (!req.user)
 		return res.status(401).json({ error: 'user must be logged in' });
