@@ -4,6 +4,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import ChatBox from '../../components/ChatBox/ChatBox';
 import { getFriends, type FriendUser } from '../../services/friends';
 import fetchAPI from '../../services/fetchAPI';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import { ChatLayout, ConversationList, ConversationButton, ConversationPanel } from './Chat.styles';
 
 type Conversation = FriendUser & { chatId: number };
@@ -35,7 +36,7 @@ function Messaging() {
 
         if (!active) return;
         setConversations(results);
-        setSelectedId((current) => current ?? results[0]?.id ?? null);
+        setSelectedId((current) => current ?? results[0]?.chatId ?? null);
       } catch {
         if (active) setError(t('requestFailed', { ns: 'common' }));
       }
@@ -46,6 +47,31 @@ function Messaging() {
       active = false;
     };
   }, [t]);
+
+  // Live online status: the initial value comes from getFriends(),
+  // then we follow presence.changed events from the shared socket.
+  useEffect(() => {
+    function updatePresence(event: RealtimeEvent) {
+      if (
+        event.type !== 'presence.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.online !== 'boolean'
+      ) return;
+
+      const userId = event.userId;
+      const online = event.online;
+
+      setConversations((current) =>
+        current.map((conversation) =>
+          conversation.id === userId
+            ? { ...conversation, isOnline: online }
+            : conversation
+        )
+      );
+    }
+
+    return realtimeSocket.subscribe(updatePresence);
+  }, []);
 
   if (error) return <p role="alert">{error}</p>;
 
@@ -66,7 +92,7 @@ function Messaging() {
                 onClick={() => setSelectedId(conversation.chatId)}
               >
                 <Avatar
-                  src={conversation.avatar}
+                  src={conversation.avatar || '/avatars/default.svg'}
                   username={conversation.username}
                   isOnline={conversation.isOnline}
                   size={40}

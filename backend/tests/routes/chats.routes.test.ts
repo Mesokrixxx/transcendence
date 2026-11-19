@@ -45,9 +45,10 @@ describe('chat routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual(chat);
     expect(chatService.isMember).toHaveBeenCalledWith(4, 1);
+    expect(chatService.get).toHaveBeenCalledWith(4);
   });
 
-  it('rejects a chat for a non-member', async () => {
+  it('rejects a chat read by a non-member', async () => {
     vi.mocked(chatService.isMember).mockResolvedValue(false);
 
     const response = await request(app).get('/api/chats/4');
@@ -71,8 +72,8 @@ describe('chat routes', () => {
     const message = {
       id: 8,
       content: 'Hello!',
-      chatId: 4,
       userId: 1,
+      chatId: 4,
       user: authenticatedUser,
     };
     vi.mocked(chatService.append).mockResolvedValue(message);

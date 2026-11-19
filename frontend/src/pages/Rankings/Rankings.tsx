@@ -20,6 +20,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import { useTranslation, Trans } from 'react-i18next';
 import { getRankings , type Player } from '../../services/rankings'
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket'
+import { useAuth } from '../../context/AuthContext'
 
 function getWinRate(wins: number, games: number): number {
   if (games === 0) return 0;
@@ -58,6 +59,7 @@ function Rankings() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [search, setSearch] = useState('')
+  const { user } = useAuth()
 
   useEffect(() => {
       getRankings()
@@ -84,6 +86,25 @@ function Rankings() {
     }
 
     return realtimeSocket.subscribe(updateProfile)
+  }, [])
+
+  // Live online status (the backend only sends presence.changed for friends).
+  useEffect(() => {
+    function updatePresence(event: RealtimeEvent) {
+      if (
+        event.type !== 'presence.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.online !== 'boolean'
+      ) return
+
+      const userId = event.userId
+      const online = event.online
+      setPlayers((current) => current.map((player) =>
+        player.id === userId ? { ...player, online } : player
+      ))
+    }
+
+    return realtimeSocket.subscribe(updatePresence)
   }, [])
 
   const rankedPlayers = players.map((player, index) => ({
@@ -127,7 +148,7 @@ function Rankings() {
                                       <Avatar
                                           src={player.avatar||'/avatars/default.svg'}
                                           username={player.username}
-                                          isOnline={player.online}
+                                          isOnline={player.id === user?.id || player.online}
                                           size={48}
                                       />
                                       <Link to={`/profile/${player.id}`}>

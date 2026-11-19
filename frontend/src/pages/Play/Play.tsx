@@ -50,6 +50,7 @@ type RemoteGameState = {
   };
   whiteId?: number;
   blackId?: number;
+  chatId?: number;
 };
 
 function isRemoteGameState(value: unknown): value is RemoteGameState {
@@ -74,6 +75,7 @@ function Play() {
     playerColor: 'white' | 'black';
     opponentName: string | null;
     opponentAvatar: string | null;
+    chatId: number | undefined;
   } | null>(null);
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
@@ -155,6 +157,7 @@ function Play() {
         playerColor,
         opponentName: opponent?.displayName?.trim() || opponent?.username || null,
         opponentAvatar: opponent?.avatar ?? null,
+        chatId: response.result.chatId,
       });
       setGame(new ChessGame(response.result.moves));
     });
@@ -333,7 +336,10 @@ function Play() {
           )}
 
           <GameChat aria-label={tChat('gameChat')}>
-            <ChatBox title={tChat('gameChat')} />
+            <ChatBox
+              title={tChat('gameChat')}
+              chatId={onlineSide?.gameId === gameId ? onlineSide.chatId : undefined}
+            />
           </GameChat>
         </GameArea>
       </PlayContent>

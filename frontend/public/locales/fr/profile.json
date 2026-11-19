@@ -12,16 +12,16 @@
   "jpgPngOrWebpMaximum2Mb": "JPG, PNG ou WebP. 2 Mo maximum.",
   "lastNameOptional": "Nom (facultatif)",
   "localProfileNotice": "Le pseudo est enregistré sur ton compte. Le prénom, le nom et l’image restent temporaires et disparaissent au rechargement.",
+  "playerElo": "Elo : {{elo}}",
+  "playerGamesPlayed": "Parties jouées : {{games}}",
+  "playerNotFound": "Joueur introuvable.",
+  "playerProfileLoadError": "Impossible de charger le profil.",
+  "playerProfileLoading": "Chargement du profil…",
   "profileActivity": "Activité du profil",
   "profileInformationAndAvatar": "Informations du profil et avatar",
   "resetAvatar": "Revenir à l’avatar par défaut",
   "saveChanges": "Enregistrer",
   "saveError": "Impossible d’enregistrer les modifications. Réessaie.",
   "saving": "Enregistrement...",
-  "yourUsername": "Votre nom d'utilisateur",
-  "playerProfileLoading": "Chargement du profil…",
-  "playerNotFound": "Joueur introuvable.",
-  "playerProfileLoadError": "Impossible de charger le profil.",
-  "playerElo": "Elo : {{elo}}",
-  "playerGamesPlayed": "Parties jouées : {{games}}"
+  "yourUsername": "Votre nom d'utilisateur"
 }

@@ -47,11 +47,18 @@ export default interface Resources {
   },
   "chat": {
     "chat": "Chat",
+    "connecting": "Connecting...",
     "conversations": "Conversations",
+    "disconnected": "Disconnected. You cannot send messages right now.",
     "gameChat": "Game chat",
+    "loadMessagesError": "Could not load the messages.",
+    "loadingMessages": "Loading messages...",
     "messages": "Messages",
     "noConversations": "No conversations with your friends.",
+    "noMessagesYet": "No messages yet.",
     "players": "Players",
+    "rateLimitError": "You are writing too fast. Please wait a few seconds.",
+    "sendError": "Could not send your message.",
     "spectatorChat": "Spectator chat",
     "spectators": "Spectators",
     "writeAMessage": "Write a message..."
