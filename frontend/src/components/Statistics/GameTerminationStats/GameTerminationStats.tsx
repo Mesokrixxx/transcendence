@@ -32,7 +32,7 @@ const gameEndTypes = {
     label: 'fifty-moves',
     color: 'cyan',
   },
-} satisfies Record<GameEndType, { label: string, color: string }>;
+} satisfies Record<GameEndType, { label: string; color: string }>;
 
 function GameTerminationStats({ games }: { games: Game[] }) {
   const segments = Object.entries(gameEndTypes).map(([endType, data]) => {
@@ -41,22 +41,25 @@ function GameTerminationStats({ games }: { games: Game[] }) {
       label: data.label,
       color: data.color,
       value: 0,
-    }
+    };
   });
 
   games.forEach((g) => {
     const endType = g.endType;
-    if (endType === null)
-      return;
+    if (endType === null) return;
 
     const segment = segments.find((s) => s.type === endType);
-    if (segment)
-      ++segment.value;
+    if (segment) ++segment.value;
   });
 
   const displayedSegments = segments
     .filter((s) => s.value > 0)
     .sort((a, b) => b.value - a.value);
+
+  const gamesCount = displayedSegments.reduce(
+    (count, segment) => count + segment.value,
+    0,
+  );
 
   return (
     <S.GameTerminationStats>
@@ -65,7 +68,7 @@ function GameTerminationStats({ games }: { games: Game[] }) {
           <SegmentedBar segments={displayedSegments} />
           <SegmentedBarLegend
             segments={displayedSegments}
-            total={games.length}
+            total={gamesCount}
           />
         </>
       ) : (

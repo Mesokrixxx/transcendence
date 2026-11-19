@@ -6,7 +6,7 @@ import * as S from './GameResultsStats.styles';
 function GameResultsStats({ games }: { games: Game[] }) {
   const whiteWins = games.filter((g) => g.result === GameResult.WHITE).length;
   const blackWins = games.filter((g) => g.result === GameResult.BLACK).length;
-  const draws = games.length - whiteWins - blackWins;
+  const draws = games.filter((g) => g.result === GameResult.DRAW).length;
   const segments = [
     {
       label: 'white',

@@ -24,6 +24,7 @@ function getEloProgression(
     .filter(
       (g) =>
         g.status === GameStatus.OVER &&
+        g.endedAt !== null &&
         (g.whiteId === userId || g.blackId === userId),
     )
     .sort((a, b) => a.endedAt!.getTime() - b.endedAt!.getTime());
