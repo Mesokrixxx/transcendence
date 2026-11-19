@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { GameResult, type Game } from '../../../types/game';
 import * as S from './FavoriteOpponentsStats.styles';
 
@@ -59,6 +60,8 @@ function FavoriteOpponentsStats({
   games,
   userId,
 }: FavoriteOpponentsStatsProps) {
+  const { t } = useTranslation('statistics');
+
   const favoriteOpponents = getFavoriteOpponents(userId, games, 5);
 
   return (
@@ -71,17 +74,17 @@ function FavoriteOpponentsStats({
               <S.Rank>{i + 1}</S.Rank>
               <S.Info>
                 <S.Username>{o.username}</S.Username>
-                <S.GamesPlayed>{o.total} games played</S.GamesPlayed>
+                <S.GamesPlayed>{t('gamesPlayed', { count: o.total })}</S.GamesPlayed>
               </S.Info>
               <S.WinRate>
                 <S.Percentage>{winRate.toFixed(1)}%</S.Percentage>
-                <S.WinRateLabel>Win rate</S.WinRateLabel>
+                <S.WinRateLabel>{t('winRate')}</S.WinRateLabel>
               </S.WinRate>
             </S.Opponent>
           );
         })
       ) : (
-        <S.InsufficientData>No opponents available</S.InsufficientData>
+        <S.InsufficientData>{t('noOpponentsAvailable')}</S.InsufficientData>
       )}
     </S.FavoriteOpponentsStats>
   );

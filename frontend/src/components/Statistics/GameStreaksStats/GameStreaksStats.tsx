@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import StreakCard from '../StreakCard/StreakCard';
 import { GameResult, type Game } from '../../../types/game';
 import * as S from './GameStreaksStats.styles';
@@ -70,33 +71,40 @@ function getGameStreaks(games: Game[], userId: number): GameStreaks {
 }
 
 function GameStreaksStats({ games, userId }: GameStreaksStatsProps) {
+  const { t } = useTranslation('statistics');
+
   const streaks = getGameStreaks(games, userId);
+
+  const currentResult = streaks.currentStreak.result ? t(streaks.currentStreak.result) : null;
 
   return (
     <S.GameStreaksStats>
       <StreakCard
-        title="Winning streak"
+        title={t('winningStreak')}
         value={streaks.longestWinStreak}
-        description="Consecutive wins"
+        description={t('consecutiveWins')}
       />
       <StreakCard
-        title="Losing streak"
+        title={t('losingStreak')}
         value={streaks.longestLossStreak}
-        description="Consecutive losses"
+        description={t('consecutiveLosses')}
       />
       <StreakCard
-        title="Drawing streak"
+        title={t('drawingStreak')}
         value={streaks.longestDrawStreak}
-        description="Consecutive draws"
+        description={t('consecutiveDraws')}
       />
       <StreakCard
-        title="Current streak"
+        title={t('currentStreak')}
         value={
-          streaks.currentStreak.result
-            ? `${streaks.currentStreak.result.toUpperCase()} x ${streaks.currentStreak.count}`
+          currentResult
+            ? t('currentStreakValue', {
+                result: currentResult,
+                count: streaks.currentStreak.count,
+              })
             : '-'
         }
-        description="Current consecutive results"
+        description={t('currentConsecutiveResults')}
       />
     </S.GameStreaksStats>
   );

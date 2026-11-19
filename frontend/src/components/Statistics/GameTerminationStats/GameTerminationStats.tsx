@@ -1,7 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import SegmentedBar from '../SegmentedBar/SegmentedBar';
 import SegmentedBarLegend from '../SegmentedBarLegend/SegmentedBarLegend';
 import { GameEndType, type Game } from '../../../types/game';
 import * as S from './GameTerminationStats.styles';
+
+type EndTypeLabel =
+  | 'checkmate'
+  | 'forfeit'
+  | 'timeForfeit'
+  | 'stalemate'
+  | 'insufficientMaterial'
+  | 'threefoldRepetition'
+  | 'fiftyMoveRule';
 
 const gameEndTypes = {
   [GameEndType.CHECKMATE]: {
@@ -13,7 +23,7 @@ const gameEndTypes = {
     color: 'var(--color-primary)',
   },
   [GameEndType.TIMEFORFEIT]: {
-    label: 'time forfeit',
+    label: 'timeForfeit',
     color: 'var(--color-primary)',
   },
   [GameEndType.STALEMATE]: {
@@ -21,24 +31,25 @@ const gameEndTypes = {
     color: 'var(--color-board-dark)',
   },
   [GameEndType.INSUFMATERIAL]: {
-    label: 'insufficient material',
+    label: 'insufficientMaterial',
     color: 'var(--color-board-dark)',
   },
   [GameEndType.TRIPLEREPETITION]: {
-    label: 'threefold repetition',
+    label: 'threefoldRepetition',
     color: 'var(--color-board-dark)',
   },
   [GameEndType.FIFTYMOVE]: {
-    label: 'fifty-moves',
+    label: 'fiftyMoveRule',
     color: 'var(--color-board-dark)',
   },
-} satisfies Record<GameEndType, { label: string; color: string }>;
+} satisfies Record<GameEndType, { label: EndTypeLabel; color: string }>;
 
 function GameTerminationStats({ games }: { games: Game[] }) {
+  const { t } = useTranslation('statistics');
   const segments = Object.entries(gameEndTypes).map(([endType, data]) => {
     return {
       type: Number(endType) as GameEndType,
-      label: data.label,
+      label: t(data.label),
       color: data.color,
       value: 0,
     };
@@ -72,7 +83,7 @@ function GameTerminationStats({ games }: { games: Game[] }) {
           />
         </>
       ) : (
-        <S.InsufficientData>No games played yet.</S.InsufficientData>
+        <S.InsufficientData>{t('noGamesPlayed')}</S.InsufficientData>
       )}
     </S.GameTerminationStats>
   );

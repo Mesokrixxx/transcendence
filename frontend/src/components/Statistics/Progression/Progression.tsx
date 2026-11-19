@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import EloChart from '../EloChart/EloChart';
 import EloCard from '../EloCard/EloCard';
 import { GameStatus, type Game } from '../../../types/game';
@@ -45,17 +46,18 @@ function getEloProgression(
 }
 
 function Progression({ games, userId }: ProgressionProps) {
+  const { t } = useTranslation('statistics');
   const eloProgression = getEloProgression(games, userId, 20);
   return (
     <S.Progression>
       <S.EloSummary>
-        <EloCard title="Current ELO" value={eloProgression.current} />
-        <EloCard title="Peak ELO" value={eloProgression.max} />
+        <EloCard title={t('currentElo')} value={eloProgression.current} />
+        <EloCard title={t('peakElo')} value={eloProgression.max} />
       </S.EloSummary>
       {eloProgression.evolution.length > 1 ? (
         <EloChart evolution={eloProgression.evolution} />
       ) : (
-        <S.EmptyChart>No games played yet.</S.EmptyChart>
+        <S.EmptyChart>{t('noGamesPlayed')}</S.EmptyChart>
       )}
     </S.Progression>
   );

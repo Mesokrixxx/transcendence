@@ -16,7 +16,6 @@ function SegmentedBar({ segments }: SegmentedBarProps) {
       {segments.map((s) => (
         <S.Segment
           key={s.label}
-          title={`${s.label}: ${s.value}`}
           $color={s.color}
           $value={s.value}
         />
