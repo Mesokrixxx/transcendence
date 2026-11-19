@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ChessGame from '../../../../chessgame/src/chessgame';
-import type { Move, DeepReadonly, Square as SquareName } from '../../../../chessgame/src/chessgame.types';
+import type {
+  Move,
+  DeepReadonly,
+  Square as SquareName,
+} from '../../../../chessgame/src/chessgame.types';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
@@ -10,6 +14,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import GameStatus from '../../components/GameStatus/GameStatus';
 import ChatBox from '../../components/ChatBox/ChatBox';
 import Button from '../../components/Button/Button';
+import PlayLobby from '../../components/Play/PlayLobby';
 import { Page } from '../Home/Home.styles';
 import { PlayContent, GameArea, GameInfo, GameChat } from './Play.styles';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +22,10 @@ import fetchAPI from '../../services/fetchAPI';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 
 type PromotionLabelKey =
-  'promotionQueen' | 'promotionRook' | 'promotionBishop' | 'promotionKnight';
+  | 'promotionQueen'
+  | 'promotionRook'
+  | 'promotionBishop'
+  | 'promotionKnight';
 
 const promotionLabels: Record<string, PromotionLabelKey> = {
   queen: 'promotionQueen',
@@ -28,8 +36,18 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 
 type RemoteGameState = {
   moves: Move[];
-  white?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
-  black?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
+  white?: {
+    id: number;
+    username?: string;
+    displayName?: string | null;
+    avatar?: string | null;
+  };
+  black?: {
+    id: number;
+    username?: string;
+    displayName?: string | null;
+    avatar?: string | null;
+  };
   whiteId?: number;
   blackId?: number;
 };
@@ -66,17 +84,23 @@ function Play() {
   const [selectedSquare, setSelectedSquare] = useState<SquareName | null>(null);
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [error, setError] = useState('');
+
   const gameId = Number(gameIdParam);
   const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
   const boardOrientation = isRemoteGame
-  ? (onlineSide?.gameId === gameId ? onlineSide.playerColor : null)
-  : orientation;
+    ? (onlineSide?.gameId === gameId ? onlineSide.playerColor : null)
+    : orientation;
   const opponentName =
-    (isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentName : null) ??
-    tChess('opponent');
+    (isRemoteGame && onlineSide?.gameId === gameId
+      ? onlineSide.opponentName
+      : null) ?? tChess('opponent');
   const opponentAvatar =
-  isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentAvatar : null;
-  const waitingForFriend = isRemoteGame && game.getHistory().length === 0 &&
+    isRemoteGame && onlineSide?.gameId === gameId
+      ? onlineSide.opponentAvatar
+      : null;
+  const waitingForFriend =
+    isRemoteGame &&
+    game.getHistory().length === 0 &&
     !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
 
   const board = game.getBoard();
@@ -86,7 +110,7 @@ function Play() {
     legalMoves = game.getMoves(selectedSquare);
   }
 
- useEffect(() => {
+  useEffect(() => {
     if (isRemoteGame || orientation === game.getTurn()) return;
 
     const timer = setTimeout(() => {
@@ -97,7 +121,7 @@ function Play() {
     return () => clearTimeout(timer);
   }, [game, orientation, isRemoteGame]);
 
- useEffect(() => {
+  useEffect(() => {
     if (!isRemoteGame || userId == null) return;
 
     let active = true;
@@ -123,7 +147,8 @@ function Play() {
         return;
       }
 
-      const opponent = playerColor === 'white' ? response.result.black : response.result.white;
+      const opponent =
+        playerColor === 'white' ? response.result.black : response.result.white;
 
       setOnlineSide({
         gameId,
@@ -136,12 +161,20 @@ function Play() {
 
     function handleGameEvent(event: RealtimeEvent) {
       if (event.type === 'game.presence') {
-        if (event.gameId === gameId && typeof event.bothPlayersPresent === 'boolean') {
-          setGamePresence({ gameId, bothPlayersPresent: event.bothPlayersPresent });
+        if (
+          event.gameId === gameId &&
+          typeof event.bothPlayersPresent === 'boolean'
+        ) {
+          setGamePresence({
+            gameId,
+            bothPlayersPresent: event.bothPlayersPresent,
+          });
         }
         return;
       }
+
       if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
+
       setGame(new ChessGame(event.game.moves));
       setSelectedSquare(null);
       setPromotionMoves([]);
@@ -156,7 +189,7 @@ function Play() {
     };
   }, [gameId, isRemoteGame, tChess, userId]);
 
- async function playMove(move: Move) {
+  async function playMove(move: Move) {
     try {
       if (isRemoteGame) {
         const response = await fetchAPI<RemoteGameState>({
@@ -164,10 +197,12 @@ function Play() {
           method: 'post',
           body: move,
         });
+
         if (response.error || !isRemoteGameState(response.result)) {
           setError(tChess('unableToPlayThisMove'));
           return;
         }
+
         setGame(new ChessGame(response.result.moves));
         setSelectedSquare(null);
         setPromotionMoves([]);
@@ -226,6 +261,8 @@ function Play() {
     }
   }
 
+  if (gameIdParam === undefined) return <PlayLobby />;
+
   return (
     <Page>
       <Navbar />
@@ -234,9 +271,16 @@ function Play() {
         <GameArea aria-label={tChess('localChessGame')}>
           <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
-              <Avatar src={opponentAvatar ?? ''} username={opponentName} size={64} isOnline={true} />              <span>{opponentName}</span>
+              <Avatar
+                src={opponentAvatar ?? ''}
+                username={opponentName}
+                size={64}
+                isOnline={true}
+              />
+              <span>{opponentName}</span>
             </div>
-           {boardOrientation !== null && (
+
+            {boardOrientation !== null && (
               <GameStatus
                 game={game}
                 message={waitingForFriend ? tChess('waitingForFriend') : undefined}
@@ -279,9 +323,15 @@ function Play() {
               selectedSquare={selectedSquare}
               onSquareClick={handleSquareClick}
               legalMoves={legalMoves}
-              disabled={ waitingForFriend || game.isOver() || promotionMoves.length > 0 || isRotating}
+              disabled={
+                waitingForFriend ||
+                game.isOver() ||
+                promotionMoves.length > 0 ||
+                isRotating
+              }
             />
           )}
+
           <GameChat aria-label={tChat('gameChat')}>
             <ChatBox title={tChat('gameChat')} />
           </GameChat>
