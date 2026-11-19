@@ -67,4 +67,28 @@ export const SendButton = styled.button`
   border-radius: 6px;
   font-weight: 700;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
+
+export const Placeholder = styled.p`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 12px 16px;
+  text-align: center;
+  color: var(--color-text-secondary)
+`
+
+export const Notice = styled.p<{ $isError?: boolean }>`
+  margin: 0;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: ${({ $isError }) =>
+    $isError ? 'var(--color-error, #f87171)' : 'var(--color-text-secondary)'};
+`

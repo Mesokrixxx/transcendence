@@ -8,6 +8,8 @@ import * as friendsService from './services/friends.service.js';
 import * as presenceService from './services/presence.service.js';
 import * as gamePresenceService from './services/gamePresence.service.js';
 import * as gameService from './services/games.service.js';
+import { moveSchema } from './validations/game-play.validation.js';
+import { treatError } from './utils/errors.js';
 
 const webSocketServer = new WebSocketServer({ noServer: true });
 
@@ -29,28 +31,6 @@ function send(socket: WebSocket, message: unknown) {
 
 async function onConnection(socket: WebSocket, userId: number) {
 	presenceService.connect(userId, socket);
-	let ids: number[];
-	try {
-		ids = await friendIds(userId);
-	} catch (error: unknown) {
-		presenceService.disconnect(userId, socket);
-		throw error;
-	}
-
-	send(socket, {
-		type: 'presence.snapshot',
-		users: ids.map((id) => ({
-			userId: id,
-			online: presenceService.isOnline(id),
-		})),
-	});
-
-	for (const friendId of ids)
-		presenceService.send(friendId, {
-			type: 'presence.changed',
-			userId,
-			online: true,
-		});
 
 	socket.on('message', async (data: Buffer) => {
 		let message: unknown;
@@ -75,7 +55,10 @@ async function onConnection(socket: WebSocket, userId: number) {
 			message.type !== 'chat.join' &&
 			message.type !== 'chat.leave' &&
 			message.type !== 'game.join' &&
-			message.type !== 'game.leave'
+			message.type !== 'game.leave' &&
+			message.type !== 'game.move' &&
+			message.type !== 'game.resign' &&
+			message.type !== 'game.draw'
 		) {
 			send(socket, {
 				type: 'error',
@@ -86,37 +69,86 @@ async function onConnection(socket: WebSocket, userId: number) {
 
 		const resourceId = message.type.startsWith('game.') ? 'gameId' : 'chatId';
 		const payload = message as Record<string, unknown>;
-		if (
-			typeof payload[resourceId] !== 'number' ||
-			!Number.isInteger(payload[resourceId]) ||
-			payload[resourceId] <= 0
-		) {
+		const id = payload[resourceId];
+
+		if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
 			send(socket, {
 				type: 'error',
 				error: `${resourceId} shall be a positive integer`,
 			});
 			return;
 		}
-		const id = payload[resourceId];
 
 		try {
-			if (message.type === 'game.join' || message.type === 'game.leave') {
-				if (!(await gameService.canAccess(id, userId))) {
+			if (resourceId === 'gameId') {
+				if (
+					(message.type === 'game.join' || message.type === 'game.leave') &&
+					!(await gameService.canSpectate(id))
+				) {
 					send(socket, {
 						type: 'error',
-						error: 'user is not a player in this game',
+						error: 'game not found',
 					});
 					return;
 				}
+
 				if (message.type === 'game.join') {
-					gamePresenceService.subscribe(id, socket);
+					const isPlayer = await gameService.canAccess(id, userId);
+					if (socket.readyState !== socket.OPEN) return;
+
+					gamePresenceService.subscribe(id, socket, isPlayer ? userId : null);
 					send(socket, { type: 'game.joined', gameId: id });
-				} else {
+
+					const state = await gameService.getState(id);
+					if (state) send(socket, { type: 'game.updated', game: state });
+				} else if (message.type === 'game.leave') {
 					gamePresenceService.unsubscribe(id, socket);
 					send(socket, { type: 'game.left', gameId: id });
+				} else {
+					if (!(await gameService.canAccess(id, userId))) {
+						send(socket, {
+							type: 'error',
+							error: 'user is not a player in this game',
+						});
+						return;
+					}
+
+					let result;
+					if (message.type === 'game.move') {
+						const move = moveSchema.safeParse(payload);
+						if (!move.success) {
+							send(socket, {
+								type: 'error',
+								error: 'invalid chess move',
+								details: move.error.issues,
+							});
+							return;
+						}
+
+						const gameMove =
+							move.data.promotion === undefined
+								? { from: move.data.from, to: move.data.to }
+								: {
+										from: move.data.from,
+										to: move.data.to,
+										promotion: move.data.promotion,
+									};
+
+						result = await gameService.playMove(id, userId, gameMove);
+					} else if (message.type === 'game.resign') {
+						result = await gameService.resign(id, userId);
+					} else {
+						result = await gameService.draw(id, userId);
+					}
+
+					gamePresenceService.broadcast(id, {
+						type: 'game.updated',
+						game: result,
+					});
 				}
 				return;
 			}
+
 			if (!(await chatService.isMember(id, userId))) {
 				send(socket, {
 					type: 'error',
@@ -133,8 +165,9 @@ async function onConnection(socket: WebSocket, userId: number) {
 				send(socket, { type: 'chat.left', chatId: id });
 			}
 		} catch (error: unknown) {
-			console.error('WebSocket chat subscription error', error);
-			send(socket, { type: 'error', error: 'chat subscription unavailable' });
+			console.error('WebSocket message error', error);
+			const treatedError = treatError(error);
+			send(socket, { type: 'error', error: treatedError.error });
 		}
 	});
 
@@ -144,16 +177,36 @@ async function onConnection(socket: WebSocket, userId: number) {
 		if (!presenceService.disconnect(userId, socket)) return;
 
 		try {
-			for (const friendId of await friendIds(userId))
+			for (const friendId of await friendIds(userId)) {
 				presenceService.send(friendId, {
 					type: 'presence.changed',
 					userId,
 					online: false,
 				});
+			}
 		} catch (error: unknown) {
 			console.error('WebSocket presence disconnect error', error);
 		}
 	});
+
+	const ids = await friendIds(userId);
+	if (socket.readyState !== socket.OPEN) return;
+
+	send(socket, {
+		type: 'presence.snapshot',
+		users: ids.map((id) => ({
+			userId: id,
+			online: presenceService.isOnline(id),
+		})),
+	});
+
+	for (const friendId of ids) {
+		presenceService.send(friendId, {
+			type: 'presence.changed',
+			userId,
+			online: true,
+		});
+	}
 }
 
 export function attachWebSocket(server: Server) {

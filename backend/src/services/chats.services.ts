@@ -36,6 +36,57 @@ export async function create() {
 	return chat;
 }
 
+export async function createPrivate(userId: number, otherUserId: number) {
+	if (userId === otherUserId)
+		return null;
+
+	const friendship = await prisma.user.findUnique({
+		where: {
+			id: userId,
+			friendsAdded: { some: { id: otherUserId } },
+			addedBy: { some: { id: otherUserId } },
+		},
+		select: { id: true },
+	});
+	if (!friendship)
+		return null;
+
+	const existingChats = await prisma.chat.findMany({
+		where: {
+			game: null,
+			spectatorGame: null,
+			users: { some: { id: userId } },
+		},
+		include: {
+			users: { select: { id: true } },
+		},
+	});
+	const existingChat = existingChats.find((chat) => {
+		const ids = chat.users.map((user) => user.id).sort((a, b) => a - b);
+		return ids.length === 2 &&
+			ids.includes(userId) &&
+			ids.includes(otherUserId);
+	});
+	if (existingChat)
+		return get(existingChat.id);
+
+	const otherUser = await prisma.user.findUnique({
+		where: { id: otherUserId },
+		select: { id: true },
+	});
+	if (!otherUser)
+		return null;
+
+	const chat = await prisma.chat.create({
+		data: {
+			users: {
+				connect: [{ id: userId }, { id: otherUserId }],
+			},
+		},
+	});
+	return get(chat.id);
+}
+
 export async function add(chatId: number, userIds: number[]) {
 	if (!await get(chatId))
 		return null;
@@ -53,17 +104,21 @@ export async function add(chatId: number, userIds: number[]) {
 }
 
 export async function isMember(chatId: number, userId: number) {
-	const membership = await prisma.chat.findUnique({
+	const access = await prisma.chat.findUnique({
 		where: { id: chatId },
 		select: {
 			users: {
 				where: { id: userId },
 				select: { id: true }
-			}
+			},
+			spectatorGame: {
+				select: { id: true },
+			},
 		}
 	});
 
-	return membership !== null && membership.users.length > 0;
+	return access !== null &&
+		(access.users.length > 0 || access.spectatorGame !== null);
 }
 
 export async function append(message: string, chatId: number, userId: number) {
@@ -71,7 +126,7 @@ export async function append(message: string, chatId: number, userId: number) {
 	if (!chat)
 		return null;
 
-	if (!chat.users.some((chatUser) => chatUser.id === userId))
+	if (!await isMember(chatId, userId))
 		throw new BackendError(403, 'user is not a member of this chat');
 
 	const limit = checkMessageRateLimit(userId);

@@ -4,16 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import type { AuthUser } from '../../types/auth';
 import { uploadAvatar } from '../../services/avatar';
-import { updateProfileNames } from '../../services/profile';
+import { updateProfileDisplayName } from '../../services/profile';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input';
-import { ProfileDialog, DialogHeader, DialogActions } from './Profile.styles';
+import { ProfileDialog, DialogHeader, DialogActions } from '../../pages/Profile/Profile.styles';
 
 export type LocalProfile = {
-  firstName: string;
-  lastName: string;
+  displayName: string;
   avatar?: string;
 };
 
@@ -33,8 +32,7 @@ function EditProfileDialog({
   const { t } = useTranslation();
   const { setUser } = useAuth();
 
-  const [firstName, setFirstName] = useState(profile.firstName);
-  const [lastName, setLastName] = useState(profile.lastName);
+  const [displayName, setDisplayName] = useState(profile.displayName);
   const [isSaving, setIsSaving] = useState(false);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -117,61 +115,55 @@ function EditProfileDialog({
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
+  event.preventDefault();
 
-    if (isSaving || avatarError) return;
+  if (isSaving || avatarError) return;
 
-    const nextFirstName = firstName.trim();
-    const nextLastName = lastName.trim();
+  const nextDisplayName = displayName.trim();
 
-    setError('');
-    setIsSaving(true);
+  setError('');
+  setIsSaving(true);
 
-    let updatedUser = user;
+  let updatedUser = user;
 
-    try {
-      if (
-        nextFirstName !== profile.firstName ||
-        nextLastName !== profile.lastName
-      ) {
-        await updateProfileNames(nextFirstName, nextLastName);
-      }
-
-      if (removeAvatarOnSave) {
-        const response = await fetch('/api/users/me/avatar', {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error('Avatar removal failed');
-        }
-
-        updatedUser = { ...updatedUser, avatar: null };
-        setUser(updatedUser);
-        setRemoveAvatarOnSave(false);
-      } else if (avatarFile) {
-        const avatar = await uploadAvatar(avatarFile);
-
-        updatedUser = { ...updatedUser, avatar };
-        setUser(updatedUser);
-        setAvatarFile(null);
-        setAvatarSrc(avatar);
-      }
-
-      onSave({
-        firstName: nextFirstName,
-        lastName: nextLastName,
-        ...(updatedUser.avatar ? { avatar: updatedUser.avatar } : {}),
-      });
-    } catch {
-      setError('saveError');
-    } finally {
-      setIsSaving(false);
+  try {
+    if (nextDisplayName !== profile.displayName) {
+      await updateProfileDisplayName(nextDisplayName);
     }
-  }
 
-  return (
+    if (removeAvatarOnSave) {
+      const response = await fetch('/api/users/me/avatar', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Avatar removal failed');
+      }
+
+      updatedUser = { ...updatedUser, avatar: null };
+      setUser(updatedUser);
+      setRemoveAvatarOnSave(false);
+    } else if (avatarFile) {
+      const avatar = await uploadAvatar(avatarFile);
+
+      updatedUser = { ...updatedUser, avatar };
+      setUser(updatedUser);
+      setAvatarFile(null);
+      setAvatarSrc(avatar);
+    }
+
+    onSave({
+      displayName: nextDisplayName,
+      ...(updatedUser.avatar ? { avatar: updatedUser.avatar } : {}),
+    });
+  } catch {
+    setError('saveError');
+  } finally {
+    setIsSaving(false);
+  }
+}
+return(
     <ProfileDialog
       ref={dialogRef}
       id="profile-edit"
@@ -240,23 +232,14 @@ function EditProfileDialog({
           </div>
 
           <Input
-            id="profile-firstname"
-            name="firstName"
-            label={t('firstNameOptional', { ns: 'profile' })}
+            id="profile-display-name"
+            name="displayName"
+            label={t('displayName', { ns: 'profile' })}
             type="text"
-            autoComplete="given-name"
-            value={firstName}
-            onChange={(event) => setFirstName(event.currentTarget.value)}
-          />
-
-          <Input
-            id="profile-lastname"
-            name="lastName"
-            label={t('lastNameOptional', { ns: 'profile' })}
-            type="text"
-            autoComplete="family-name"
-            value={lastName}
-            onChange={(event) => setLastName(event.currentTarget.value)}
+            autoComplete="nickname"
+            maxLength={32}
+            value={displayName}
+            onChange={(event) => setDisplayName(event.currentTarget.value)}
           />
 
           {error && <p role="alert">{t('saveError', { ns: 'profile' })}</p>}

@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import ChessGame from '../../../../chessgame/src/chessgame';
-import type {
-  Move,
-  DeepReadonly,
-  Square as SquareName,
-} from '../../../../chessgame/src/chessgame.types';
+import type { Move, DeepReadonly, Square as SquareName } from '../../../../chessgame/src/chessgame.types';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
@@ -15,6 +13,8 @@ import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
 import { PlayContent, GameArea, GameInfo, GameChat } from './Play.styles';
 import { useTranslation } from 'react-i18next';
+import fetchAPI from '../../services/fetchAPI';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 
 type PromotionLabelKey =
   'promotionQueen' | 'promotionRook' | 'promotionBishop' | 'promotionKnight';
@@ -26,7 +26,39 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
   knight: 'promotionKnight',
 };
 
+type RemoteGameState = {
+  moves: Move[];
+  white?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
+  black?: { id: number; username?: string; displayName?: string | null; avatar?: string | null };
+  whiteId?: number;
+  blackId?: number;
+  chatId?: number;
+};
+
+function isRemoteGameState(value: unknown): value is RemoteGameState {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'moves' in value &&
+    Array.isArray(value.moves)
+  );
+}
+
 function Play() {
+  const { gameId: gameIdParam } = useParams();
+  const [gamePresence, setGamePresence] = useState<{
+    gameId: number;
+    bothPlayersPresent: boolean;
+  } | null>(null);
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [onlineSide, setOnlineSide] = useState<{
+    gameId: number;
+    playerColor: 'white' | 'black';
+    opponentName: string | null;
+    opponentAvatar: string | null;
+    chatId: number | undefined;
+  } | null>(null);
   const { t: tChess } = useTranslation('chess');
   const { t: tCommon } = useTranslation('common');
   const { t: tChat } = useTranslation('chat');
@@ -36,6 +68,18 @@ function Play() {
   const [selectedSquare, setSelectedSquare] = useState<SquareName | null>(null);
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [error, setError] = useState('');
+  const gameId = Number(gameIdParam);
+  const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
+  const boardOrientation = isRemoteGame
+  ? (onlineSide?.gameId === gameId ? onlineSide.playerColor : null)
+  : orientation;
+  const opponentName =
+    (isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentName : null) ??
+    tChess('opponent');
+  const opponentAvatar =
+  isRemoteGame && onlineSide?.gameId === gameId ? onlineSide.opponentAvatar : null;
+  const waitingForFriend = isRemoteGame && game.getHistory().length === 0 &&
+    !(gamePresence?.gameId === gameId && gamePresence.bothPlayersPresent);
 
   const board = game.getBoard();
 
@@ -44,18 +88,96 @@ function Play() {
     legalMoves = game.getMoves(selectedSquare);
   }
 
-  useEffect(() => {
-    if (orientation === game.getTurn()) return;
+ useEffect(() => {
+    if (isRemoteGame || orientation === game.getTurn()) return;
+
     const timer = setTimeout(() => {
       setOrientation(game.getTurn());
       setIsRotating(false);
     }, 700);
 
     return () => clearTimeout(timer);
-  }, [game, orientation]);
+  }, [game, orientation, isRemoteGame]);
 
-  function playMove(move: Move) {
+ useEffect(() => {
+    if (!isRemoteGame || userId == null) return;
+
+    let active = true;
+
+    fetchAPI<RemoteGameState>({
+      path: `/games/${gameId}`,
+      method: 'get',
+    }).then((response) => {
+      if (!active) return;
+
+      if (response.error || !isRemoteGameState(response.result)) {
+        setError(tChess('unableToPlayThisMove'));
+        return;
+      }
+
+      const whiteId = response.result.white?.id ?? response.result.whiteId;
+      const blackId = response.result.black?.id ?? response.result.blackId;
+      const playerColor =
+        userId === whiteId ? 'white' : userId === blackId ? 'black' : null;
+
+      if (playerColor === null) {
+        setError(tChess('unableToPlayThisMove'));
+        return;
+      }
+
+      const opponent = playerColor === 'white' ? response.result.black : response.result.white;
+
+      setOnlineSide({
+        gameId,
+        playerColor,
+        opponentName: opponent?.displayName?.trim() || opponent?.username || null,
+        opponentAvatar: opponent?.avatar ?? null,
+        chatId: response.result.chatId,
+      });
+      setGame(new ChessGame(response.result.moves));
+    });
+
+    function handleGameEvent(event: RealtimeEvent) {
+      if (event.type === 'game.presence') {
+        if (event.gameId === gameId && typeof event.bothPlayersPresent === 'boolean') {
+          setGamePresence({ gameId, bothPlayersPresent: event.bothPlayersPresent });
+        }
+        return;
+      }
+      if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
+      setGame(new ChessGame(event.game.moves));
+      setSelectedSquare(null);
+      setPromotionMoves([]);
+      setIsRotating(false);
+    }
+
+    const leaveGame = realtimeSocket.joinGame(gameId, handleGameEvent);
+
+    return () => {
+      active = false;
+      leaveGame();
+    };
+  }, [gameId, isRemoteGame, tChess, userId]);
+
+ async function playMove(move: Move) {
     try {
+      if (isRemoteGame) {
+        const response = await fetchAPI<RemoteGameState>({
+          path: `/games/${gameId}/moves`,
+          method: 'post',
+          body: move,
+        });
+        if (response.error || !isRemoteGameState(response.result)) {
+          setError(tChess('unableToPlayThisMove'));
+          return;
+        }
+        setGame(new ChessGame(response.result.moves));
+        setSelectedSquare(null);
+        setPromotionMoves([]);
+        setError('');
+        return;
+      }
+
       const nextGame = new ChessGame([...game.getHistory(), move]);
 
       setGame(nextGame);
@@ -115,11 +237,14 @@ function Play() {
         <GameArea aria-label={tChess('localChessGame')}>
           <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
-              <Avatar username={tChess('opponent')} size={64} isOnline={true} />
-              <span>{tChess('opponent')}</span>
+              <Avatar src={opponentAvatar || '/avatars/default.svg'} username={opponentName} size={64} isOnline={true} />              <span>{opponentName}</span>
             </div>
-
-            <GameStatus game={game} />
+           {boardOrientation !== null && (
+              <GameStatus
+                game={game}
+                message={waitingForFriend ? tChess('waitingForFriend') : undefined}
+              />
+            )}
 
             {promotionMoves.length > 0 && (
               <div role="group" aria-label={tChess('choosePromotionPiece')}>
@@ -150,17 +275,21 @@ function Play() {
             {error && <p role="alert">{error}</p>}
           </GameInfo>
 
-          <ChessBoard
-            board={board}
-            orientation={orientation}
-            // orientation={playerColor}
-            selectedSquare={selectedSquare}
-            onSquareClick={handleSquareClick}
-            legalMoves={legalMoves}
-            disabled={game.isOver() || promotionMoves.length > 0 || isRotating}
-          />
+          {boardOrientation !== null && (
+            <ChessBoard
+              board={board}
+              orientation={boardOrientation}
+              selectedSquare={selectedSquare}
+              onSquareClick={handleSquareClick}
+              legalMoves={legalMoves}
+              disabled={ waitingForFriend || game.isOver() || promotionMoves.length > 0 || isRotating}
+            />
+          )}
           <GameChat aria-label={tChat('gameChat')}>
-            <ChatBox title={tChat('gameChat')} />
+            <ChatBox
+              title={tChat('gameChat')}
+              chatId={onlineSide?.gameId === gameId ? onlineSide.chatId : undefined}
+            />
           </GameChat>
         </GameArea>
       </PlayContent>

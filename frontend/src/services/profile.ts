@@ -1,13 +1,12 @@
 import fetchAPI from './fetchAPI';
 
-export async function updateProfileNames(firstName: string, lastName: string) {
+export async function updateProfileDisplayName(displayName: string) {
+  const name = displayName.trim();
+
   const response = await fetchAPI({
     path: '/users/me',
     method: 'patch',
-    body: {
-      firstName: firstName.trim() || null,
-      lastName: lastName.trim() || null,
-    },
+    body: { displayName: name || null },
   });
 
   if (response.error) {

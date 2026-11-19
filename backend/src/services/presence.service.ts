@@ -32,3 +32,13 @@ export function send(userId: number, message: unknown) {
 			socket.send(payload);
 	}
 }
+
+export function broadcast(message: unknown) {
+	const payload = JSON.stringify(message);
+	for (const sockets of connections.values()) {
+		for (const socket of sockets) {
+			if (socket.readyState === socket.OPEN)
+				socket.send(payload);
+		}
+	}
+}

@@ -11,7 +11,7 @@ import Rankings from '../pages/Rankings/Rankings';
 import Chat from '../pages/Chat/Chat';
 import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
-import PlayerProfilePage from '../pages/Profile/PlayerProfilePage';
+import PlayerProfilePage from '../components/Profil/PlayerProfilePage';
 import ErrorPage from '../pages/Errors/ErrorPage';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
@@ -35,6 +35,10 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/play',
+        element: <Play />,
+      },
+      {
+        path: '/play/:gameId',
         element: <Play />,
       },
       {
@@ -112,6 +116,10 @@ const routes: RouteObject[] = [
   {
     path: '/500',
     element: <ErrorPage code={500} />,
+  },
+  {
+    path: '*',
+    element: <ErrorPage code={404} />,
   },
 ];
 

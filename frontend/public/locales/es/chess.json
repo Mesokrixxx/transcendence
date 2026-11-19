@@ -52,6 +52,7 @@
   "toMove": "Juegan {{color}}",
   "trainingDescription": "Practica jugando con ambos bandos.",
   "unableToPlayThisMove": "No se puede realizar este movimiento.",
+  "waitingForFriend": "Esperando a tu amigo…",
   "watchGame": "Ver partida",
   "white": "Blancas"
 }

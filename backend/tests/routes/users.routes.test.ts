@@ -18,8 +18,16 @@ vi.mock('../../src/middlewares/auth.middleware.js', () => ({
 
 vi.mock('../../src/services/users.service.js', () => ({
   get: vi.fn(),
+  getPlayerProfile: vi.fn(),
+  getAll: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
+}));
+
+vi.mock('../../src/controllers/avatar.controller.js', () => ({
+  receiveAvatar: vi.fn((_req, _res, next: () => void) => next()),
+  uploadAvatar: vi.fn(),
+  removeAvatar: vi.fn(),
 }));
 
 const app = createTestApp(usersRouter, '/api/users');
@@ -27,18 +35,32 @@ const app = createTestApp(usersRouter, '/api/users');
 describe('user routes', () => {
   beforeEach(() => {
     vi.mocked(userService.get).mockReset();
+    vi.mocked(userService.getPlayerProfile).mockReset();
+    vi.mocked(userService.getAll).mockReset();
     vi.mocked(userService.create).mockReset();
     vi.mocked(userService.update).mockReset();
   });
 
   it('gets a user by id', async () => {
-    vi.mocked(userService.get).mockResolvedValue(authenticatedUser);
+    vi.mocked(userService.getPlayerProfile).mockResolvedValue({
+      id: authenticatedUser.id,
+      username: authenticatedUser.username,
+      avatar: authenticatedUser.avatar,
+      elo: 1400,
+      gamesPlayed: 0,
+    });
 
     const response = await request(app).get('/api/users/1');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(authenticatedUser);
-    expect(userService.get).toHaveBeenCalledWith(1);
+    expect(response.body).toEqual({
+      id: authenticatedUser.id,
+      username: authenticatedUser.username,
+      avatar: authenticatedUser.avatar,
+      elo: 1400,
+      gamesPlayed: 0,
+    });
+    expect(userService.getPlayerProfile).toHaveBeenCalledWith(1);
   });
 
   it('rejects an invalid user id', async () => {
@@ -46,7 +68,7 @@ describe('user routes', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'id shall be a positive integer' });
-    expect(userService.get).not.toHaveBeenCalled();
+    expect(userService.getPlayerProfile).not.toHaveBeenCalled();
   });
 
   it('creates a user with a valid body', async () => {

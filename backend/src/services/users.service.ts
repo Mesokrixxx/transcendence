@@ -12,7 +12,7 @@ export async function get(id: number) {
       username: true,
       email: true,
       profile: {
-        select: { avatar: true },
+        select: { avatar: true, displayName: true },
       },
     },
   });
@@ -24,6 +24,7 @@ export async function get(id: number) {
     username: user.username,
     email: user.email,
     avatar: user.profile?.avatar ?? null,
+    displayName: user.profile?.displayName ?? null,
   };
 }
 
@@ -160,8 +161,7 @@ export async function update(
     username?: string | undefined;
     password?: string | undefined;
     currentPassword?: string | undefined;
-    firstName?: string | null | undefined;
-    lastName?: string | null | undefined;
+    displayName?: string | null | undefined;
   },
 ) {
   if (data.password !== undefined) {
@@ -180,9 +180,8 @@ export async function update(
   }
 
   const profileData = {
-    ...(data.firstName !== undefined ? { firstName: data.firstName } : {}),
-    ...(data.lastName !== undefined ? { lastName: data.lastName } : {}),
-  };
+    ...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+    };
 
   const updatedUser = await prisma.user.update({
     where: { id },
@@ -214,7 +213,7 @@ export async function getAll() {
 			username: true,
 			elo: true,
 			profile: {
-				select: { avatar: true },
+				select: { avatar: true, displayName: true },
 			},
 			whiteGames: {
 				where: { result: { not: null } },
@@ -238,6 +237,7 @@ export async function getAll() {
 			return {
 				id: user.id,
 				username: user.username,
+				displayName: user.profile?.displayName ?? null,
 				rating: user.elo,
 				wins,
 				games,
