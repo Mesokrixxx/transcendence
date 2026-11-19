@@ -9,6 +9,8 @@ function GameResultsStats({ games }: { games: Game[] }) {
   const whiteWins = games.filter((g) => g.result === GameResult.WHITE).length;
   const blackWins = games.filter((g) => g.result === GameResult.BLACK).length;
   const draws = games.filter((g) => g.result === GameResult.DRAW).length;
+  const total = whiteWins + blackWins + draws;
+
   const segments = [
     {
       label: t('white', { ns: 'chess' }),
@@ -36,7 +38,7 @@ function GameResultsStats({ games }: { games: Game[] }) {
           <SegmentedBar segments={displayedSegments} />
           <SegmentedBarLegend
             segments={displayedSegments}
-            total={games.length}
+            total={total}
           />
         </>
       ) : (
