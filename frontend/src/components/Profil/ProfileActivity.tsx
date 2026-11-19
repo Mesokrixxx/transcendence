@@ -82,7 +82,7 @@ function ProfileActivity({ userId }: { userId: number }) {
                 ? t('friends')
                 : tab === 'messages'
                   ? t('messages', { ns: 'chat' })
-                  : 'Stats'}
+                  : t('statistics', { ns: 'statistics' })}
           </ActivityTab>
         ))}
       </ActivityTabs>
