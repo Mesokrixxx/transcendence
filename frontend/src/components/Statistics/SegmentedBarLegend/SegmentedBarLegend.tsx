@@ -23,9 +23,10 @@ function SegmentedBarLegend({ segments, total }: SegmentedBarLegendProps) {
               {s.label}
             </S.Label>
 
-            <S.Percentage>{percentage.toFixed(1)}%</S.Percentage>
-
-            <S.Count>({s.value})</S.Count>
+            <S.PercentageAndCount>
+              <S.Percentage>{percentage.toFixed(1)}%</S.Percentage>
+              <S.Count>({s.value})</S.Count>
+            </S.PercentageAndCount>
           </S.Item>
         );
       })}
