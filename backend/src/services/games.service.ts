@@ -142,6 +142,145 @@ export async function create(whiteId: number, blackId: number) {
 	});
 }
 
+export async function getActiveWithFriend(userId: number, friendId: number) {
+	return await prisma.game.findFirst({
+		where: {
+			status: { in: ['WAITING', 'PLAYING'] },
+			OR: [
+				{ whiteId: userId, blackId: friendId },
+				{ whiteId: friendId, blackId: userId },
+			],
+		},
+		orderBy: { createdAt: 'desc' },
+		select: { id: true },
+	});
+}
+
+export async function createInvitation(senderId: number, receiverId: number) {
+	if (senderId === receiverId)
+		throw new BackendError(400, 'you cannot invite yourself');
+
+	const friendship = await prisma.user.findUnique({
+		where: {
+			id: senderId,
+			friendsAdded: { some: { id: receiverId } },
+			addedBy: { some: { id: receiverId } },
+		},
+		select: { id: true },
+	});
+	if (!friendship)
+		throw new BackendError(403, 'game invitations require friendship');
+
+	const activeGame = await getActiveWithFriend(senderId, receiverId);
+	if (activeGame)
+		return { activeGame, invitation: null };
+
+	const existing = await prisma.gameInvitation.findFirst({
+		where: {
+			status: 'PENDING',
+			OR: [
+				{ senderId, receiverId },
+				{ senderId: receiverId, receiverId: senderId },
+			],
+		},
+		orderBy: { createdAt: 'desc' },
+	});
+	if (existing)
+		return { activeGame: null, invitation: existing };
+
+	const invitation = await prisma.gameInvitation.create({
+		data: { senderId, receiverId, status: 'PENDING' },
+	});
+	return { activeGame: null, invitation };
+}
+
+export async function getPendingInvitations(userId: number) {
+	return await prisma.gameInvitation.findMany({
+		where: { receiverId: userId, status: 'PENDING' },
+		orderBy: { createdAt: 'desc' },
+		include: {
+			sender: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true, displayName: true } },
+				},
+			},
+		},
+	});
+}
+
+export async function acceptInvitation(invitationId: number, userId: number) {
+	const invitation = await prisma.gameInvitation.findUnique({
+		where: { id: invitationId },
+	});
+	if (!invitation)
+		throw new BackendError(404, 'invitation not found');
+	if (invitation.receiverId !== userId)
+		throw new BackendError(403, 'you are not the invited player');
+	if (invitation.status !== 'PENDING')
+		throw new BackendError(409, 'invitation is no longer pending');
+
+	const activeGame = await getActiveWithFriend(invitation.senderId, userId);
+	if (activeGame) {
+		const existingGame = await prisma.game.findUnique({ where: { id: activeGame.id } });
+		if (existingGame) return existingGame;
+	}
+
+	const game = await prisma.$transaction(async (tx) => {
+		const whiteId = invitation.senderId;
+		const blackId = userId;
+
+		const users = await tx.user.findMany({
+			where: { id: { in: [invitation.senderId, userId] } },
+			select: { id: true },
+		});
+		if (users.length !== 2)
+			throw new BackendError(400, 'invalid game players');
+
+		const specChat = await tx.chat.create({ data: {} });
+		const gameChat = await tx.chat.create({
+			data: {
+				users: {
+					connect: [{ id: invitation.senderId }, { id: userId }],
+				},
+			},
+		});
+		const created = await tx.game.create({
+			data: {
+				whiteId,
+				blackId,
+				chatId: gameChat.id,
+				specChatId: specChat.id,
+				moves: [],
+			},
+		});
+		await tx.gameInvitation.update({
+			where: { id: invitationId },
+			data: { status: 'ACCEPTED' },
+		});
+		return created;
+	});
+	return game;
+}
+
+export async function declineInvitation(invitationId: number, userId: number) {
+	const invitation = await prisma.gameInvitation.findUnique({
+		where: { id: invitationId },
+	});
+	if (!invitation)
+		throw new BackendError(404, 'invitation not found');
+	if (invitation.receiverId !== userId)
+		throw new BackendError(403, 'you are not the invited player');
+	if (invitation.status !== 'PENDING')
+		throw new BackendError(409, 'invitation is no longer pending');
+
+	return await prisma.gameInvitation.update({
+		where: { id: invitationId },
+		data: { status: 'DECLINED' },
+	});
+}
+
 export async function get(id: number) {
 	return await prisma.game.findUnique({
 		where: { id: id },

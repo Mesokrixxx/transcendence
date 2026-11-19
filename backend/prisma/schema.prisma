@@ -29,6 +29,12 @@ enum GameEndType {
   FIFTYMOVE
 }
 
+enum GameInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 // Tournament should have its own models and/or fields.
 
 model User {
@@ -57,6 +63,24 @@ model User {
   chats    Chat[]
   messages Message[]
   sessions Session[]
+
+  sentGameInvitations     GameInvitation[] @relation("SentGameInvitations")
+  receivedGameInvitations GameInvitation[] @relation("ReceivedGameInvitations")
+}
+
+model GameInvitation {
+  id         Int                   @id @default(autoincrement())
+  sender     User                  @relation("SentGameInvitations", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   Int
+  receiver   User                  @relation("ReceivedGameInvitations", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId Int
+  status     GameInvitationStatus  @default(PENDING)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@unique([senderId, receiverId, status])
+  @@index([receiverId, status])
+  @@index([senderId, status])
 }
 
 model Session {

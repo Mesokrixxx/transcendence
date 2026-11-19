@@ -36,6 +36,7 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 
 type RemoteGameState = {
   moves: Move[];
+  chatId?: number;
   white?: {
     id: number;
     username?: string;
@@ -84,6 +85,7 @@ function Play() {
   const [selectedSquare, setSelectedSquare] = useState<SquareName | null>(null);
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [error, setError] = useState('');
+  const [remoteChatId, setRemoteChatId] = useState<number | null>(null);
 
   const gameId = Number(gameIdParam);
   const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
@@ -156,6 +158,9 @@ function Play() {
         opponentName: opponent?.displayName?.trim() || opponent?.username || null,
         opponentAvatar: opponent?.avatar ?? null,
       });
+      setRemoteChatId(
+        typeof response.result.chatId === 'number' ? response.result.chatId : null,
+      );
       setGame(new ChessGame(response.result.moves));
     });
 
@@ -345,7 +350,10 @@ function Play() {
           )}
 
           <GameChat aria-label={tChat('gameChat')}>
-            <ChatBox title={tChat('gameChat')} />
+            <ChatBox
+              title={tChat('gameChat')}
+              chatId={isRemoteGame ? remoteChatId ?? undefined : undefined}
+            />
           </GameChat>
         </GameArea>
       </PlayContent>

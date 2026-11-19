@@ -20,6 +20,11 @@ vi.mock('../../src/services/games.service.js', () => ({
   getState: vi.fn(),
   canSpectate: vi.fn(),
   create: vi.fn(),
+  getActiveWithFriend: vi.fn(),
+  createInvitation: vi.fn(),
+  getPendingInvitations: vi.fn(),
+  acceptInvitation: vi.fn(),
+  declineInvitation: vi.fn(),
   playMove: vi.fn(),
   resign: vi.fn(),
   draw: vi.fn(),
@@ -27,6 +32,10 @@ vi.mock('../../src/services/games.service.js', () => ({
 
 vi.mock('../../src/services/gamePresence.service.js', () => ({
   broadcast: vi.fn(),
+}));
+
+vi.mock('../../src/services/presence.service.js', () => ({
+  send: vi.fn(),
 }));
 
 const app = createTestApp(gamesRouter, '/api/games');
@@ -37,6 +46,11 @@ describe('game routes', () => {
     vi.mocked(gameService.getState).mockReset();
     vi.mocked(gameService.canSpectate).mockReset();
     vi.mocked(gameService.create).mockReset();
+    vi.mocked(gameService.getActiveWithFriend).mockReset();
+    vi.mocked(gameService.createInvitation).mockReset();
+    vi.mocked(gameService.getPendingInvitations).mockReset();
+    vi.mocked(gameService.acceptInvitation).mockReset();
+    vi.mocked(gameService.declineInvitation).mockReset();
     vi.mocked(gameService.playMove).mockReset();
     vi.mocked(gameService.resign).mockReset();
     vi.mocked(gameService.draw).mockReset();
@@ -83,6 +97,41 @@ describe('game routes', () => {
 
     expect(response.status).toBe(403);
     expect(gameService.create).not.toHaveBeenCalled();
+  });
+
+  it('finds an active game with a friend', async () => {
+    vi.mocked(gameService.getActiveWithFriend).mockResolvedValue({ id: 7 });
+
+    const response = await request(app).get('/api/games/active/2');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ id: 7 });
+    expect(gameService.getActiveWithFriend).toHaveBeenCalledWith(1, 2);
+  });
+
+  it('creates a game invitation for a friend', async () => {
+    vi.mocked(gameService.createInvitation).mockResolvedValue({
+      activeGame: null,
+      invitation: { id: 12 },
+    } as never);
+
+    const response = await request(app).post('/api/games/invitations/2');
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({ invitationId: 12 });
+  });
+
+  it('accepts a game invitation and starts the game', async () => {
+    vi.mocked(gameService.acceptInvitation).mockResolvedValue({
+      id: 7,
+      whiteId: 2,
+      blackId: 1,
+    } as never);
+
+    const response = await request(app).post('/api/games/invitations/12/accept');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ gameId: 7 });
   });
 
   it('plays a move', async () => {

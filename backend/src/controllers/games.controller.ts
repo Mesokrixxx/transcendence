@@ -5,6 +5,7 @@ import { moveSchema } from '../validations/game-play.validation.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import { broadcast } from '../services/gamePresence.service.js';
+import * as presenceService from '../services/presence.service.js';
 
 export async function getGame(req: Request, res: Response) {
 	if (!req.user)
@@ -64,6 +65,122 @@ export async function createGame(req: Request, res: Response) {
 	}
 
 	res.status(201).json(result);
+}
+
+export async function getActiveGameWithFriend(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const friendId = Number(req.params.friendId);
+	if (!Number.isInteger(friendId) || friendId <= 0)
+		return res.status(400).json({ error: 'friendId shall be a positive integer' });
+
+	const { result, error } = await query(() =>
+		gameService.getActiveWithFriend(req.user!.id, friendId),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	return res.status(200).json(result);
+}
+
+export async function getInvitations(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const { result, error } = await query(() =>
+		gameService.getPendingInvitations(req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	return res.status(200).json({ invitations: result });
+}
+
+export async function createInvitation(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const receiverId = Number(req.params.friendId);
+	if (!Number.isInteger(receiverId) || receiverId <= 0)
+		return res.status(400).json({ error: 'friendId shall be a positive integer' });
+
+	const { result, error } = await query(() =>
+		gameService.createInvitation(req.user!.id, receiverId),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'invitation could not be created' });
+	if (result.activeGame) {
+		return res.status(200).json({ gameId: result.activeGame.id });
+	}
+
+	presenceService.send(receiverId, {
+		type: 'game.invitation.received',
+		invitationId: result.invitation?.id,
+		senderId: req.user.id,
+	});
+	return res.status(201).json({ invitationId: result.invitation?.id });
+}
+
+export async function acceptInvitation(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const invitationId = Number(req.params.id);
+	if (!Number.isInteger(invitationId) || invitationId <= 0)
+		return res.status(400).json({ error: 'id shall be a positive integer' });
+
+	const { result, error } = await query(() =>
+		gameService.acceptInvitation(invitationId, req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'game not found' });
+
+	presenceService.send(result.whiteId, {
+		type: 'game.invitation.accepted',
+		gameId: result.id,
+		invitationId,
+	});
+	presenceService.send(result.blackId, {
+		type: 'game.invitation.accepted',
+		gameId: result.id,
+		invitationId,
+	});
+	return res.status(200).json({ gameId: result.id });
+}
+
+export async function declineInvitation(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const invitationId = Number(req.params.id);
+	if (!Number.isInteger(invitationId) || invitationId <= 0)
+		return res.status(400).json({ error: 'id shall be a positive integer' });
+
+	const { result, error } = await query(() =>
+		gameService.declineInvitation(invitationId, req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'invitation not found' });
+	presenceService.send(result.senderId, {
+		type: 'game.invitation.declined',
+		invitationId,
+	});
+	return res.status(200).json({ invitationId });
 }
 
 export async function playMove(req: Request, res: Response) {
