@@ -1,9 +1,10 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Progression = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  min-width: 0;
 `;
 
 export const EloSummary = styled.div`
@@ -17,6 +18,7 @@ export const EmptyChart = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  border-radius: 0.75rem;
-  opacity: 0.7;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
 `;

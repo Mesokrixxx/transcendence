@@ -8,14 +8,28 @@ export const FavoriteOpponentsStats = styled.div`
 export const Opponent = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-border);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 `;
 
 export const Rank = styled.div`
-  width: 2rem;
+  width: 1.75rem;
   flex-shrink: 0;
-  opacity: 0.65;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 `;
 
 export const Info = styled.div`
@@ -27,15 +41,16 @@ export const Info = styled.div`
 `;
 
 export const Username = styled.div`
-  font-weight: 600;
   overflow: hidden;
+  color: var(--color-text-primary);
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
 export const GamesPlayed = styled.div`
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
-  opacity: 0.65;
 `;
 
 export const WinRate = styled.div`
@@ -47,15 +62,18 @@ export const WinRate = styled.div`
 `;
 
 export const Percentage = styled.div`
+  color: var(--color-text-primary);
   font-size: 1.1rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 `;
 
 export const WinRateLabel = styled.div`
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
-  opacity: 0.65;
 `;
 
 export const InsufficientData = styled.div`
-  opacity: 0.65;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
 `;
