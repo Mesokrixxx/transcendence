@@ -54,5 +54,13 @@
   "unableToPlayThisMove": "No se puede realizar este movimiento.",
   "waitingForFriend": "Esperando a tu amigo…",
   "watchGame": "Ver partida",
-  "white": "Blancas"
+  "white": "Blancas",
+  "lobby": {
+    "title": "Jugar con un amigo",
+    "loadError": "No se pudo cargar tu lista de amigos.",
+    "loading": "Cargando tu lista de amigos…",
+    "noFriends": "Aún no tienes amigos en ChessMove.",
+    "online": "En línea",
+    "offline": "Sin conexión"
+  }
 }

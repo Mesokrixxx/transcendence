@@ -77,6 +77,14 @@ export default interface Resources {
     "games": "Games",
     "legalCapture": "Legal capture",
     "legalMove": "Legal move",
+    "lobby": {
+      "loadError": "Could not load your friends.",
+      "loading": "Loading your friends…",
+      "noFriends": "You don’t have any friends on ChessMove yet.",
+      "offline": "Offline",
+      "online": "Online",
+      "title": "Play with a friend"
+    },
     "localChessGame": "Local chess game",
     "opponent": "Opponent",
     "pieceBishop": "Bishop",

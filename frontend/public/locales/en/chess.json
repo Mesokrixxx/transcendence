@@ -56,5 +56,13 @@
   "unableToPlayThisMove": "Unable to play this move.",
   "waitingForFriend": "Waiting for your friend…",
   "watchGame": "Watch game",
-  "white": "White"
+  "white": "White",
+  "lobby": {
+    "title": "Play with a friend",
+    "loadError": "Could not load your friends.",
+    "loading": "Loading your friends…",
+    "noFriends": "You don’t have any friends on ChessMove yet.",
+    "online": "Online",
+    "offline": "Offline"
+  }
 }

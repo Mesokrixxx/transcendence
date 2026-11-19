@@ -7,9 +7,11 @@ import Navbar from '../../components/Navbar/Navbar';
 import { getFriends, type FriendUser } from '../../services/friends';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import { Page } from '../../pages/Home/Home.styles';
+import { useTranslation } from 'react-i18next';
 import { PlayContent, GameArea, GameInfo } from '../../pages/Play/Play.styles';
 
 export default function PlayLobby() {
+  const { t } = useTranslation('chess');
   const [board] = useState(() => new ChessGame().getBoard());
   const [friends, setFriends] = useState<FriendUser[] | null>(null);
   const [hasError, setHasError] = useState(false);
@@ -81,20 +83,24 @@ export default function PlayLobby() {
       <Navbar />
 
       <PlayContent className="container">
-        <GameArea aria-label="Jouer avec un ami">
+        <GameArea aria-label={t('lobby.title')}>
           <GameInfo>
-            <h1>Jouer avec un ami</h1>
+            <h1>{t('lobby.title')}</h1>
 
             {hasError ? (
-              <p role="alert">Impossible de charger tes amis.</p>
+              <p role="alert">{t('lobby.loadError')}</p>
             ) : friends === null ? (
-              <p role="status">Chargement de tes amis…</p>
+              <p role="status">{t('lobby.loading')}</p>
             ) : visibleFriends.length === 0 ? (
-              <p>Tu n’as pas encore d’amis dans ChessMove.</p>
+              <p>{t('lobby.noFriends')}</p>
             ) : (
               <ul>
                 {visibleFriends.map((friend) => (
-                  <li key={friend.id} className="opponent">
+                  <li
+                    key={friend.id}
+                    className="opponent"
+                    title={friend.isOnline ? t('lobby.online') : t('lobby.offline')}
+                  >
                     <Avatar
                       src={friend.avatar ?? ''}
                       username={friend.name}
@@ -102,7 +108,6 @@ export default function PlayLobby() {
                       size={40}
                     />
                     <span>{friend.name}</span>
-                    <span>{friend.isOnline ? 'En ligne' : 'Hors ligne'}</span>
                   </li>
                 ))}
               </ul>
