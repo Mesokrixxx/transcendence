@@ -107,6 +107,7 @@ function Play() {
     result: 'DRAW' | 'WHITE' | 'BLACK' | null;
     endType: string | null;
   } | null>(null);
+  const [drawRequestSent, setDrawRequestSent] = useState(false);
 
   const gameId = Number(gameIdParam);
   const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
@@ -191,6 +192,10 @@ function Play() {
     });
 
     function handleGameEvent(event: RealtimeEvent) {
+      if (event.type === 'game.draw.declined' && event.gameId === gameId) {
+        setDrawRequestSent(false);
+        setError(tChess('drawRequestDeclined'));
+      }
       if (event.type === 'game.presence') {
         if (
           event.gameId === gameId &&
@@ -288,6 +293,20 @@ function Play() {
 
   async function endRemoteGame(action: 'resign' | 'draw') {
     if (!isRemoteGame) return;
+
+    if (action === 'draw') {
+      const response = await fetchAPI<{ gameId: number }>({
+        path: `/games/${gameId}/draw/request`,
+        method: 'post',
+      });
+      if (response.error) {
+        setError(apiErrorMessage(response.result, tChess('unableToSendDrawRequest')));
+        return;
+      }
+      setError('');
+      setDrawRequestSent(true);
+      return;
+    }
 
     const response = await fetchAPI<RemoteGameState>({
       path: `/games/${gameId}/${action}`,
@@ -387,7 +406,9 @@ function Play() {
                   variant="secondary"
                   onClick={() => void endRemoteGame('draw')}
                 >
-                  {tChess('offerDraw')}
+                  {drawRequestSent
+                    ? tChess('drawRequestSent')
+                    : tChess('offerDraw')}
                 </Button>
                 <Button
                   variant="secondary"

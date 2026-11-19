@@ -183,6 +183,20 @@ export async function declineInvitation(req: Request, res: Response) {
 	return res.status(200).json({ invitationId });
 }
 
+export async function getDrawOffers(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const { result, error } = await query(() =>
+		gameService.getPendingDrawOffers(req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	return res.status(200).json({ offers: result });
+}
+
 export async function playMove(req: Request, res: Response) {
 	if (!req.user)
 		return res.status(401).json({ error: 'user must be logged in' });
@@ -228,6 +242,87 @@ export async function resign(req: Request, res: Response) {
 	}
 	broadcast(id, { type: 'game.updated', game: result });
 	return res.status(200).json(result);
+}
+
+export async function requestDraw(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const id = Number(req.params.id);
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const { result, error } = await query(() =>
+		gameService.createDrawOffer(id, req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'draw offer not found' });
+
+	presenceService.send(result.receiverId, {
+		type: 'game.draw.received',
+		gameId: id,
+		senderId: req.user.id,
+	});
+	return res.status(201).json({ gameId: id });
+}
+
+export async function acceptDraw(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const id = Number(req.params.id);
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const { result, error } = await query(() =>
+		gameService.acceptDrawOffer(id, req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'game not found' });
+
+	broadcast(id, { type: 'game.updated', game: result });
+	presenceService.send(result.whiteId, {
+		type: 'game.draw.accepted',
+		gameId: id,
+	});
+	presenceService.send(result.blackId, {
+		type: 'game.draw.accepted',
+		gameId: id,
+	});
+	return res.status(200).json(result);
+}
+
+export async function declineDraw(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const id = Number(req.params.id);
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be an integer' });
+
+	const { result, error } = await query(() =>
+		gameService.declineDrawOffer(id, req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	if (!result)
+		return res.status(404).json({ error: 'draw offer not found' });
+
+	presenceService.send(result.senderId, {
+		type: 'game.draw.declined',
+		gameId: id,
+	});
+	return res.status(200).json({ gameId: id });
 }
 
 export async function draw(req: Request, res: Response) {

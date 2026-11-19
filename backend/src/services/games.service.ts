@@ -11,7 +11,7 @@ function isSerializationConflict(error: unknown) {
 	return error instanceof PrismaClientKnownRequestError && error.code === 'P2034';
 }
 
-type GameTransactionClient = Pick<typeof prisma, 'game' | 'user'>;
+type GameTransactionClient = Pick<typeof prisma, 'game' | 'user' | 'drawOffer'>;
 
 type GameOutcome = {
 	status: 'OVER';
@@ -375,6 +375,120 @@ export async function declineInvitation(invitationId: number, userId: number) {
 		},
 	});
 	return { id: invitationId, senderId: invitation.senderId };
+}
+
+export async function createDrawOffer(gameId: number, senderId: number) {
+	const game = await prisma.game.findUnique({
+		where: { id: gameId },
+		select: { id: true, status: true, whiteId: true, blackId: true },
+	});
+	if (!game)
+		throw new BackendError(404, 'game not found');
+	if (game.status === 'OVER')
+		throw new BackendError(409, 'game is over');
+	if (game.whiteId !== senderId && game.blackId !== senderId)
+		throw new BackendError(403, 'you are not a game player');
+
+	const receiverId = game.whiteId === senderId ? game.blackId : game.whiteId;
+	const existing = await prisma.drawOffer.findUnique({
+		where: {
+			gameId_senderId_receiverId: {
+				gameId,
+				senderId,
+				receiverId,
+			},
+		},
+	});
+	if (existing)
+		return existing;
+
+	return await prisma.drawOffer.create({
+		data: { gameId, senderId, receiverId, status: 'PENDING' },
+	});
+}
+
+export async function getPendingDrawOffers(userId: number) {
+	return await prisma.drawOffer.findMany({
+		where: { receiverId: userId, status: 'PENDING' },
+		orderBy: { createdAt: 'desc' },
+		include: {
+			game: {
+				select: {
+					id: true,
+					status: true,
+					whiteId: true,
+					blackId: true,
+				},
+			},
+			sender: {
+				select: {
+					id: true,
+					username: true,
+					profile: { select: { avatar: true, displayName: true } },
+				},
+			},
+		},
+	});
+}
+
+export async function acceptDrawOffer(gameId: number, userId: number) {
+	const offer = await prisma.drawOffer.findFirst({
+		where: {
+			gameId,
+			receiverId: userId,
+			status: 'PENDING',
+		},
+	});
+	if (!offer)
+		throw new BackendError(404, 'draw offer not found');
+
+	const result = await serializableGameTransaction(async (tx) => {
+		const game = await tx.game.findUnique({ where: { id: gameId } });
+		if (!game)
+			throw new BackendError(404, 'game not found');
+		if (game.status === 'OVER')
+			throw new BackendError(409, 'game is over');
+		if (game.whiteId !== userId && game.blackId !== userId)
+			throw new BackendError(403, 'you are not a game player');
+
+		const outcome: GameOutcome = {
+			status: 'OVER',
+			result: 'DRAW',
+			endType: 'AGREED',
+		};
+		const updated = await tx.game.update({
+			where: { id: gameId },
+			data: {
+				status: 'OVER',
+				result: 'DRAW',
+				endType: 'AGREED',
+				endedAt: new Date(),
+			},
+		});
+		await applyFinishedGame(tx, game, outcome);
+		await tx.drawOffer.deleteMany({
+			where: { gameId },
+		});
+		return gameView(updated);
+	});
+	return result;
+}
+
+export async function declineDrawOffer(gameId: number, userId: number) {
+	const offer = await prisma.drawOffer.findFirst({
+		where: {
+			gameId,
+			receiverId: userId,
+			status: 'PENDING',
+		},
+	});
+	if (!offer)
+		throw new BackendError(404, 'draw offer not found');
+
+	await prisma.drawOffer.delete({
+		where: { id: offer.id },
+	});
+	return offer;
 }
 
 export async function get(id: number) {
