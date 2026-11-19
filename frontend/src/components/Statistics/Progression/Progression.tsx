@@ -34,7 +34,9 @@ function getEloProgression(
 
   const limitedGames = limit ? sortedGames.slice(-limit) : sortedGames;
 
-  const eloEvolution: number[] = limitedGames.map((g) => g.whiteId === userId ? g.whiteElo : g.blackElo);
+  const eloEvolution: number[] = limitedGames.map((g) =>
+    g.whiteId === userId ? g.whiteElo : g.blackElo,
+  );
 
   const lastGame = sortedGames[sortedGames.length - 1];
   const user = lastGame.whiteId === userId ? lastGame.white : lastGame.black;
@@ -42,7 +44,7 @@ function getEloProgression(
     current: user.elo,
     max: user.maxElo,
     evolution: [...eloEvolution, user.elo],
-  }
+  };
 }
 
 function Progression({ games, userId }: ProgressionProps) {

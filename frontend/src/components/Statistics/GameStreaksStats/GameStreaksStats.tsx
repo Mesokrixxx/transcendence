@@ -75,7 +75,9 @@ function GameStreaksStats({ games, userId }: GameStreaksStatsProps) {
 
   const streaks = getGameStreaks(games, userId);
 
-  const currentResult = streaks.currentStreak.result ? t(streaks.currentStreak.result) : null;
+  const currentResult = streaks.currentStreak.result
+    ? t(streaks.currentStreak.result)
+    : null;
 
   return (
     <S.GameStreaksStats>

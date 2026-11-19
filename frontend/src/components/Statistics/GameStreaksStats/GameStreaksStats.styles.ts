@@ -6,6 +6,6 @@ export const GameStreaksStats = styled.div`
   gap: 1rem;
 
   @media (max-width: 480px) {
-  grid-template-columns: 1fr;
-}
+    grid-template-columns: 1fr;
+  }
 `;

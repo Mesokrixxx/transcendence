@@ -31,4 +31,3 @@ export const CurrentPoint = styled.circle`
   stroke: var(--color-background);
   stroke-width: 2;
 `;
-

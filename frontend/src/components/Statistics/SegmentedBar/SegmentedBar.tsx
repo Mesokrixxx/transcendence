@@ -14,11 +14,7 @@ function SegmentedBar({ segments }: SegmentedBarProps) {
   return (
     <S.SegmentedBar>
       {segments.map((s) => (
-        <S.Segment
-          key={s.label}
-          $color={s.color}
-          $value={s.value}
-        />
+        <S.Segment key={s.label} $color={s.color} $value={s.value} />
       ))}
     </S.SegmentedBar>
   );

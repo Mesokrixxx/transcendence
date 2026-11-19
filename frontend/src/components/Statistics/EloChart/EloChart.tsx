@@ -116,14 +116,8 @@ function EloChart({ evolution }: { evolution: number[] }) {
       })}
 
       <S.EvolutionLine points={pointsString} />
-      
-      { lastPoint && (
-        <S.CurrentPoint
-          cx={lastPoint.x}
-          cy={lastPoint.y}
-          r={5}
-        />
-      )}
+
+      {lastPoint && <S.CurrentPoint cx={lastPoint.x} cy={lastPoint.y} r={5} />}
     </S.Chart>
   );
 }

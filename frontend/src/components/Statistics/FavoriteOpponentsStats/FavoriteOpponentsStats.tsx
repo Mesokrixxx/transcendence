@@ -74,7 +74,9 @@ function FavoriteOpponentsStats({
               <S.Rank>{i + 1}</S.Rank>
               <S.Info>
                 <S.Username>{o.username}</S.Username>
-                <S.GamesPlayed>{t('gamesPlayed', { count: o.total })}</S.GamesPlayed>
+                <S.GamesPlayed>
+                  {t('gamesPlayed', { count: o.total })}
+                </S.GamesPlayed>
               </S.Info>
               <S.WinRate>
                 <S.Percentage>{winRate.toFixed(1)}%</S.Percentage>

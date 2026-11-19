@@ -36,10 +36,7 @@ function GameResultsStats({ games }: { games: Game[] }) {
       {displayedSegments.length > 0 ? (
         <>
           <SegmentedBar segments={displayedSegments} />
-          <SegmentedBarLegend
-            segments={displayedSegments}
-            total={total}
-          />
+          <SegmentedBarLegend segments={displayedSegments} total={total} />
         </>
       ) : (
         <S.InsufficientData>{t('noGamesPlayed')}</S.InsufficientData>
