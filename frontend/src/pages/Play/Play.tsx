@@ -173,6 +173,18 @@ function Play() {
         return;
       }
 
+      if (
+        event.type === 'game.player.left' &&
+        event.gameId === gameId &&
+        typeof event.userId === 'number'
+      ) {
+        setGamePresence({
+          gameId,
+          bothPlayersPresent: false,
+        });
+        return;
+      }
+
       if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
 
       setGame(new ChessGame(event.game.moves));

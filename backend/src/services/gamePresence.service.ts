@@ -15,12 +15,21 @@ export function subscribe(
 
 export function unsubscribe(gameId: number, socket: WebSocket) {
   const sockets = connections.get(gameId);
-  if (!sockets || !sockets.delete(socket)) return;
+  if (!sockets) return;
 
+  const playerId = sockets.get(socket) ?? null;
+  if (!sockets.delete(socket)) return;
   if (sockets.size === 0) {
     connections.delete(gameId);
   } else {
     broadcastPresence(gameId);
+    if (playerId !== null) {
+      broadcast(gameId, {
+        type: 'game.player.left',
+        gameId,
+        userId: playerId,
+      });
+    }
   }
 }
 
