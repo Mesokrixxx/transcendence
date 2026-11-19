@@ -3,7 +3,8 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "generate": "prisma generate",
+    "build": "npm run generate && tsc",
     "start": "node ../dist/backend/src/index.js",
     "dev": "tsx watch src/index.ts",
     "lint": "eslint .",

@@ -6,38 +6,53 @@ import realtimeSocket, { type RealtimeEvent } from '../services/websocket'
 
 function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null)
+    const sessionUserId = user?.id
 
     useEffect(() => {
-        if (!user) return
+        if (sessionUserId === undefined) return
 
-        function handleProfileChange(event: RealtimeEvent) {
+        function handleEvent(event: RealtimeEvent) {
+            if (event.type === 'profile.changed') {
+                const { userId, username, avatar, firstName, lastName } = event
+
+                if (
+                    userId !== sessionUserId ||
+                    typeof username !== 'string' ||
+                    (avatar !== null && typeof avatar !== 'string') ||
+                    (firstName !== null && typeof firstName !== 'string') ||
+                    (lastName !== null && typeof lastName !== 'string')
+                ) return
+
+                setUser((current) => current && current.id === sessionUserId
+                    ? { ...current, username, avatar, firstName, lastName }
+                    : current)
+
+                return
+            }
+
             if (
-                event.type !== 'profile.changed' ||
-                typeof event.userId !== 'number' ||
-                typeof event.username !== 'string' ||
-                (event.avatar !== null && typeof event.avatar !== 'string') ||
-                (event.firstName !== null && typeof event.firstName !== 'string') ||
-                (event.lastName !== null && typeof event.lastName !== 'string')
+                event.type !== 'stats.updated' ||
+                !event.stats ||
+                typeof event.stats !== 'object'
             ) return
 
-            const userId = event.userId
-            const username = event.username
-            const avatar = event.avatar
-            const firstName = event.firstName
-            const lastName = event.lastName
-            setUser((current) => current && current.id === userId
-                ? {
-                    ...current,
-                    username,
-                    avatar,
-                    firstName,
-                    lastName,
-                }
+            const { userId, elo, gamesPlayed, maxElo } =
+                event.stats as Record<string, unknown>
+
+            if (
+                userId !== sessionUserId ||
+                typeof elo !== 'number' ||
+                typeof gamesPlayed !== 'number' ||
+                typeof maxElo !== 'number'
+            ) return
+
+            setUser((current) => current && current.id === sessionUserId
+                ? { ...current, elo, gamesPlayed, maxElo }
                 : current)
         }
 
-        return realtimeSocket.subscribe(handleProfileChange)
-    }, [user?.id])
+        return realtimeSocket.subscribe(handleEvent)
+    }, [sessionUserId])
 
     return (
         <AuthContext.Provider value={{ user, setUser }}>

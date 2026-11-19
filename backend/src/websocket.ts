@@ -143,8 +143,15 @@ async function onConnection(socket: WebSocket, userId: number) {
 
 					gamePresenceService.broadcast(id, {
 						type: 'game.updated',
-						game: result,
+						game: result.game,
 					});
+
+					for (const stats of result.stats) {
+						presenceService.send(stats.userId, {
+							type: 'stats.updated',
+							stats,
+						});
+					}
 				}
 				return;
 			}

@@ -4,4 +4,7 @@ export type AuthUser = {
   email: string;
   avatar?: string | null;
   displayName?: string | null;
+  elo?: number;
+  gamesPlayed?: number;
+  maxElo?: number;
 };

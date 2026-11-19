@@ -31,15 +31,13 @@ services:
       OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
     volumes:
       - avatars_data:/app/uploads/avatars
+      - ./certs/backend:/app/backend/certs:ro
     depends_on:
       db:
         condition: service_healthy
     networks:
       - network-backend-db
       - network-frontend-backend
-    volumes:
-      - avatars_data:/app/uploads/avatars
-      - ./certs/backend:/app/backend/certs:ro
 
   frontend:
     build:

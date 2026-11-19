@@ -39,6 +39,9 @@ export async function getSession(token: string) {
           id: true,
           username: true,
           email: true,
+          elo: true,
+          gamesPlayed: true,
+          maxElo: true,
           profile: {
             select: { avatar: true, displayName: true},
           },
@@ -61,6 +64,9 @@ export async function getSession(token: string) {
     id: session.user.id,
     username: session.user.username,
     email: session.user.email,
+    elo: session.user.elo,
+    gamesPlayed: session.user.gamesPlayed,
+    maxElo: session.user.maxElo,
     avatar: session.user.profile?.avatar ?? null,
     displayName: session.user.profile?.displayName ?? null,
   };
