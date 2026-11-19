@@ -10,6 +10,8 @@ import { ProfilePanel, ProfileHeader } from './Profile.styles';
 import EditProfileDialog from '../../components/Profil/EditProfileDialog';
 import type { LocalProfile } from '../../components/Profil/EditProfileDialog';
 import ProfileActivity from '../../components/Profil/ProfileActivity';
+import ProfileProgress from './ProfileProgress';
+
 function Profile() {
   const { t } = useTranslation();
   const { user , setUser} = useAuth();
@@ -65,9 +67,9 @@ function Profile() {
               {t('editProfile', { ns: 'profile' })}
             </Button>
           </ProfileHeader>
-        </ProfilePanel>
-
-        { user && <ProfileActivity userId={user.id} /> }
+          </ProfilePanel>
+          {user && <ProfileProgress />}
+          {user && <ProfileActivity userId={user.id} />}
 
         {isEditing && user && (
           <EditProfileDialog
