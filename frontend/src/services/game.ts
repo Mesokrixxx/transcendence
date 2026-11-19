@@ -1,7 +1,8 @@
 import fetchAPI from "./fetchAPI";
-import { faker } from '@faker-js/faker';
-import { GameEndType, GameResult, GameStatus, type Game } from "../types/game";
-import ChessGame from "../../../chessgame/src/chessgame";
+// import { faker } from '@faker-js/faker';
+import type { Game } from "../types/game";
+// import { GameEndType, GameResult, GameStatus } from "../types/game";
+// import ChessGame from "../../../chessgame/src/chessgame";
 
 export async function getUserGames(userId: number):  Promise<Game[] | null> {
   const response = await fetchAPI<Game[]>({
@@ -12,6 +13,7 @@ export async function getUserGames(userId: number):  Promise<Game[] | null> {
   return (response.result);
 }
 
+/*
 export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: number }): Game[] {
   function getFakeGameUser() {
     const firstName = faker.person.firstName();
@@ -66,3 +68,4 @@ export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: n
 
   return games;
 }
+*/
