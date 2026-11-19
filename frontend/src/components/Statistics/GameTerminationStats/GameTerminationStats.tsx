@@ -48,7 +48,7 @@ function GameTerminationStats({ games }: { games: Game[] }) {
   const { t } = useTranslation('statistics');
   const segments = Object.entries(gameEndTypes).map(([endType, data]) => {
     return {
-      type: Number(endType) as GameEndType,
+      type: endType as GameEndType,
       label: t(data.label),
       color: data.color,
       value: 0,
