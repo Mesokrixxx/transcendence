@@ -6,31 +6,31 @@ import * as S from './GameTerminationStats.styles';
 const gameEndTypes = {
   [GameEndType.CHECKMATE]: {
     label: 'checkmate',
-    color: 'white',
+    color: 'var(--color-primary)',
   },
   [GameEndType.FORFEIT]: {
     label: 'forfeit',
-    color: 'gray',
+    color: 'var(--color-primary)',
   },
   [GameEndType.TIMEFORFEIT]: {
     label: 'time forfeit',
-    color: 'black',
+    color: 'var(--color-primary)',
   },
   [GameEndType.STALEMATE]: {
     label: 'stalemate',
-    color: 'purple',
+    color: 'var(--color-board-dark)',
   },
   [GameEndType.INSUFMATERIAL]: {
     label: 'insufficient material',
-    color: 'yellow',
+    color: 'var(--color-board-dark)',
   },
   [GameEndType.TRIPLEREPETITION]: {
     label: 'threefold repetition',
-    color: 'brown',
+    color: 'var(--color-board-dark)',
   },
   [GameEndType.FIFTYMOVE]: {
     label: 'fifty-moves',
-    color: 'cyan',
+    color: 'var(--color-board-dark)',
   },
 } satisfies Record<GameEndType, { label: string; color: string }>;
 

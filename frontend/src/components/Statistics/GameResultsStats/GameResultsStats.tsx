@@ -11,17 +11,17 @@ function GameResultsStats({ games }: { games: Game[] }) {
     {
       label: 'white',
       value: whiteWins,
-      color: 'white',
+      color: 'var(--color-board-light)',
     },
     {
       label: 'draw',
       value: draws,
-      color: 'gray',
+      color: 'var(--color-primary)',
     },
     {
       label: 'black',
       value: blackWins,
-      color: 'black',
+      color: 'var(--color-board-dark)',
     },
   ];
 
