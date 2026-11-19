@@ -37,6 +37,9 @@ const promotionLabels: Record<string, PromotionLabelKey> = {
 type RemoteGameState = {
   moves: Move[];
   chatId?: number;
+  status?: 'WAITING' | 'PLAYING' | 'OVER';
+  result?: 'DRAW' | 'WHITE' | 'BLACK' | null;
+  endType?: string | null;
   white?: {
     id: number;
     username?: string;
@@ -60,6 +63,19 @@ function isRemoteGameState(value: unknown): value is RemoteGameState {
     'moves' in value &&
     Array.isArray(value.moves)
   );
+}
+
+function apiErrorMessage(value: unknown, fallback: string) {
+  if (typeof value === 'string') return value;
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'error' in value &&
+    typeof value.error === 'string'
+  ) {
+    return value.error;
+  }
+  return fallback;
 }
 
 function Play() {
@@ -86,6 +102,11 @@ function Play() {
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [error, setError] = useState('');
   const [remoteChatId, setRemoteChatId] = useState<number | null>(null);
+  const [remoteOutcome, setRemoteOutcome] = useState<{
+    status: 'WAITING' | 'PLAYING' | 'OVER';
+    result: 'DRAW' | 'WHITE' | 'BLACK' | null;
+    endType: string | null;
+  } | null>(null);
 
   const gameId = Number(gameIdParam);
   const isRemoteGame = Number.isInteger(gameId) && gameId > 0;
@@ -135,7 +156,7 @@ function Play() {
       if (!active) return;
 
       if (response.error || !isRemoteGameState(response.result)) {
-        setError(tChess('unableToPlayThisMove'));
+        setError(apiErrorMessage(response.result, tChess('unableToPlayThisMove')));
         return;
       }
 
@@ -161,6 +182,11 @@ function Play() {
       setRemoteChatId(
         typeof response.result.chatId === 'number' ? response.result.chatId : null,
       );
+      setRemoteOutcome({
+        status: response.result.status ?? 'PLAYING',
+        result: response.result.result ?? null,
+        endType: response.result.endType ?? null,
+      });
       setGame(new ChessGame(response.result.moves));
     });
 
@@ -193,6 +219,20 @@ function Play() {
       if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
 
       setGame(new ChessGame(event.game.moves));
+      setRemoteOutcome({
+        status:
+          typeof event.game.status === 'string'
+            ? event.game.status as 'WAITING' | 'PLAYING' | 'OVER'
+            : 'PLAYING',
+        result:
+          event.game.result === 'DRAW' ||
+          event.game.result === 'WHITE' ||
+          event.game.result === 'BLACK'
+            ? event.game.result
+            : null,
+        endType:
+          typeof event.game.endType === 'string' ? event.game.endType : null,
+      });
       setSelectedSquare(null);
       setPromotionMoves([]);
       setIsRotating(false);
@@ -216,11 +256,16 @@ function Play() {
         });
 
         if (response.error || !isRemoteGameState(response.result)) {
-          setError(tChess('unableToPlayThisMove'));
+          setError(apiErrorMessage(response.result, tChess('unableToPlayThisMove')));
           return;
         }
 
         setGame(new ChessGame(response.result.moves));
+        setRemoteOutcome({
+          status: response.result.status ?? 'PLAYING',
+          result: response.result.result ?? null,
+          endType: response.result.endType ?? null,
+        });
         setSelectedSquare(null);
         setPromotionMoves([]);
         setError('');
@@ -241,8 +286,36 @@ function Play() {
     }
   }
 
+  async function endRemoteGame(action: 'resign' | 'draw') {
+    if (!isRemoteGame) return;
+
+    const response = await fetchAPI<RemoteGameState>({
+      path: `/games/${gameId}/${action}`,
+      method: 'post',
+    });
+    if (response.error || !isRemoteGameState(response.result)) {
+      setError(tChess('unableToPlayThisMove'));
+      return;
+    }
+
+    setGame(new ChessGame(response.result.moves));
+    setRemoteOutcome({
+      status: response.result.status ?? 'OVER',
+      result: response.result.result ?? null,
+      endType: response.result.endType ?? null,
+    });
+    setSelectedSquare(null);
+    setPromotionMoves([]);
+    setError('');
+  }
+
   function handleSquareClick(square: SquareName) {
-    if (game.isOver() || promotionMoves.length > 0 || isRotating) return;
+    if (
+      game.isOver() ||
+      remoteOutcome?.status === 'OVER' ||
+      promotionMoves.length > 0 ||
+      isRotating
+    ) return;
 
     setError('');
 
@@ -301,7 +374,28 @@ function Play() {
               <GameStatus
                 game={game}
                 message={waitingForFriend ? tChess('waitingForFriend') : undefined}
+                remoteStatus={remoteOutcome?.status}
+                remoteResult={remoteOutcome?.result}
               />
+            )}
+
+            {isRemoteGame &&
+              remoteOutcome?.status !== 'OVER' &&
+              !game.isOver() && (
+              <div role="group" aria-label={tChess('gameActions')}>
+                <Button
+                  variant="secondary"
+                  onClick={() => void endRemoteGame('draw')}
+                >
+                  {tChess('offerDraw')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => void endRemoteGame('resign')}
+                >
+                  {tChess('resign')}
+                </Button>
+              </div>
             )}
 
             {promotionMoves.length > 0 && (
@@ -343,6 +437,7 @@ function Play() {
               disabled={
                 waitingForFriend ||
                 game.isOver() ||
+                remoteOutcome?.status === 'OVER' ||
                 promotionMoves.length > 0 ||
                 isRotating
               }

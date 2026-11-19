@@ -10,6 +10,8 @@ import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import fetchAPI from '../../services/fetchAPI';
 import { Page } from '../../pages/Home/Home.styles';
 import { PlayContent, GameArea, GameInfo } from '../../pages/Play/Play.styles';
+import Button from '../../components/Button/Button';
+import { FriendSelect, ConfirmationDialog } from './PlayLobby.styles';
 
 export default function PlayLobby() {
   const navigate = useNavigate();
@@ -150,7 +152,7 @@ export default function PlayLobby() {
             ) : (
               <>
                 <label htmlFor="friend-game-select">Choisir un ami</label>
-                <select
+                <FriendSelect
                   id="friend-game-select"
                   value={selectedFriendId ?? ''}
                   onChange={(event) => void handleFriendSelected(Number(event.target.value))}
@@ -161,7 +163,7 @@ export default function PlayLobby() {
                       {friend.name} — {friend.isOnline ? 'En ligne' : 'Hors ligne'}
                     </option>
                   ))}
-                </select>
+                </FriendSelect>
 
                 {selectedFriendId !== null &&
                   (() => {
@@ -179,37 +181,38 @@ export default function PlayLobby() {
                     ) : null;
                   })()}
 
-                <button
-                  type="button"
-                  disabled={selectedFriendId === null || isSending}
+                <Button
+                  variant="primary"
                   onClick={() => void handlePlay()}
                 >
                   {isSending ? 'Envoi…' : 'Envoyer une demande de partie'}
-                </button>
+                </Button>
                 {confirmFriendId !== null &&
                   (() => {
                     const friend = visibleFriends.find((item) => item.id === confirmFriendId);
                     return (
-                      <div role="dialog" aria-label="Confirmation de demande de partie">
+                      <ConfirmationDialog role="dialog" aria-label="Confirmation de demande de partie">
                         <p>
                           Es-tu sûr de vouloir envoyer une demande de partie à{' '}
                           {friend?.name ?? 'cet ami'} ?
                         </p>
-                        <button
-                          type="button"
-                          disabled={isSending}
-                          onClick={() => void sendInvitation(confirmFriendId)}
-                        >
-                          Oui
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isSending}
-                          onClick={() => setConfirmFriendId(null)}
-                        >
-                          Non
-                        </button>
-                      </div>
+                        <div>
+                          <button
+                            type="button"
+                            disabled={isSending}
+                            onClick={() => void sendInvitation(confirmFriendId)}
+                          >
+                            Oui
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isSending}
+                            onClick={() => setConfirmFriendId(null)}
+                          >
+                            Non
+                          </button>
+                        </div>
+                      </ConfirmationDialog>
                     );
                   })()}
                 {actionError && <p role="alert">{actionError}</p>}

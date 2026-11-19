@@ -11,15 +11,25 @@ export const NotificationLayer = styled.div`
 `;
 
 export const NotificationCard = styled.section`
-  border: 1px solid var(--color-border, #4a4a4a);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
   border-radius: 12px;
-  background: var(--color-bg-secondary, #fff);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 24%);
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgb(20 19 27 / 45%);
   padding: 16px;
   color: var(--color-text-primary);
+  animation: notification-in 180ms ease-out;
 
   p {
     margin: 0 0 12px;
+    line-height: 1.45;
+  }
+
+  @keyframes notification-in {
+    from {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
   }
 `;
 
@@ -28,6 +38,29 @@ export const NotificationActions = styled.div`
   gap: 8px;
 
   button {
+    min-height: 38px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    padding: 8px 14px;
     cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+
+    &:first-child {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: var(--color-background);
+    }
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+    }
   }
 `;

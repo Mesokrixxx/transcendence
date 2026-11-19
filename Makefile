@@ -15,6 +15,7 @@ down:
 
 clean: DOWN_FLAGS = --volumes --remove-orphans
 clean: down
+	-podman volume rm -f transcendence_postgres_data transcendence_avatars_data
 	-podman image rm -f $(IMAGE)
 
 re: down all

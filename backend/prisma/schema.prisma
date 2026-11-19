@@ -27,6 +27,7 @@ enum GameEndType {
   INSUFMATERIAL
   TRIPLEREPETITION
   FIFTYMOVE
+  AGREED
 }
 
 enum GameInvitationStatus {
@@ -78,7 +79,6 @@ model GameInvitation {
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
 
-  @@unique([senderId, receiverId, status])
   @@index([receiverId, status])
   @@index([senderId, status])
 }

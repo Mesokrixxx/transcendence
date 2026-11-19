@@ -3,6 +3,7 @@ import { BackendError } from '../types/backendError.types.js';
 import ChessGame from '../../../chessgame/src/chessgame.js';
 import type { Move } from '../../../chessgame/src/chessgame.types.js';
 import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
+import { getKFactor, getUpdatedELOs } from '../utils/elo.js';
 
 const transactionOptions = { isolationLevel: 'Serializable' as const };
 
@@ -10,7 +11,82 @@ function isSerializationConflict(error: unknown) {
 	return error instanceof PrismaClientKnownRequestError && error.code === 'P2034';
 }
 
-type GameTransactionClient = Pick<typeof prisma, 'game'>;
+type GameTransactionClient = Pick<typeof prisma, 'game' | 'user'>;
+
+type GameOutcome = {
+	status: 'OVER';
+	result: 'DRAW' | 'WHITE' | 'BLACK';
+	endType:
+		| 'CHECKMATE'
+		| 'FORFEIT'
+		| 'TIMEFORFEIT'
+		| 'STALEMATE'
+		| 'INSUFMATERIAL'
+		| 'TRIPLEREPETITION'
+		| 'FIFTYMOVE'
+		| 'AGREED';
+};
+
+async function applyFinishedGame(
+	tx: GameTransactionClient,
+	game: {
+		id: number;
+		status: string;
+		whiteId: number;
+		blackId: number;
+	},
+	outcome: GameOutcome,
+) {
+	if (game.status === 'OVER')
+		return;
+
+	const players = await tx.user.findMany({
+		where: { id: { in: [game.whiteId, game.blackId] } },
+		select: {
+			id: true,
+			elo: true,
+			gamesPlayed: true,
+			maxElo: true,
+		},
+	});
+	const white = players.find((player) => player.id === game.whiteId);
+	const black = players.find((player) => player.id === game.blackId);
+	if (!white || !black)
+		throw new BackendError(400, 'invalid game players');
+
+	const eloResult: 1 | 0.5 | -1 =
+		outcome.result === 'DRAW'
+			? 0.5
+			: outcome.result === 'WHITE'
+				? 1
+				: -1;
+	const [whiteElo, blackElo] = getUpdatedELOs(
+		white.elo,
+		black.elo,
+		eloResult,
+		getKFactor(white.maxElo, white.gamesPlayed),
+		getKFactor(black.maxElo, black.gamesPlayed),
+	);
+
+	await Promise.all([
+		tx.user.update({
+			where: { id: white.id },
+			data: {
+				elo: whiteElo,
+				gamesPlayed: { increment: 1 },
+				maxElo: Math.max(white.maxElo, whiteElo),
+			},
+		}),
+		tx.user.update({
+			where: { id: black.id },
+			data: {
+				elo: blackElo,
+				gamesPlayed: { increment: 1 },
+				maxElo: Math.max(black.maxElo, blackElo),
+			},
+		}),
+	]);
+}
 
 async function serializableGameTransaction<T>(
 	callback: (tx: GameTransactionClient) => Promise<T>,
@@ -218,8 +294,17 @@ export async function acceptInvitation(invitationId: number, userId: number) {
 		throw new BackendError(404, 'invitation not found');
 	if (invitation.receiverId !== userId)
 		throw new BackendError(403, 'you are not the invited player');
-	if (invitation.status !== 'PENDING')
-		throw new BackendError(409, 'invitation is no longer pending');
+	if (invitation.status === 'DECLINED')
+		throw new BackendError(409, 'invitation was declined');
+
+	if (invitation.status === 'ACCEPTED') {
+		const activeGame = await getActiveWithFriend(invitation.senderId, userId);
+		if (activeGame) {
+			const existingGame = await prisma.game.findUnique({ where: { id: activeGame.id } });
+			if (existingGame) return existingGame;
+		}
+		throw new BackendError(409, 'invitation was already accepted');
+	}
 
 	const activeGame = await getActiveWithFriend(invitation.senderId, userId);
 	if (activeGame) {
@@ -255,9 +340,14 @@ export async function acceptInvitation(invitationId: number, userId: number) {
 				moves: [],
 			},
 		});
-		await tx.gameInvitation.update({
-			where: { id: invitationId },
-			data: { status: 'ACCEPTED' },
+		await tx.gameInvitation.deleteMany({
+			where: {
+				status: 'PENDING',
+				OR: [
+					{ senderId: invitation.senderId, receiverId: userId },
+					{ senderId: userId, receiverId: invitation.senderId },
+				],
+			},
 		});
 		return created;
 	});
@@ -275,10 +365,16 @@ export async function declineInvitation(invitationId: number, userId: number) {
 	if (invitation.status !== 'PENDING')
 		throw new BackendError(409, 'invitation is no longer pending');
 
-	return await prisma.gameInvitation.update({
-		where: { id: invitationId },
-		data: { status: 'DECLINED' },
+	await prisma.gameInvitation.deleteMany({
+		where: {
+			status: 'PENDING',
+			OR: [
+				{ senderId: invitation.senderId, receiverId: userId },
+				{ senderId: userId, receiverId: invitation.senderId },
+			],
+		},
 	});
+	return { id: invitationId, senderId: invitation.senderId };
 }
 
 export async function get(id: number) {
@@ -375,6 +471,9 @@ export async function playMove(id: number, userId: number, move: Move) {
 				endedAt: outcome.status === 'OVER' ? new Date() : null,
 			},
 		});
+		if (outcome.status === 'OVER') {
+			await applyFinishedGame(tx, game, outcome);
+		}
 		return gameView(updated);
 	});
 }
@@ -400,6 +499,11 @@ export async function resign(id: number, userId: number) {
 				endedAt: new Date(),
 			},
 		});
+		await applyFinishedGame(tx, game, {
+			status: 'OVER',
+			result,
+			endType: 'FORFEIT',
+		});
 		return gameView(updated);
 	});
 }
@@ -411,20 +515,21 @@ export async function draw(id: number, userId: number) {
 		if (game.status === 'OVER') throw new BackendError(409, 'game is over');
 		if (game.whiteId !== userId && game.blackId !== userId)
 			throw new BackendError(403, 'user is not a game player');
-		const engine = new ChessGame(readMoves(game.moves));
-
-		const reason = engine.canClaimDraw()[0];
-		if (!reason) throw new BackendError(409, 'no draw can be claimed');
-		return gameView(
-			await tx.game.update({
-				where: { id },
-				data: {
-					status: 'OVER',
-					result: 'DRAW',
-					endType: reason === 'fifty moves' ? 'FIFTYMOVE' : 'TRIPLEREPETITION',
-					endedAt: new Date(),
-				},
-			}),
-		);
+		const outcome: GameOutcome = {
+			status: 'OVER',
+			result: 'DRAW',
+			endType: 'AGREED',
+		};
+		const updated = await tx.game.update({
+			where: { id },
+			data: {
+				status: outcome.status,
+				result: outcome.result,
+				endType: outcome.endType,
+				endedAt: new Date(),
+			},
+		});
+		await applyFinishedGame(tx, game, outcome);
+		return gameView(updated);
 	});
 }
