@@ -167,6 +167,7 @@ export async function update(
     password?: string | undefined;
     currentPassword?: string | undefined;
     displayName?: string | null | undefined;
+    avatar?: string | undefined;
   },
 ) {
   if (data.password !== undefined) {
@@ -186,6 +187,7 @@ export async function update(
 
   const profileData = {
     ...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+    ...(data.avatar !== undefined ? { avatar: data.avatar } : {}),
   };
 
   const updatedUser = await prisma.user.update({
