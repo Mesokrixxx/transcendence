@@ -18,6 +18,21 @@ export async function getProgress(req: Request, res: Response) {
   return res.status(200).json(result);
 }
 
+export async function getFeaturedBadges(req: Request, res: Response) {
+  const userId = Number(req.params.id);
+  if (!Number.isInteger(userId) || userId <= 0)
+    return res.status(400).json({ error: 'id shall be a positive integer' });
+
+  const { result, error } = await query(() =>
+    gamificationService.getFeaturedBadges(userId),
+  );
+  if (error) {
+    const treated = treatError(error);
+    return res.status(treated.status).json(treated.error);
+  }
+  return res.status(200).json(result);
+}
+
 export async function setBadgeFeatured(req: Request, res: Response) {
   if (!req.user)
     return res.status(401).json({ error: 'user must be logged in' });
@@ -39,9 +54,13 @@ export async function setBadgeFeatured(req: Request, res: Response) {
     return res.status(treated.status).json(treated.error);
   }
   if (!result) return res.status(404).json({ error: 'badge not found' });
-  presenceService.send(req.user.id, {
+  const progress = await gamificationService.getProgress(req.user.id);
+  const featuredBadges = await gamificationService.getFeaturedBadges(req.user.id);
+  presenceService.broadcast({
     type: 'gamification.updated',
-    progress: await gamificationService.getProgress(req.user.id),
+    userId: req.user.id,
+    progress,
+    featuredBadges,
   });
   return res.status(200).json(result);
 }

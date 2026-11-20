@@ -40,6 +40,11 @@ const BADGES = [
 		name: 'Marathonien',
 		description: 'Votre record de parties terminées en une journée',
 	},
+	{
+		code: 'highest-elo-record',
+		name: 'Sommet du classement',
+		description: 'Votre plus haut Elo atteint',
+	},
 ] as const;
 
 function isWinForPlayer(
@@ -136,7 +141,7 @@ export async function recordGameResult(gameId: number) {
 			const [user, gamesPlayed, wins, playerGames] = await Promise.all([
 				tx.user.findUniqueOrThrow({
 					where: { id: playerId },
-					select: { elo: true },
+					select: { elo: true, maxElo: true },
 				}),
 				tx.game.count({
 					where: {
@@ -195,6 +200,7 @@ export async function recordGameResult(gameId: number) {
 					'daily-games-record',
 					Math.max(0, ...gamesPerDay.values()),
 				],
+				['highest-elo-record', user.maxElo],
 			]);
 			for (const badge of badges) {
 				const record = records.get(badge.code) ?? 0;
@@ -230,20 +236,120 @@ export async function recordGameResult(gameId: number) {
 	});
 }
 
-export async function getProgress(userId: number) {
-	const [achievements, badges] = await Promise.all([
-		prisma.userAchievement.findMany({
-			where: { userId },
-			include: { achievement: true },
-			orderBy: { unlockedAt: 'asc' },
-		}),
-		prisma.badgesOnProfile.findMany({
-			where: { profileUserId: userId },
-			include: { badge: true },
-			orderBy: { assignedAt: 'asc' },
-		}),
+async function ensureRewardCatalog() {
+	await prisma.$transaction([
+		...ACHIEVEMENTS.map((achievement) =>
+			prisma.achievement.upsert({
+				where: { code: achievement.code },
+				create: achievement,
+				update: { name: achievement.name, description: achievement.description },
+			}),
+		),
+		...BADGES.map((badge) =>
+			prisma.badge.upsert({
+				where: { code: badge.code },
+				create: badge,
+				update: { name: badge.name, description: badge.description },
+			}),
+		),
 	]);
-	return { achievements, badges };
+}
+
+export async function getProgress(userId: number) {
+	await ensureRewardCatalog();
+	const [user, achievements, badges, ownedAchievements, ownedBadges] =
+		await Promise.all([
+			prisma.user.findUnique({
+				where: { id: userId },
+				select: {
+					elo: true,
+					maxElo: true,
+					whiteGames: {
+						where: { status: 'OVER' },
+						orderBy: { endedAt: 'desc' },
+						select: { result: true, whiteId: true, endedAt: true },
+					},
+					blackGames: {
+						where: { status: 'OVER' },
+						orderBy: { endedAt: 'desc' },
+						select: { result: true, whiteId: true, endedAt: true },
+					},
+				},
+			}),
+			prisma.achievement.findMany({ orderBy: { id: 'asc' } }),
+			prisma.badge.findMany({ orderBy: { id: 'asc' } }),
+			prisma.userAchievement.findMany({
+				where: { userId },
+				select: { achievementId: true, unlockedAt: true },
+			}),
+			prisma.badgesOnProfile.findMany({
+				where: { profileUserId: userId },
+				select: {
+					badgeId: true,
+					record: true,
+					featured: true,
+					assignedAt: true,
+				},
+			}),
+		]);
+
+	if (!user) return null;
+
+	const games = [...user.whiteGames, ...user.blackGames].sort(
+		(left, right) =>
+			(right.endedAt?.getTime() ?? 0) - (left.endedAt?.getTime() ?? 0),
+	);
+	const gamesPlayed = games.length;
+	const wins = games.filter((game) =>
+		isWinForPlayer(game.result, game.whiteId, userId),
+	).length;
+	const dates = games
+		.map((game) => game.endedAt)
+		.filter((endedAt): endedAt is Date => endedAt !== null)
+		.map(dayKey);
+	const gamesPerDay = new Map<string, number>();
+	for (const date of dates)
+		gamesPerDay.set(date, (gamesPerDay.get(date) ?? 0) + 1);
+	const records = new Map([
+		['win-streak-record', longestWinStreak([...games].reverse(), userId)],
+		['consecutive-days-record', longestConsecutiveDays(dates)],
+		['daily-games-record', Math.max(0, ...gamesPerDay.values())],
+		['highest-elo-record', user.maxElo],
+	]);
+	const achievementMap = new Map(
+		ownedAchievements.map((item) => [item.achievementId, item.unlockedAt]),
+	);
+	const badgeMap = new Map(
+		ownedBadges.map((item) => [item.badgeId, item]),
+	);
+
+	return {
+		achievements: achievements.map((achievement) => ({
+			achievement,
+			unlocked: achievementMap.has(achievement.id),
+			unlockedAt: achievementMap.get(achievement.id) ?? null,
+			stats: {
+				gamesPlayed,
+				wins,
+				elo: user.elo,
+			},
+		})),
+		badges: badges.map((badge) => ({
+			badge,
+			record: records.get(badge.code) ?? 0,
+			unlocked: badgeMap.has(badge.id),
+			featured: badgeMap.get(badge.id)?.featured ?? false,
+			assignedAt: badgeMap.get(badge.id)?.assignedAt ?? null,
+		})),
+	};
+}
+
+export async function getFeaturedBadges(userId: number) {
+	return prisma.badgesOnProfile.findMany({
+		where: { profileUserId: userId, featured: true },
+		include: { badge: true },
+		orderBy: { assignedAt: 'asc' },
+	});
 }
 
 export async function setBadgeFeatured(
