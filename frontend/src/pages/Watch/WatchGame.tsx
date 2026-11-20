@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import ChessGame from '../../../../chessgame/src/chessgame';
 import type { Move } from '../../../../chessgame/src/chessgame.types';
 import Navbar from '../../components/Navbar/Navbar';
@@ -16,26 +17,106 @@ import {
   GameChat,
 } from '../Play/Play.styles';
 import { useTranslation } from 'react-i18next';
+import fetchAPI from '../../services/fetchAPI';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 
-// en attendant les donnees du back
-const demoMoves: Move[] = [
-  // { from: 'e2', to: 'e4'},
-  // { from: 'e7', to: 'e5'},
-  // { from: 'g1', to: 'f3'},
-  // { from: 'b8', to: 'c6'},
-];
+type Player = {
+  id: number;
+  username: string;
+  avatar: string | null;
+};
 
-function Watch() {
+type GameState = {
+  moves: Move[];
+  specChatId: number;
+  white: Player;
+  black: Player;
+};
+
+function isGameState(value: unknown): value is GameState {
+  if (!isGameUpdate(value)) return false;
+
+  const game = value as {
+    moves?: unknown;
+    specChatId?: unknown;
+    white?: unknown;
+    black?: unknown;
+  };
+  const isPlayer = (player: unknown): player is Player =>
+    typeof player === 'object' &&
+    player !== null &&
+    'id' in player &&
+    'username' in player &&
+    'avatar' in player &&
+    typeof player.id === 'number' &&
+    typeof player.username === 'string' &&
+    (player.avatar === null || typeof player.avatar === 'string');
+
+  return (
+    Array.isArray(game.moves) &&
+    typeof game.specChatId === 'number' &&
+    isPlayer(game.white) &&
+    isPlayer(game.black)
+  );
+}
+
+function isGameUpdate(value: unknown): value is { moves: Move[] } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'moves' in value &&
+    Array.isArray(value.moves)
+  );
+}
+
+function WatchGame() {
+  const { gameId: gameIdParam } = useParams();
   const { t } = useTranslation();
-  const [game] = useState(() => new ChessGame(demoMoves));
+  const [game, setGame] = useState(() => new ChessGame());
+  const [players, setPlayers] = useState<GameState | null>(null);
   const [orientation, setOrientation] = useState<'white' | 'black'>('white');
+  const [error, setError] = useState('');
+  const gameId = Number(gameIdParam);
+  const isValidGameId = Number.isInteger(gameId) && gameId > 0;
+
+  useEffect(() => {
+    if (!isValidGameId) {
+      setError(t('gameNotFound', { ns: 'chess' }));
+      return;
+    }
+
+    let active = true;
+
+    fetchAPI<GameState>({
+      path: `/games/${gameId}`,
+      method: 'get',
+    }).then((response) => {
+      if (!active) return;
+      if (response.error || !isGameState(response.result)) {
+        setError(t('gameNotFound', { ns: 'chess' }));
+        return;
+      }
+      setPlayers(response.result);
+      setGame(new ChessGame(response.result.moves));
+      setError('');
+    });
+
+    function handleGameEvent(event: RealtimeEvent) {
+      if (event.type !== 'game.updated' || !isGameUpdate(event.game)) return;
+      if (isGameState(event.game)) setPlayers(event.game);
+      setGame(new ChessGame(event.game.moves));
+      setError('');
+    }
+
+    const leaveGame = realtimeSocket.joinGame(gameId, handleGameEvent);
+    return () => {
+      active = false;
+      leaveGame();
+    };
+  }, [gameId, isValidGameId, t]);
 
   function flipBoard() {
-    if (orientation === 'white') {
-      setOrientation('black');
-    } else {
-      setOrientation('white');
-    }
+    setOrientation((current) => current === 'white' ? 'black' : 'white');
   }
 
   return (
@@ -43,19 +124,33 @@ function Watch() {
       <Navbar />
 
       <WatchContent className="container">
-        <GameArea aria-label={t('demoGameForSpectators', { ns: 'chess' })}>
+        <GameArea aria-label={t('gameForSpectators', { ns: 'chess' })}>
           <GameInfo aria-label={t('gameInformation', { ns: 'chess' })}>
             <div className="opponent">
-              <Avatar username={t('playerWhite', { ns: 'chess' })} size={48} />
-              <span>{t('playerWhite', { ns: 'chess' })}</span>
+              <Avatar
+                src={players?.white.avatar || '/avatars/default.svg'}
+                username={players?.white.username ?? t('playerWhite', { ns: 'chess' })}
+                size={48}
+              />
+              <span>
+                {t('white', { ns: 'chess' })} —{' '}
+                {players?.white.username ?? t('playerWhite', { ns: 'chess' })}
+              </span>
             </div>
 
             <div className="opponent">
-              <Avatar username={t('playerBlack', { ns: 'chess' })} size={48} />
-              <span>{t('playerBlack', { ns: 'chess' })}</span>
+              <Avatar
+                src={players?.black.avatar || '/avatars/default.svg'}
+                username={players?.black.username ?? t('playerBlack', { ns: 'chess' })}
+                size={48}
+              />
+              <span>
+                {t('black', { ns: 'chess' })} —{' '}
+                {players?.black.username ?? t('playerBlack', { ns: 'chess' })}
+              </span>
             </div>
 
-            <p>{t('demoGame', { ns: 'chess' })}</p>
+            {error && <p role="alert">{error}</p>}
 
             <Button variant="secondary" onClick={flipBoard}>
               {t('flipBoard', { ns: 'chess' })}
@@ -71,7 +166,10 @@ function Watch() {
           />
 
           <GameChat aria-label={t('spectatorChat', { ns: 'chat' })}>
-            <ChatBox title={t('spectatorChat', { ns: 'chat' })} />
+            <ChatBox
+              title={t('spectatorChat', { ns: 'chat' })}
+              chatId={players?.specChatId}
+            />
           </GameChat>
         </GameArea>
       </WatchContent>
@@ -80,4 +178,5 @@ function Watch() {
     </Page>
   );
 }
-export default Watch;
+
+export default WatchGame;

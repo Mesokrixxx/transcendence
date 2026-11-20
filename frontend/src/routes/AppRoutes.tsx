@@ -11,9 +11,11 @@ import Rankings from '../pages/Rankings/Rankings';
 import Chat from '../pages/Chat/Chat';
 import WatchGame from '../pages/Watch/WatchGame';
 import Watch from '../pages/Watch/Watch';
+import PlayerProfilePage from '../components/Profil/PlayerProfilePage';
+import ErrorPage from '../pages/Errors/ErrorPage';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
-import { publicPageLoader, guestOnlyLoader, requireAuthLoader } from '../loaders/authLoaders';
+import { publicPageLoader, guestOnlyLoader, requireAuthLoader, githubLoader, githubCallbackLoader } from '../loaders/authLoaders';
 
 const routes: RouteObject[] = [
   {
@@ -33,6 +35,10 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/play',
+        element: <Play />,
+      },
+      {
+        path: '/play/:gameId',
         element: <Play />,
       },
       {
@@ -56,6 +62,10 @@ const routes: RouteObject[] = [
         element: <Profile />,
       },
       {
+        path: '/profile/:id',
+        element: <PlayerProfilePage />,
+      },
+      {
         path: '/chat',
         element: <Chat />,
       },
@@ -72,6 +82,14 @@ const routes: RouteObject[] = [
     loader: guestOnlyLoader,
   },
   {
+    path: '/github-signin',
+    loader: githubLoader,
+  },
+  {
+    path: '/github-signin/callback',
+    loader: githubCallbackLoader,
+  },
+  {
     path: '/privacy',
     element: <PrivacyPolicy />,
   },
@@ -82,6 +100,26 @@ const routes: RouteObject[] = [
   {
     path: '/test-api',
     element: <ApiTest />,
+  },
+  {
+    path: '/401',
+    element: <ErrorPage code={401} />,
+  },
+  {
+    path: '/403',
+    element: <ErrorPage code={403} />,
+  },
+  {
+    path: '/404',
+    element: <ErrorPage code={404} />,
+  },
+  {
+    path: '/500',
+    element: <ErrorPage code={500} />,
+  },
+  {
+    path: '*',
+    element: <ErrorPage code={404} />,
   },
 ];
 

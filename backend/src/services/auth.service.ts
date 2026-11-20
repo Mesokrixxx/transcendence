@@ -30,29 +30,44 @@ export async function deleteSession(token: string) {
 }
 
 export async function getSession(token: string) {
-	const session = await prisma.session.findUnique({
-		where: { tokenHash: hashToken(token) },
-		select: {
-			expiresAt: true,
-			user: {
-				select: {
-					id: true,
-					username: true,
-					email: true
-				}
-			}
-		}
-	});
+  const session = await prisma.session.findUnique({
+    where: { tokenHash: hashToken(token) },
+    select: {
+      expiresAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          elo: true,
+          gamesPlayed: true,
+          maxElo: true,
+          profile: {
+            select: { avatar: true, displayName: true},
+          },
+        },
+      },
+    },
+  });
 
-	if (!session)
-		return null;
+  if (!session) return null;
 
-	if (session.expiresAt <= new Date()) {
-		await prisma.session.deleteMany({
-			where: { tokenHash: hashToken(token) }
-		});
-		return null;
-	}
+  if (session.expiresAt <= new Date()) {
+    await prisma.session.deleteMany({
+      where: { tokenHash: hashToken(token) },
+    });
 
-	return session.user;
+    return null;
+  }
+
+  return {
+    id: session.user.id,
+    username: session.user.username,
+    email: session.user.email,
+    elo: session.user.elo,
+    gamesPlayed: session.user.gamesPlayed,
+    maxElo: session.user.maxElo,
+    avatar: session.user.profile?.avatar ?? null,
+    displayName: session.user.profile?.displayName ?? null,
+  };
 }

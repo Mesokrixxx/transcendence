@@ -13,6 +13,8 @@ const namespaces = [
   'home',
   'rankings',
   'legal',
+  'errors',
+  'friends'
 ];
 
 const supportedLanguages = ['en', 'fr', 'es'];

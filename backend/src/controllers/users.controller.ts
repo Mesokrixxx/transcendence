@@ -1,15 +1,18 @@
 import { type Request, type Response } from 'express';
 import * as userService from '../services/users.service.js';
+import { getAll as getGamesByUserId } from '../services/games.service.js';
 import { createUserSchema, updateUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
+import { isOnline } from '../services/presence.service.js';
+import { broadcastProfileChanged } from '../services/profilePresence.service.js';
 
 export async function getUser(req: Request, res: Response) {
 	const id = Number(req.params.id);
 	if (!Number.isInteger(id) || id <= 0)
 		return res.status(400).json({ error: 'id shall be a positive integer' });
 
-	const { result, error } = await query(() => userService.get(id));
+	const { result, error } = await query(() => userService.getPlayerProfile(id));
 	if (error) {
 		const treatedErr = treatError(error);
 
@@ -20,6 +23,24 @@ export async function getUser(req: Request, res: Response) {
 		return res.status(404).json({ error: 'user not found' });
 
 	res.status(200).json(result);
+}
+
+export async function getUserGames(req: Request, res: Response) {
+  const id = Number(req.params.id);
+	if (!Number.isInteger(id) || id <= 0)
+		return res.status(400).json({ error: 'id shall be a positive integer' });
+
+  const { result, error } = await query(() => getGamesByUserId(id));
+  if (error) {
+    const treatedErr = treatError(error);
+
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+
+  if (!result)
+    return res.status(404).json({ error: 'user not found' });
+
+  res.status(200).json(result);
 }
 
 export async function createUser(req: Request, res: Response) {
@@ -46,6 +67,7 @@ export async function updateUser(req: Request, res: Response) {
 	const user = req.user;
 	if (!user)
 		return res.status(401).json({ error: 'user must be logged in' });
+
 	const treatedReq = updateUserSchema.safeParse(req.body);
 	if (!treatedReq.success) {
 		return res.status(400).json({
@@ -54,22 +76,22 @@ export async function updateUser(req: Request, res: Response) {
 		});
 	}
 
-	const { username, password, currentPassword } = treatedReq.data;
-	
-	const updateData: {
-		username?: string,
-		password?: string,
-		currentPassword?: string,
-	} = {};
-	if (username) updateData.username = username;
-	if (password) updateData.password = password;
-	if (currentPassword) updateData.currentPassword = currentPassword;
+	const updateData = treatedReq.data;
+	const { result, error } = await query(() =>
+		userService.update(user.id, updateData),
+	);
 
-	const { result, error } = await query(() => userService.update(user.id, updateData));
 	if (error) {
 		const treatedErr = treatError(error);
 		return res.status(treatedErr.status).json(treatedErr.error);
 	}
+
+	if (result) await broadcastProfileChanged({
+		userId: result.id,
+		username: result.username,
+		avatar: result.avatar,
+		displayName: result.displayName,
+	});
 
 	return res.status(200).json(result);
 }
@@ -86,7 +108,10 @@ export async function getUsersByRanking(req: Request, res: Response) {
 	}
 
 	if (!result)
-		return res.status(200).json({});
+		return res.status(200).json([]);
 
-	return res.status(200).json(result);
+	return res.status(200).json(result.map((rankingUser) => ({
+		...rankingUser,
+		online: isOnline(rankingUser.id),
+	})));
 }

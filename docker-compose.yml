@@ -25,15 +25,19 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      DATABASE_URL: ${DATABASE_URL}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
+    volumes:
+      - avatars_data:/app/uploads/avatars
+      - ./certs/backend:/app/backend/certs:ro
     depends_on:
       db:
         condition: service_healthy
     networks:
       - network-backend-db
       - network-frontend-backend
-    volumes:
-      - ./certs/backend:/app/backend/certs:ro
 
   frontend:
     build:
@@ -66,11 +70,10 @@ services:
 
 volumes:
   postgres_data:
+  avatars_data:
 
 networks:
   network-backend-db:
     internal: true
   network-frontend-backend:
-    internal: true
   network-nginx-frontend:
-    internal: true

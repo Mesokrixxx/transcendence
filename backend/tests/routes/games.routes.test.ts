@@ -17,8 +17,15 @@ vi.mock('../../src/middlewares/auth.middleware.js', () => ({
 }));
 
 vi.mock('../../src/services/games.service.js', () => ({
+  listActive: vi.fn(),
   getState: vi.fn(),
+  canSpectate: vi.fn(),
   create: vi.fn(),
+  getActiveWithFriend: vi.fn(),
+  createInvitation: vi.fn(),
+  getPendingInvitations: vi.fn(),
+  acceptInvitation: vi.fn(),
+  declineInvitation: vi.fn(),
   playMove: vi.fn(),
   resign: vi.fn(),
   draw: vi.fn(),
@@ -28,26 +35,48 @@ vi.mock('../../src/services/gamePresence.service.js', () => ({
   broadcast: vi.fn(),
 }));
 
+vi.mock('../../src/services/presence.service.js', () => ({
+  send: vi.fn(),
+}));
+
 const app = createTestApp(gamesRouter, '/api/games');
 const game = { id: 7, status: 'PLAYING', moves: [] };
 
 describe('game routes', () => {
   beforeEach(() => {
     vi.mocked(gameService.getState).mockReset();
+    vi.mocked(gameService.canSpectate).mockReset();
     vi.mocked(gameService.create).mockReset();
+    vi.mocked(gameService.getActiveWithFriend).mockReset();
+    vi.mocked(gameService.createInvitation).mockReset();
+    vi.mocked(gameService.getPendingInvitations).mockReset();
+    vi.mocked(gameService.acceptInvitation).mockReset();
+    vi.mocked(gameService.declineInvitation).mockReset();
     vi.mocked(gameService.playMove).mockReset();
     vi.mocked(gameService.resign).mockReset();
     vi.mocked(gameService.draw).mockReset();
   });
 
   it('gets a game', async () => {
+    vi.mocked(gameService.canSpectate).mockResolvedValue(true);
     vi.mocked(gameService.getState).mockResolvedValue(game);
 
     const response = await request(app).get('/api/games/7');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(game);
+    expect(gameService.canSpectate).toHaveBeenCalledWith(7);
     expect(gameService.getState).toHaveBeenCalledWith(7);
+  });
+
+  it('returns not found for a game that cannot be watched', async () => {
+    vi.mocked(gameService.canSpectate).mockResolvedValue(false);
+
+    const response = await request(app).get('/api/games/7');
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'game not found' });
+    expect(gameService.getState).not.toHaveBeenCalled();
   });
 
   it('creates a game when the authenticated user is a player', async () => {
@@ -69,6 +98,41 @@ describe('game routes', () => {
 
     expect(response.status).toBe(403);
     expect(gameService.create).not.toHaveBeenCalled();
+  });
+
+  it('finds an active game with a friend', async () => {
+    vi.mocked(gameService.getActiveWithFriend).mockResolvedValue({ id: 7 });
+
+    const response = await request(app).get('/api/games/active/2');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ id: 7 });
+    expect(gameService.getActiveWithFriend).toHaveBeenCalledWith(1, 2);
+  });
+
+  it('creates a game invitation for a friend', async () => {
+    vi.mocked(gameService.createInvitation).mockResolvedValue({
+      activeGame: null,
+      invitation: { id: 12 },
+    } as never);
+
+    const response = await request(app).post('/api/games/invitations/2');
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({ invitationId: 12 });
+  });
+
+  it('accepts a game invitation and starts the game', async () => {
+    vi.mocked(gameService.acceptInvitation).mockResolvedValue({
+      id: 7,
+      whiteId: 2,
+      blackId: 1,
+    } as never);
+
+    const response = await request(app).post('/api/games/invitations/12/accept');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ gameId: 7 });
   });
 
   it('plays a move', async () => {

@@ -41,10 +41,10 @@ const fetchAPI = async <Data = unknown>({
   method: Method;
 }): Promise<APIResponse<Data>> => {
   try {
-    const response = await fetch(
-      `${getURL()}${path}`,
-      getFetchOptions(body ?? null, method),
-    );
+    const response = await fetch(`${getURL()}${path}`, {
+    ...getFetchOptions(body ?? null, method),
+    method: method.toUpperCase(),
+    });
 
     const text = await response.text();
     let result: unknown = undefined;

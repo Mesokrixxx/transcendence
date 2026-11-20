@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import Navbar from '../../components/Navbar/Navbar';
-import Footer from '../../components/Footer/Footer';
-import { Page } from '../Home/Home.styles';
+import { Link } from 'react-router-dom'
+import Navbar from '../../components/Navbar/Navbar'
+import Footer from '../../components/Footer/Footer'
+import { Page } from '../Home/Home.styles'
 import {
   Content,
   Header,
@@ -17,7 +18,9 @@ import {
 } from './Rankings.styles';
 import Avatar from '../../components/Avatar/Avatar';
 import { useTranslation, Trans } from 'react-i18next';
-import { getRankings , type Player } from './Rankings.service'
+import { getRankings , type Player } from '../../services/rankings'
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket'
+import { useAuth } from '../../context/AuthContext'
 
 function getWinRate(wins: number, games: number): number {
   if (games === 0) return 0;
@@ -56,12 +59,52 @@ function Rankings() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [search, setSearch] = useState('')
+  const { user } = useAuth()
 
   useEffect(() => {
       getRankings()
           .then((data) => setPlayers(data))
           .catch(() => setHasError(true))
           .finally(() => setIsLoading(false))
+  }, [])
+
+  useEffect(() => {
+    function updateProfile(event: RealtimeEvent) {
+      if (
+        event.type !== 'profile.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.username !== 'string' ||
+        (event.avatar !== null && typeof event.avatar !== 'string')
+      ) return
+
+      const userId = event.userId
+      const username = event.username
+      const avatar = event.avatar ?? undefined
+      setPlayers((current) => current.map((player) =>
+        player.id === userId ? { ...player, username, avatar } : player
+      ))
+    }
+
+    return realtimeSocket.subscribe(updateProfile)
+  }, [])
+
+  // Live online status (the backend only sends presence.changed for friends).
+  useEffect(() => {
+    function updatePresence(event: RealtimeEvent) {
+      if (
+        event.type !== 'presence.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.online !== 'boolean'
+      ) return
+
+      const userId = event.userId
+      const online = event.online
+      setPlayers((current) => current.map((player) =>
+        player.id === userId ? { ...player, online } : player
+      ))
+    }
+
+    return realtimeSocket.subscribe(updatePresence)
   }, [])
 
   const rankedPlayers = players.map((player, index) => ({
@@ -103,12 +146,21 @@ function Rankings() {
                               <td>
                                   <PlayerCell>
                                       <Avatar
-                                          src={player.avatar}
+                                          src={player.avatar||'/avatars/default.svg'}
                                           username={player.username}
-                                          isOnline={player.isOnline}
+                                          isOnline={player.id === user?.id || player.online}
                                           size={48}
                                       />
-                                      <span title={player.username}>{player.username}</span>
+                                      <Link to={`/profile/${player.id}`}>
+                                        <span style={{ display: 'block' }}>
+                                            {player.displayName || player.username}
+                                        </span>
+                                        {player.displayName && player.displayName !== player.username && (
+                                            <small style={{ display: 'block', opacity: 0.75 }}>
+                                                @{player.username}
+                                            </small>
+                                        )}
+                                      </Link>
                                   </PlayerCell>
                               </td>
                               <td>{player.rating}</td>

@@ -181,7 +181,8 @@ function Navbar() {
           <Auth>
             {user ? (
               <UserMenu
-                username={user.username}
+                username={user.displayName || user.username}
+                avatar={user.avatar}
                 isLoggingOut={isLoggingOut}
                 onLogout={handleLogout}
               />
@@ -194,6 +195,7 @@ function Navbar() {
                 <Button to="/register" variant="primary">
                   {t('signUp', { ns: 'auth' })}
                 </Button>
+
               </>
             )}
 

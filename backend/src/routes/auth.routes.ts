@@ -7,5 +7,6 @@ const router = Router();
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 router.get('/me', requireAuth, authController.getCurrentUser);
+router.post('/oauth', authController.oauth);
 
 export default router;

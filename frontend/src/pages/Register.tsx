@@ -6,6 +6,7 @@ import fetchAPI from '../services/fetchAPI';
 import type { AuthUser } from '../types/auth';
 import Navbar from '../components/Navbar/Navbar';
 import Form from '../components/Form/Form';
+import GitHubSignIn from '../components/GitHubSignIn/GitHubSignIn';
 import Input from '../components/Input/Input';
 import Button from '../components/Button/Button';
 import PasswordRequirements from '../components/PasswordRequirements/PasswordRequirements';
@@ -146,6 +147,7 @@ function Register() {
             </AuthSuccess>
           ) : (
             <>
+              <GitHubSignIn />
               <Form
                 onSubmit={(event) => {
                   void handleSubmit(event);
@@ -217,7 +219,6 @@ function Register() {
 
                 {error && <p role="alert">{error}</p>}
               </Form>
-
               <AuthHint>
                 {t('alreadyHaveAnAccount')}{' '}
                 <Link to="/login">{t('logIn')}</Link>

@@ -33,6 +33,11 @@ export const createUserSchema = z.object({
     password: passwordSchema,
 });
 
+export const createGithubUserSchema = z.object({
+  username: z.string().trim(),
+  email: z.email(),
+});
+
 export const authUserSchema = z.object({
     email: z.email(),
     password: z.string().min(8).max(100),
@@ -42,8 +47,14 @@ export const updateUserSchema = z.object({
     username: z.string().trim().min(1).max(32).optional(),
     password: passwordSchema.optional(),
     currentPassword: z.string().min(1).optional(),
+    displayName: z.string().trim().min(1).max(32).nullable().optional(),
+    avatar: z.string().trim().min(1).max(2048).optional(),
 }).refine(
-    data => data.username !== undefined || data.password !== undefined,
+    data =>
+        data.username !== undefined ||
+        data.password !== undefined ||
+        data.displayName !== undefined ||
+        data.avatar !== undefined,
     { message: 'at least one field must be updated' }
 ).refine(
     data => data.password === undefined || data.currentPassword !== undefined,

@@ -27,6 +27,17 @@ enum GameEndType {
   INSUFMATERIAL
   TRIPLEREPETITION
   FIFTYMOVE
+  AGREED
+}
+
+enum GameInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum DrawOfferStatus {
+  PENDING
 }
 
 // Tournament should have its own models and/or fields.
@@ -36,7 +47,7 @@ model User {
   username String  @unique
   email    String  @unique
   password String? // Possibly no password if User only uses OAuth 2.0
-  // OAuth 2.0 should have its own field. Would be clearer.
+  githubId Int?    @unique
 
   elo         Int @default(1400)
   gamesPlayed Int @default(0)
@@ -57,6 +68,41 @@ model User {
   chats    Chat[]
   messages Message[]
   sessions Session[]
+  achievements UserAchievement[]
+
+  sentGameInvitations     GameInvitation[] @relation("SentGameInvitations")
+  receivedGameInvitations GameInvitation[] @relation("ReceivedGameInvitations")
+  sentDrawOffers          DrawOffer[]        @relation("SentDrawOffers")
+  receivedDrawOffers      DrawOffer[]        @relation("ReceivedDrawOffers")
+}
+
+model DrawOffer {
+  id         Int             @id @default(autoincrement())
+  game       Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId     Int
+  sender     User            @relation("SentDrawOffers", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   Int
+  receiver   User            @relation("ReceivedDrawOffers", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId Int
+  status     DrawOfferStatus @default(PENDING)
+  createdAt  DateTime        @default(now())
+
+  @@unique([gameId, senderId, receiverId])
+  @@index([receiverId, status])
+}
+
+model GameInvitation {
+  id         Int                   @id @default(autoincrement())
+  sender     User                  @relation("SentGameInvitations", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   Int
+  receiver   User                  @relation("ReceivedGameInvitations", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId Int
+  status     GameInvitationStatus  @default(PENDING)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([receiverId, status])
+  @@index([senderId, status])
 }
 
 model Session {
@@ -74,11 +120,11 @@ model Session {
 model Profile {
   avatar       String?
   displayName  String?
+  firstName String?
+  lastName  String?
   creationDate DateTime          @default(now())
   user         User              @relation(fields: [userId], references: [id])
   userId       Int               @unique
-  level        Int               @default(0)
-  xp           Int               @default(0)
   badges       BadgesOnProfile[]
 }
 
@@ -90,15 +136,19 @@ model Game {
   createdAt  DateTime     @default(now())
   startedAt  DateTime?
   endedAt    DateTime?
+  gamificationProcessed Boolean @default(false)
   moves      Json
   white      User         @relation("WhiteGames", fields: [whiteId], references: [id])
   whiteId    Int
+  whiteElo   Int
   black      User         @relation("BlackGames", fields: [blackId], references: [id])
   blackId    Int
+  blackElo   Int
   specChat   Chat         @relation("SpectatorChat", fields: [specChatId], references: [id])
   specChatId Int          @unique
   chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
   chatId     Int          @unique
+  drawOffers DrawOffer[]
   // Spectator Field probably needed. Maybe Game.chat.users could be that field.
 }
 
@@ -123,6 +173,7 @@ model Message {
 
 model Badge {
   id          Int               @id @default(autoincrement())
+  code        String            @unique
   name        String
   description String
   ownedBy     BadgesOnProfile[]
@@ -130,11 +181,31 @@ model Badge {
 
 // Explicit many-to-many relationship -- Needed due to Profile model id/unique usage
 model BadgesOnProfile {
-  profile    Profile  @relation(fields: [profileUserId], references: [userId])
+  profile       Profile  @relation(fields: [profileUserId], references: [userId])
   profileUserId Int
-  badge      Badge    @relation(fields: [badgeId], references: [id])
-  badgeId    Int
-  assignedAt DateTime @default(now())
+  badge         Badge    @relation(fields: [badgeId], references: [id])
+  badgeId       Int
+  record        Int      @default(0)
+  featured      Boolean  @default(false)
+  assignedAt    DateTime @default(now())
 
   @@unique([profileUserId, badgeId])
+}
+
+model Achievement {
+  id          Int               @id @default(autoincrement())
+  code        String             @unique
+  name        String
+  description String
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  achievementId Int
+  unlockedAt    DateTime   @default(now())
+
+  @@id([userId, achievementId])
 }

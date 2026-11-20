@@ -1,8 +1,18 @@
 {
   "chat": "Discussion",
+  "connecting": "Connexion...",
+  "conversations": "Conversations",
+  "disconnected": "Déconnecté. Vous ne pouvez pas envoyer de messages pour le moment.",
   "gameChat": "Discussion de la partie",
+  "loadingMessages": "Chargement des messages...",
+  "loadMessagesError": "Impossible de charger les messages.",
+  "messages": "Messages",
+  "noMessagesYet": "Aucun message pour le moment.",
   "players": "Joueurs",
+  "rateLimitError": "Vous écrivez trop vite. Patientez quelques secondes.",
+  "sendError": "Impossible d'envoyer votre message.",
   "spectatorChat": "Discussion des spectateurs",
   "spectators": "Spectateurs",
-  "writeAMessage": "Écrire un message…"
+  "writeAMessage": "Écrire un message…",
+  "noConversations": "Aucune conversation avec vos amis."
 }

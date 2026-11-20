@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const ProfilePanel = styled.section`
-  margin: 48px 0;
+  margin: 48px 0 24px;
   padding: 32px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -17,15 +17,21 @@ export const ProfileHeader = styled.div`
   .profile-info {
     flex: 1;
     min-width: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  h1 {
+  .profile-info h1 {
     margin: 0;
+    line-height: 1.2;
     color: var(--color-text-primary);
   }
 
-  p {
-    margin: 8px 0 0;
+  .profile-info p {
+    margin: 0;
+    line-height: 1.4;
     color: var(--color-text-secondary);
   }
 
@@ -102,6 +108,19 @@ export const ProfileDialog = styled.dialog`
 
   &::backdrop {
     background: rgb(0 0 0 /65%);
+  }
+
+  .profile-username-display {
+  cursor: default;
+  opacity: 0.7;
+  }
+
+  .profile-username-display p {
+    margin: 0.5rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
   }
 
   @media (max-width: 600px) {

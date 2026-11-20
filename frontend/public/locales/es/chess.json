@@ -14,6 +14,18 @@
   "gameHistoryAndScores": "Historial y puntuaciones de partidas",
   "gameInformation": "Información de la partida",
   "gameInProgress": "Partida en curso",
+  "noGamesInProgress": "No hay partidas en curso.",
+  "unableToLoadGames": "No se pueden cargar las partidas.",
+  "yourGame": "Tu partida",
+  "joinGame": "Unirse a la partida",
+  "gameActions": "Acciones de la partida",
+  "gameOver": "Partida terminada",
+  "winnerStatus": "Victoria de las {{winner}}",
+  "offerDraw": "Proponer tablas",
+  "drawRequestSent": "Solicitud de tablas enviada",
+  "drawRequestDeclined": "La solicitud de tablas fue rechazada",
+  "unableToSendDrawRequest": "No se pudo enviar la solicitud de tablas.",
+  "resign": "Abandonar",
   "games": "Partidas",
   "legalCapture": "Captura posible",
   "legalMove": "Movimiento posible",
@@ -52,6 +64,15 @@
   "toMove": "Juegan {{color}}",
   "trainingDescription": "Practica jugando con ambos bandos.",
   "unableToPlayThisMove": "No se puede realizar este movimiento.",
+  "waitingForFriend": "Esperando a tu amigo…",
   "watchGame": "Ver partida",
-  "white": "Blancas"
+  "white": "Blancas",
+  "lobby": {
+    "title": "Jugar con un amigo",
+    "loadError": "No se pudo cargar tu lista de amigos.",
+    "loading": "Cargando tu lista de amigos…",
+    "noFriends": "Aún no tienes amigos en ChessMove.",
+    "online": "En línea",
+    "offline": "Sin conexión"
+  }
 }
