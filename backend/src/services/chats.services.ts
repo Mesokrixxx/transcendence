@@ -2,6 +2,7 @@ import prisma from '../db/prisma.js'
 import { BackendError } from '../types/backendError.types.js';
 import * as chatPresenceService from './chatPresence.service.js';
 import { checkMessageRateLimit } from './chatRateLimit.service.js';
+import * as presenceService from './presence.service.js';
 
 export async function get(id: number) {
 	return await prisma.chat.findUnique({
@@ -163,6 +164,31 @@ export async function append(message: string, chatId: number, userId: number) {
 		chatId,
 		message: createdMessage
 	});
+
+	const privateChat = await prisma.chat.findUnique({
+		where: { id: chatId },
+		select: {
+			game: { select: { id: true } },
+			spectatorGame: { select: { id: true } },
+			users: { select: { id: true } },
+		},
+	});
+
+	if (
+		privateChat &&
+		privateChat.game === null &&
+		privateChat.spectatorGame === null &&
+		privateChat.users.length === 2
+	) {
+		for (const recipient of privateChat.users) {
+			if (recipient.id === userId) continue;
+			presenceService.send(recipient.id, {
+				type: 'chat.message.received',
+				chatId,
+				message: createdMessage,
+			});
+		}
+	}
 
 	return createdMessage;
 }

@@ -5,6 +5,7 @@ import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import {
   NotificationLayer,
   NotificationCard,
+  PrivateMessageNotificationCard,
   NotificationActions,
 } from './GameInvitationNotifications.styles';
 
@@ -33,12 +34,22 @@ type DrawOffer = {
   };
 };
 
+type PrivateMessageNotification = {
+  id: number;
+  chatId: number;
+  senderName: string;
+  content: string;
+};
+
 export default function GameInvitationNotifications() {
   const navigate = useNavigate();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [actionError, setActionError] = useState('');
   const [pendingActionId, setPendingActionId] = useState<number | null>(null);
   const [drawOffers, setDrawOffers] = useState<DrawOffer[]>([]);
+  const [privateMessages, setPrivateMessages] = useState<
+    PrivateMessageNotification[]
+  >([]);
 
   async function loadInvitations() {
     const response = await fetchAPI<{ invitations: Invitation[] }>({
@@ -78,6 +89,49 @@ export default function GameInvitationNotifications() {
         event.type === 'game.draw.declined'
       ) {
         void loadDrawOffers();
+      }
+      if (
+        event.type === 'chat.message.received' &&
+        typeof event.chatId === 'number' &&
+        event.message &&
+        typeof event.message === 'object'
+      ) {
+        const message = event.message as Record<string, unknown>;
+        const sender = message.user;
+        if (
+          typeof message.id !== 'number' ||
+          typeof message.content !== 'string' ||
+          !sender ||
+          typeof sender !== 'object'
+        ) return;
+
+        const senderData = sender as Record<string, unknown>;
+        if (
+          typeof senderData.username !== 'string' ||
+          (senderData.profile !== null &&
+            typeof senderData.profile !== 'object')
+        ) return;
+
+        const messageId = message.id;
+        const content = message.content;
+        const profile = senderData.profile as
+          | { displayName?: unknown }
+          | null;
+        const senderName =
+          typeof profile?.displayName === 'string' &&
+          profile.displayName.trim() !== ''
+            ? profile.displayName
+            : senderData.username;
+
+        setPrivateMessages((current) => [
+          ...current.filter((item) => item.id !== messageId),
+          {
+            id: messageId,
+            chatId: event.chatId as number,
+            senderName,
+            content,
+          },
+        ]);
       }
     });
   }, [navigate]);
@@ -159,7 +213,11 @@ export default function GameInvitationNotifications() {
     setDrawOffers((current) => current.filter((item) => item.id !== offer.id));
   }
 
-  if (invitations.length === 0 && drawOffers.length === 0) return null;
+  if (
+    invitations.length === 0 &&
+    drawOffers.length === 0 &&
+    privateMessages.length === 0
+  ) return null;
 
   return (
     <NotificationLayer aria-live="polite">
@@ -216,6 +274,47 @@ export default function GameInvitationNotifications() {
           </NotificationCard>
         );
       })}
+      {privateMessages.map((message) => (
+        <PrivateMessageNotificationCard
+          key={`message-${message.id}`}
+          role="alert"
+          onAnimationEnd={(event) => {
+            if (event.animationName !== 'notification-fade') return;
+            setPrivateMessages((current) =>
+              current.filter((item) => item.id !== message.id),
+            );
+          }}
+        >
+          <p>
+            <strong>{message.senderName}</strong> t&apos;a envoyé un message
+            privé.
+          </p>
+          <p>{message.content}</p>
+          <NotificationActions>
+            <button
+              type="button"
+              onClick={() => {
+                setPrivateMessages((current) =>
+                  current.filter((item) => item.id !== message.id),
+                );
+                navigate('/chat');
+              }}
+            >
+              Ouvrir les messages
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setPrivateMessages((current) =>
+                  current.filter((item) => item.id !== message.id),
+                )
+              }
+            >
+              Fermer
+            </button>
+          </NotificationActions>
+        </PrivateMessageNotificationCard>
+      ))}
       {actionError && <p role="alert">{actionError}</p>}
     </NotificationLayer>
   );
