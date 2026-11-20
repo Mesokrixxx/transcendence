@@ -27,6 +27,17 @@ enum GameEndType {
   INSUFMATERIAL
   TRIPLEREPETITION
   FIFTYMOVE
+  AGREED
+}
+
+enum GameInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum DrawOfferStatus {
+  PENDING
 }
 
 // Tournament should have its own models and/or fields.
@@ -58,6 +69,40 @@ model User {
   messages Message[]
   sessions Session[]
   achievements UserAchievement[]
+
+  sentGameInvitations     GameInvitation[] @relation("SentGameInvitations")
+  receivedGameInvitations GameInvitation[] @relation("ReceivedGameInvitations")
+  sentDrawOffers          DrawOffer[]        @relation("SentDrawOffers")
+  receivedDrawOffers      DrawOffer[]        @relation("ReceivedDrawOffers")
+}
+
+model DrawOffer {
+  id         Int             @id @default(autoincrement())
+  game       Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId     Int
+  sender     User            @relation("SentDrawOffers", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   Int
+  receiver   User            @relation("ReceivedDrawOffers", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId Int
+  status     DrawOfferStatus @default(PENDING)
+  createdAt  DateTime        @default(now())
+
+  @@unique([gameId, senderId, receiverId])
+  @@index([receiverId, status])
+}
+
+model GameInvitation {
+  id         Int                   @id @default(autoincrement())
+  sender     User                  @relation("SentGameInvitations", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId   Int
+  receiver   User                  @relation("ReceivedGameInvitations", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId Int
+  status     GameInvitationStatus  @default(PENDING)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@index([receiverId, status])
+  @@index([senderId, status])
 }
 
 model Session {
@@ -103,6 +148,7 @@ model Game {
   specChatId Int          @unique
   chat       Chat         @relation("GameChat", fields: [chatId], references: [id])
   chatId     Int          @unique
+  drawOffers DrawOffer[]
   // Spectator Field probably needed. Maybe Game.chat.users could be that field.
 }
 

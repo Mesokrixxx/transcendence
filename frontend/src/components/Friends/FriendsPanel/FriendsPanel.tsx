@@ -127,6 +127,24 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
         return realtimeSocket.subscribe(updateProfile)
     }, [])
 
+    useEffect(() => {
+        function updateFriends(event: RealtimeEvent) {
+            if (
+                event.type !== 'friend.request.sent' &&
+                event.type !== 'friend.request.accepted' &&
+                event.type !== 'friend.changed' &&
+                event.type !== 'friend.blocked' &&
+                event.type !== 'friend.unblocked'
+            ) return
+
+            getFriends()
+                .then((result) => setData(result))
+                .catch(() => setHasError(true))
+        }
+
+        return realtimeSocket.subscribe(updateFriends)
+    }, [])
+
     function handleSend(username: string): Promise<void> {
         return sendFriendRequest(username)
             .then(() => getFriends())

@@ -4,13 +4,22 @@ import type { Game } from "../types/game";
 // import { GameEndType, GameResult, GameStatus } from "../types/game";
 // import ChessGame from "../../../chessgame/src/chessgame";
 
-export async function getUserGames(userId: number):  Promise<Game[] | null> {
-  const response = await fetchAPI<Game[]>({
+type GameFromApi = Omit<Game, 'endedAt'> & {
+  endedAt: string | null;
+};
+
+export async function getUserGames(userId: number): Promise<Game[] | null> {
+  const response = await fetchAPI<GameFromApi[]>({
     path: `/users/${userId}/games`,
     method: 'get',
   });
-  if (response.error) return null;
-  return (response.result);
+
+  if (response.error || !response.result) return null;
+
+  return response.result.map((game) => ({
+    ...game,
+    endedAt: game.endedAt === null ? null : new Date(game.endedAt),
+  }));
 }
 
 /*

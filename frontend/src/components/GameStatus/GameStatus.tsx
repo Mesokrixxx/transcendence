@@ -2,9 +2,20 @@ import type ChessGame from '../../../../chessgame/src/chessgame';
 import { useTranslation } from 'react-i18next';
 import { StatusBox } from './GameStatus.styles';
 
-type GameStatusProps = { game: ChessGame; message?: string | undefined};
+type GameStatusProps = {
+  game: ChessGame;
+  message?: string | undefined;
+  remoteStatus?: 'WAITING' | 'PLAYING' | 'OVER';
+  remoteResult?: 'DRAW' | 'WHITE' | 'BLACK' | null;
+  remoteEndType?: string | null;
+};
 
-function GameStatus({ game, message }: GameStatusProps) {
+function GameStatus({
+  game,
+  message,
+  remoteStatus,
+  remoteResult,
+}: GameStatusProps) {
   const { t } = useTranslation();
   const currentColor =
     game.getTurn() === 'white'
@@ -16,7 +27,23 @@ function GameStatus({ game, message }: GameStatusProps) {
       : t('white', { ns: 'chess' });
 
   let status: string;
-  if (game.isCheckmate()) {
+  if (remoteStatus === 'OVER') {
+    if (remoteResult === 'DRAW') {
+      status = t('drawStatus', { ns: 'chess' });
+    } else if (remoteResult === 'WHITE') {
+      status = t('winnerStatus', {
+        ns: 'chess',
+        winner: t('white', { ns: 'chess' }),
+      });
+    } else if (remoteResult === 'BLACK') {
+      status = t('winnerStatus', {
+        ns: 'chess',
+        winner: t('black', { ns: 'chess' }),
+      });
+    } else {
+      status = t('gameOver', { ns: 'chess' });
+    }
+  } else if (game.isCheckmate()) {
     status = t('checkmateWinner', { ns: 'chess', winner });
   } else if (game.isDraw()) {
     status = t('drawStatus', { ns: 'chess' });

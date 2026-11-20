@@ -2,8 +2,17 @@ import { type Request, type Response } from 'express';
 import * as friendsService from '../services/friends.service.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
-import { isOnline } from '../services/presence.service.js';
+import * as presenceService from '../services/presence.service.js';
 import { friendParamsSchema, friendRequestSchema } from '../validations/friends.validation.js';
+
+function notifyFriendChanged(
+	userId: number,
+	friendId: number,
+	type: string,
+) {
+	presenceService.send(userId, { type, userId: friendId });
+	presenceService.send(friendId, { type, userId });
+}
 
 function getFriendId(req: Request, res: Response) {
 	const parsed = friendParamsSchema.safeParse(req.params);
@@ -34,7 +43,7 @@ export async function getList(req: Request, res: Response) {
 	return res.status(200).json(
 		result.map((friend) => ({
 			...friend,
-			online: isOnline(friend.id),
+			online: presenceService.isOnline(friend.id),
 		})));
 }
 
@@ -54,7 +63,7 @@ export async function getRequests(req: Request, res: Response) {
 
 	return res.status(200).json(result.map((friend) => ({
 		...friend,
-		online: isOnline(friend.id),
+		online: presenceService.isOnline(friend.id),
 	})));
 }
 
@@ -74,7 +83,7 @@ export async function getBlocked(req: Request, res: Response) {
 
 	return res.status(200).json(result.map((friend) => ({
 		...friend,
-		online: isOnline(friend.id),
+		online: presenceService.isOnline(friend.id),
 	})));
 }
 
@@ -97,7 +106,8 @@ export async function addFriend(req: Request, res: Response) {
 	if (!result) 
 		return res.status(404).json({ error: 'user not found' });
 
-	return res.status(201).json({ ...result, online: isOnline(result.id) });
+	notifyFriendChanged(user.id, id, 'friend.request.sent');
+	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function addFriendByUsername(req: Request, res: Response) {
@@ -133,7 +143,8 @@ export async function addFriendByUsername(req: Request, res: Response) {
 	if (!result)
 		return res.status(404).json({ error: 'user not found' });
 
-	return res.status(201).json({ ...result, online: isOnline(result.id) });
+	notifyFriendChanged(user.id, friend.id, 'friend.request.sent');
+	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function acceptFriend(req: Request, res: Response) {
@@ -153,7 +164,8 @@ export async function acceptFriend(req: Request, res: Response) {
 	if (!result)
 		return res.status(404).json({ error: 'friend request not found' });
 
-	return res.status(200).json({ ...result, online: isOnline(result.id) });
+	notifyFriendChanged(req.user!.id, id, 'friend.request.accepted');
+	return res.status(200).json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function delFriend(req: Request, res: Response) {
@@ -173,6 +185,7 @@ export async function delFriend(req: Request, res: Response) {
 	if (!result)
 		return res.status(404).json({ error: 'user not found' });
 
+	notifyFriendChanged(user.id, id, 'friend.changed');
 	return res.status(204).send();
 }
 
@@ -193,7 +206,8 @@ export async function block(req: Request, res: Response) {
 	if (!result)
 		return res.status(404).json({ error: 'user not found' });
 
-	return res.status(201).json({ ...result, online: isOnline(result.id) });
+	notifyFriendChanged(req.user!.id, id, 'friend.blocked');
+	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function unblock(req: Request, res: Response) {
@@ -213,5 +227,6 @@ export async function unblock(req: Request, res: Response) {
 	if (!result)
 		return res.status(404).json({ error: 'user not found' });
 
+	notifyFriendChanged(req.user!.id, id, 'friend.unblocked');
 	return res.status(204).send();
 }
