@@ -43,7 +43,7 @@ export async function getPlayerProfile(id: number) {
       elo: true,
       gamesPlayed: true,
       profile: {
-        select: { avatar: true },
+        select: { avatar: true, displayName: true },
       },
     },
   });
@@ -54,6 +54,7 @@ export async function getPlayerProfile(id: number) {
     id: user.id,
     username: user.username,
     avatar: user.profile?.avatar ?? null,
+    displayName: user.profile?.displayName ?? null,
     elo: user.elo,
     gamesPlayed: user.gamesPlayed,
   };

@@ -4,6 +4,7 @@ export type PlayerProfile = {
   id: number;
   username: string;
   avatar: string | null;
+  displayName: string | null;
   elo: number;
   gamesPlayed: number;
 };

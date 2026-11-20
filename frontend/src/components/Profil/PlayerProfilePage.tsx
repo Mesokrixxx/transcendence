@@ -51,11 +51,13 @@ function PlayerProfileDetails({ id }: { id: number }) {
         event.type !== 'profile.changed' ||
         event.userId !== id ||
         typeof event.username !== 'string' ||
-        (event.avatar !== null && typeof event.avatar !== 'string')
+        (event.avatar !== null && typeof event.avatar !== 'string') ||
+        (event.displayName !== null && typeof event.displayName !== 'string')
       ) return;
 
       const username = event.username;
       const avatar = event.avatar;
+      const displayName = event.displayName ?? null;
       setState((current) => current.status === 'ready'
         ? {
             ...current,
@@ -63,6 +65,7 @@ function PlayerProfileDetails({ id }: { id: number }) {
               ...current.player,
               username,
               avatar,
+              displayName,
             },
           }
         : current);
@@ -94,7 +97,10 @@ function PlayerProfileDetails({ id }: { id: number }) {
       />
 
       <div className="profile-info">
-        <h1>{player.username}</h1>
+        <h1>{player.displayName?.trim() || player.username}</h1>
+        {player.displayName && player.displayName !== player.username && (
+          <p>@{player.username}</p>
+        )}
         <p>{t('playerElo', { elo: player.elo })}</p>
         <p>{t('playerGamesPlayed', { games: player.gamesPlayed })}</p>
       </div>

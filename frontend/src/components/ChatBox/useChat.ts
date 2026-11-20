@@ -74,6 +74,23 @@ export function useChat(chatId: number | undefined) {
 
         // Shared socket: reconnects automatically and re-joins the chat.
         function handleEvent(event: RealtimeEvent) {
+            if (event.type === 'profile.changed' &&
+                typeof event.userId === 'number' &&
+                typeof event.username === 'string') {
+                const name =
+                    typeof event.displayName === 'string'
+                        ? event.displayName.trim() || event.username
+                        : event.username
+                update((current) => ({
+                    messages: current.messages.map((message) =>
+                        message.userId === event.userId
+                            ? { ...message, username: name }
+                            : message
+                    ),
+                }))
+                return
+            }
+
             if (event.type !== 'chat.message' || event.chatId !== chatId) return
             if (!isMessageFromAPI(event.message)) return
 

@@ -13,18 +13,17 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
         function handleEvent(event: RealtimeEvent) {
             if (event.type === 'profile.changed') {
-                const { userId, username, avatar, firstName, lastName } = event
+                const { userId, username, avatar, displayName } = event
 
                 if (
                     userId !== sessionUserId ||
                     typeof username !== 'string' ||
                     (avatar !== null && typeof avatar !== 'string') ||
-                    (firstName !== null && typeof firstName !== 'string') ||
-                    (lastName !== null && typeof lastName !== 'string')
+                    (displayName !== null && typeof displayName !== 'string')
                 ) return
 
                 setUser((current) => current && current.id === sessionUserId
-                    ? { ...current, username, avatar, firstName, lastName }
+                    ? { ...current, username, avatar, displayName }
                     : current)
 
                 return

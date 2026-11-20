@@ -74,14 +74,16 @@ function Rankings() {
         event.type !== 'profile.changed' ||
         typeof event.userId !== 'number' ||
         typeof event.username !== 'string' ||
-        (event.avatar !== null && typeof event.avatar !== 'string')
+        (event.avatar !== null && typeof event.avatar !== 'string') ||
+        (event.displayName !== null && typeof event.displayName !== 'string')
       ) return
 
       const userId = event.userId
       const username = event.username
       const avatar = event.avatar ?? undefined
+      const displayName = event.displayName ?? null
       setPlayers((current) => current.map((player) =>
-        player.id === userId ? { ...player, username, avatar } : player
+        player.id === userId ? { ...player, username, avatar, displayName } : player
       ))
     }
 

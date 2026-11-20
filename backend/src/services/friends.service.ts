@@ -108,6 +108,7 @@ export async function addFriend(userId: number, friendId: number) {
 	return {
 		id: friend.id,
 		username: friend.username,
+		displayName: friend.profile?.displayName ?? null,
 		avatar: friend.profile?.avatar ?? '',
 	};
 }
@@ -134,6 +135,7 @@ export async function acceptFriend(userId: number, friendId: number) {
 	}).then((friend) => friend && ({
 		id: friend.id,
 		username: friend.username,
+		displayName: friend.profile?.displayName ?? null,
 		avatar: friend.profile?.avatar ?? '',
 	}));
 }
@@ -160,6 +162,7 @@ export async function delFriend(userId: number, friendId: number) {
 	return {
 		id: friend.id,
 		username: friend.username,
+		displayName: friend.profile?.displayName ?? null,
 		avatar: friend.profile?.avatar ?? '',
 	};
 }

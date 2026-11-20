@@ -73,6 +73,66 @@ function Messaging() {
     return realtimeSocket.subscribe(updatePresence);
   }, []);
 
+  useEffect(() => {
+    function updateConversations(event: RealtimeEvent) {
+      if (
+        event.type === 'friend.request.accepted' ||
+        event.type === 'friend.changed' ||
+        event.type === 'friend.blocked' ||
+        event.type === 'friend.unblocked'
+      ) {
+        void getFriends()
+          .then(async ({ friends }) => {
+            const results = await Promise.all(
+              friends.map(async (friend) => {
+                const response = await fetchAPI<{ id: number }>({
+                  path: '/chats',
+                  method: 'post',
+                  body: { userId: friend.id },
+                });
+                if (response.error) throw new Error('Unable to create chat');
+                return { ...friend, chatId: response.result.id };
+              }),
+            );
+            setConversations(results);
+          })
+          .catch(() => setError(t('requestFailed', { ns: 'common' })));
+        return;
+      }
+
+      if (
+        event.type !== 'profile.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.username !== 'string' ||
+        (event.avatar !== null && typeof event.avatar !== 'string')
+      ) return;
+
+      const displayName =
+        typeof event.displayName === 'string'
+          ? event.displayName
+          : event.displayName === null
+            ? null
+            : undefined;
+      const username = event.username;
+      const avatar = event.avatar ?? undefined;
+
+      setConversations((current) =>
+        current.map((conversation) =>
+          conversation.id === event.userId
+            ? {
+                ...conversation,
+                username,
+                displayName,
+                avatar,
+              }
+            : conversation
+        )
+      );
+    }
+
+    return realtimeSocket.subscribe(updateConversations);
+  }, [t]);
+
   if (error) return <p role="alert">{error}</p>;
 
   return (
@@ -97,7 +157,7 @@ function Messaging() {
                   isOnline={conversation.isOnline}
                   size={40}
                 />
-                <span>{conversation.username}</span>
+                <span>{conversation.displayName?.trim() || conversation.username}</span>
               </ConversationButton>
             </li>
           ))}
@@ -111,7 +171,10 @@ function Messaging() {
           id={`${id}-${conversation.chatId}`}
           hidden={selectedId !== conversation.chatId}
         >
-          <ChatBox title={conversation.username} chatId={conversation.chatId} />
+          <ChatBox
+            title={conversation.displayName?.trim() || conversation.username}
+            chatId={conversation.chatId}
+          />
         </ConversationPanel>
       ))}
     </ChatLayout>

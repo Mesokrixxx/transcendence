@@ -14,6 +14,9 @@ export async function get(id: number) {
 						select: {
 							id: true,
 							username: true,
+							profile: {
+								select: { displayName: true },
+							},
 						},
 					},
 				},
@@ -22,6 +25,9 @@ export async function get(id: number) {
 				select: {
 					id: true,
 					username: true,
+					profile: {
+						select: { displayName: true },
+					},
 				},
 			},
 		}
@@ -143,7 +149,10 @@ export async function append(message: string, chatId: number, userId: number) {
 			user: {
 				select: {
 					id: true,
-					username: true
+					username: true,
+					profile: {
+						select: { displayName: true },
+					},
 				}
 			}
 		}
