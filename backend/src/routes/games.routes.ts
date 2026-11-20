@@ -4,6 +4,7 @@ import { requireAuth } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
+router.get('/', requireAuth, gamesController.listGames);
 router.get('/active/:friendId', requireAuth, gamesController.getActiveGameWithFriend);
 router.get('/invitations', requireAuth, gamesController.getInvitations);
 router.get('/draw/offers', requireAuth, gamesController.getDrawOffers);

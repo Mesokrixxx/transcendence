@@ -35,6 +35,20 @@ function broadcastGameResult(gameId: number, result: GameResult) {
 		presenceService.send(stats.userId, { type: 'stats.updated', stats });
 }
 
+export async function listGames(req: Request, res: Response) {
+	if (!req.user)
+		return res.status(401).json({ error: 'user must be logged in' });
+
+	const { result, error } = await query(() =>
+		gameService.listActive(req.user!.id),
+	);
+	if (error) {
+		const treatedErr = treatError(error);
+		return res.status(treatedErr.status).json(treatedErr.error);
+	}
+	return res.status(200).json({ games: result });
+}
+
 export async function getGame(req: Request, res: Response) {
 	if (!req.user)
 		return res.status(401).json({ error: 'user must be logged in' });
@@ -54,7 +68,8 @@ export async function getGame(req: Request, res: Response) {
 	if (!canSpectate)
 		return res.status(404).json({ error: 'game not found' });
 
-	const { result, error } = await query(() => gameService.getState(id, true));	if (error) {
+	const { result, error } = await query(() => gameService.getState(id, true));
+	if (error) {
 		const treatedErr = treatError(error);
 
 		return res.status(treatedErr.status).json(treatedErr.error);

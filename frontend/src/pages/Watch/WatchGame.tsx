@@ -132,7 +132,10 @@ function WatchGame() {
                 username={players?.white.username ?? t('playerWhite', { ns: 'chess' })}
                 size={48}
               />
-              <span>{players?.white.username ?? t('playerWhite', { ns: 'chess' })}</span>
+              <span>
+                {t('white', { ns: 'chess' })} —{' '}
+                {players?.white.username ?? t('playerWhite', { ns: 'chess' })}
+              </span>
             </div>
 
             <div className="opponent">
@@ -141,7 +144,10 @@ function WatchGame() {
                 username={players?.black.username ?? t('playerBlack', { ns: 'chess' })}
                 size={48}
               />
-              <span>{players?.black.username ?? t('playerBlack', { ns: 'chess' })}</span>
+              <span>
+                {t('black', { ns: 'chess' })} —{' '}
+                {players?.black.username ?? t('playerBlack', { ns: 'chess' })}
+              </span>
             </div>
 
             {error && <p role="alert">{error}</p>}

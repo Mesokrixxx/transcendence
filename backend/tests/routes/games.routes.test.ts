@@ -17,6 +17,7 @@ vi.mock('../../src/middlewares/auth.middleware.js', () => ({
 }));
 
 vi.mock('../../src/services/games.service.js', () => ({
+  listActive: vi.fn(),
   getState: vi.fn(),
   canSpectate: vi.fn(),
   create: vi.fn(),
