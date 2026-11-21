@@ -9,14 +9,17 @@
   "invalidJSONResponse": "Le serveur a renvoyé une réponse JSON invalide.",
   "loading": "Chargement...",
   "mainNavigation": "Navigation principale",
+  "no": "Non",
   "offline": "Hors ligne",
   "online": "En ligne",
   "openNavigation": "Ouvrir la navigation",
+  "processing": "Traitement…",
   "requestFailed": "La requête a échoué.",
   "send": "Envoyer",
   "testAPI": "Tester l’API",
   "testNotStarted": "Test non démarré.",
   "unableToReachServer": "Impossible de joindre le serveur.",
   "unknownError": "Une erreur est survenue.",
+  "yes": "Oui",
   "you": "Vous"
 }

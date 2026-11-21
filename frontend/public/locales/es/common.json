@@ -9,14 +9,17 @@
   "invalidJSONResponse": "El servidor devolvió una respuesta JSON no válida.",
   "loading": "Cargando...",
   "mainNavigation": "Navegación principal",
+  "no": "No",
   "offline": "Desconectado",
   "online": "En línea",
   "openNavigation": "Abrir navegación",
+  "processing": "Procesando…",
   "requestFailed": "La solicitud ha fallado.",
   "send": "Enviar",
   "testAPI": "Probar la API",
   "testNotStarted": "Prueba no iniciada.",
   "unableToReachServer": "No se puede conectar con el servidor.",
   "unknownError": "Se ha producido un error.",
+  "yes": "Sí",
   "you": "Tú"
 }

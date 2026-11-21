@@ -128,7 +128,7 @@ function ProfileActivity({ userId }: { userId: number }) {
         {gamesLoading ? (
           <StatusMessage>{t('loading', { ns: 'common' })}</StatusMessage>
         ) : games === null ? (
-          <StatusMessage>Could not load data.</StatusMessage>
+          <StatusMessage>{t('activityLoadError')}</StatusMessage>
         ) : (
           <Statistics games={games} userId={userId} />
         )}

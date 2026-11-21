@@ -383,7 +383,7 @@ function Play() {
           <GameInfo aria-label={tChess('gameInformation')}>
             <div className="opponent">
               <Avatar
-                src={opponentAvatar ?? ''}
+                src={opponentAvatar || '/avatars/default.svg'}
                 username={opponentName}
                 size={64}
                 isOnline={true}
