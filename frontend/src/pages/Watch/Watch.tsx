@@ -103,7 +103,7 @@ function Watch() {
                 </MiniBoard>
 
                 <div>
-                  <h2>{whiteName} vs {blackName}</h2>
+                  <h2>{t('versus', { ns: 'chess', white: whiteName, black: blackName })}</h2>
                   <p>
                     {activeGame.status === 'PLAYING'
                       ? t('gameInProgress', { ns: 'chess' })

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import fetchAPI from '../../services/fetchAPI';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import {
@@ -35,6 +36,7 @@ type DrawOffer = {
 
 export default function GameInvitationNotifications() {
   const navigate = useNavigate();
+  const { t } = useTranslation('chess');
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [actionError, setActionError] = useState('');
   const [pendingActionId, setPendingActionId] = useState<number | null>(null);
@@ -169,21 +171,23 @@ export default function GameInvitationNotifications() {
           invitation.sender.username;
         return (
           <NotificationCard key={invitation.id} role="alert">
-            <p>{name} souhaite commencer une partie avec toi.</p>
+            <p>{t('invitations.gameRequest', { name })}</p>
             <NotificationActions>
               <button
                 type="button"
                 disabled={pendingActionId === invitation.id}
                 onClick={() => void accept(invitation.id)}
               >
-                {pendingActionId === invitation.id ? 'Traitement…' : 'Oui'}
+                {pendingActionId === invitation.id
+                  ? t('processing', { ns: 'common' })
+                  : t('yes', { ns: 'common' })}
               </button>
               <button
                 type="button"
                 disabled={pendingActionId === invitation.id}
                 onClick={() => void decline(invitation.id)}
               >
-                Non
+                {t('no', { ns: 'common' })}
               </button>
             </NotificationActions>
             {actionError && <p role="alert">{actionError}</p>}
@@ -196,21 +200,21 @@ export default function GameInvitationNotifications() {
           offer.sender.username;
         return (
           <NotificationCard key={`draw-${offer.id}`} role="alert">
-            <p>{name} propose la partie nulle.</p>
+            <p>{t('invitations.drawOffer', { name })}</p>
             <NotificationActions>
               <button
                 type="button"
                 disabled={pendingActionId === offer.id}
                 onClick={() => void acceptDrawOffer(offer)}
               >
-                Oui
+                {t('yes', { ns: 'common' })}
               </button>
               <button
                 type="button"
                 disabled={pendingActionId === offer.id}
                 onClick={() => void declineDrawOffer(offer)}
               >
-                Non
+                {t('no', { ns: 'common' })}
               </button>
             </NotificationActions>
           </NotificationCard>

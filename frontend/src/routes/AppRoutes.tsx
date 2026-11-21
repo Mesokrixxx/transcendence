@@ -17,11 +17,16 @@ import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
 import { publicPageLoader, guestOnlyLoader, requireAuthLoader, githubLoader, githubCallbackLoader } from '../loaders/authLoaders';
 
+// Shown while a route loader runs on the first page load (e.g. after F5).
+// Kept empty on purpose: translations may not be loaded yet at that moment.
+const loadingFallback = <div aria-busy="true" />;
+
 const routes: RouteObject[] = [
   {
     path: '/',
     element: <ProtectedPage />,
     loader: publicPageLoader,
+    hydrateFallbackElement: loadingFallback,
     children: [
       {
         index: true,
@@ -32,6 +37,7 @@ const routes: RouteObject[] = [
   {
     element: <ProtectedPage />,
     loader: requireAuthLoader,
+    hydrateFallbackElement: loadingFallback,
     children: [
       {
         path: '/play',
@@ -75,19 +81,23 @@ const routes: RouteObject[] = [
     path: '/register',
     element: <Register />,
     loader: guestOnlyLoader,
+    hydrateFallbackElement: loadingFallback,
   },
   {
     path: '/login',
     element: <Login />,
     loader: guestOnlyLoader,
+    hydrateFallbackElement: loadingFallback,
   },
   {
     path: '/github-signin',
     loader: githubLoader,
+    hydrateFallbackElement: loadingFallback,
   },
   {
     path: '/github-signin/callback',
     loader: githubCallbackLoader,
+    hydrateFallbackElement: loadingFallback,
   },
   {
     path: '/privacy',

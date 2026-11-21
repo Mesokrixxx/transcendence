@@ -11,6 +11,8 @@
   "drawStatus": "Tablas",
   "emptySquare": "Casilla vacía",
   "flipBoard": "Girar tablero",
+  "gameForSpectators": "Partida para espectadores",
+  "gameNotFound": "Partida no encontrada.",
   "gameHistoryAndScores": "Historial y puntuaciones de partidas",
   "gameInformation": "Información de la partida",
   "gameInProgress": "Partida en curso",
@@ -73,6 +75,21 @@
     "loading": "Cargando tu lista de amigos…",
     "noFriends": "Aún no tienes amigos en ChessMove.",
     "online": "En línea",
-    "offline": "Sin conexión"
-  }
+    "offline": "Sin conexión",
+    "checkError": "No se pudo comprobar la partida.",
+    "chooseFriend": "Elegir un amigo",
+    "confirmMessage": "¿Seguro que quieres enviar una solicitud de partida a {{name}}?",
+    "confirmTitle": "Confirmación de solicitud de partida",
+    "selectFriend": "Seleccionar un amigo",
+    "sendError": "No se pudo enviar la solicitud.",
+    "sending": "Enviando…",
+    "sendRequest": "Enviar una solicitud de partida",
+    "startError": "No se pudo iniciar la partida.",
+    "thisFriend": "este amigo"
+  },
+  "invitations": {
+    "gameRequest": "{{name}} quiere empezar una partida contigo.",
+    "drawOffer": "{{name}} ofrece tablas."
+  },
+  "versus": "{{white}} contra {{black}}"
 }
