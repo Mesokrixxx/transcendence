@@ -102,14 +102,14 @@ export default function PlayLobby() {
         path: `/games/active/${selectedFriendId}`,
         method: 'get',
       });
-      if (activeResponse.error) throw new Error('Impossible de vérifier la partie.');
+      if (activeResponse.error) throw new Error(t('lobby.checkError'));
       if (activeResponse.result) {
         navigate(`/play/${activeResponse.result.id}`);
         return;
       }
       setConfirmFriendId(selectedFriendId);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Impossible de lancer la partie.');
+      setActionError(error instanceof Error ? error.message : t('lobby.startError'));
     } finally {
       setIsSending(false);
     }
@@ -123,14 +123,14 @@ export default function PlayLobby() {
         path: `/games/invitations/${friendId}`,
         method: 'post',
       });
-      if (invitationResponse.error) throw new Error('Impossible d’envoyer la demande.');
+      if (invitationResponse.error) throw new Error(t('lobby.sendError'));
       if (invitationResponse.result.gameId) {
         navigate(`/play/${invitationResponse.result.gameId}`);
         return;
       }
       setConfirmFriendId(null);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Impossible d’envoyer la demande.');
+      setActionError(error instanceof Error ? error.message : t('lobby.sendError'));
     } finally {
       setIsSending(false);
     }
@@ -153,13 +153,13 @@ export default function PlayLobby() {
               <p>{t('lobby.noFriends')}</p>
             ) : (
               <>
-                <label htmlFor="friend-game-select">Choisir un ami</label>
+                <label htmlFor="friend-game-select">{t('lobby.chooseFriend')}</label>
                 <FriendSelect
                   id="friend-game-select"
                   value={selectedFriendId ?? ''}
                   onChange={(event) => void handleFriendSelected(Number(event.target.value))}
                 >
-                  <option value="" disabled>Sélectionner un ami</option>
+                  <option value="" disabled>{t('lobby.selectFriend')}</option>
                   {visibleFriends.map((friend) => (
                     <option key={friend.id} value={friend.id}>
                       {friend.name} — {friend.isOnline ? t('lobby.online') : t('lobby.offline')}
@@ -173,7 +173,7 @@ export default function PlayLobby() {
                     return friend ? (
                       <div className="opponent">
                         <Avatar
-                          src={friend.avatar ?? ''}
+                          src={friend.avatar || '/avatars/default.svg'}
                           username={friend.name}
                           isOnline={friend.isOnline}
                           size={40}
@@ -187,16 +187,17 @@ export default function PlayLobby() {
                   variant="primary"
                   onClick={() => void handlePlay()}
                 >
-                  {isSending ? 'Envoi…' : 'Envoyer une demande de partie'}
+                  {isSending ? t('lobby.sending') : t('lobby.sendRequest')}
                 </Button>
                 {confirmFriendId !== null &&
                   (() => {
                     const friend = visibleFriends.find((item) => item.id === confirmFriendId);
                     return (
-                      <ConfirmationDialog role="dialog" aria-label="Confirmation de demande de partie">
+                      <ConfirmationDialog role="dialog" aria-label={t('lobby.confirmTitle')}>
                         <p>
-                          Es-tu sûr de vouloir envoyer une demande de partie à{' '}
-                          {friend?.name ?? 'cet ami'} ?
+                          {t('lobby.confirmMessage', {
+                            name: friend?.name ?? t('lobby.thisFriend'),
+                          })}
                         </p>
                         <div>
                           <button
@@ -204,14 +205,14 @@ export default function PlayLobby() {
                             disabled={isSending}
                             onClick={() => void sendInvitation(confirmFriendId)}
                           >
-                            Oui
+                            {t('yes', { ns: 'common' })}
                           </button>
                           <button
                             type="button"
                             disabled={isSending}
                             onClick={() => setConfirmFriendId(null)}
                           >
-                            Non
+                            {t('no', { ns: 'common' })}
                           </button>
                         </div>
                       </ConfirmationDialog>

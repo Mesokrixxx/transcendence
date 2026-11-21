@@ -605,9 +605,11 @@ async function notifyGamification(gameId: number) {
   const changedUsers = await gamificationService.recordGameResult(gameId);
   await Promise.all(
     changedUsers.map(async (userId) => {
-      presenceService.send(userId, {
+      presenceService.broadcast({
         type: 'gamification.updated',
+        userId,
         progress: await gamificationService.getProgress(userId),
+        featuredBadges: await gamificationService.getFeaturedBadges(userId),
       });
     }),
   );

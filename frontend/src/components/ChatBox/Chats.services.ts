@@ -16,13 +16,21 @@ export type MessageFromAPI = {
     content: string
     creationDate: string
     userId: number
-    user?: { id: number; username: string }
+    user?: {
+        id: number
+        username: string
+        profile?: { displayName: string | null } | null
+    }
 }
 
 type ChatFromAPI = {
     id: number
     messages: MessageFromAPI[]
-    users: { id: number; username: string}[]
+    users: {
+        id: number
+        username: string
+        profile?: { displayName: string | null } | null
+    }[]
 }
 
 function getErrorMessage(error: APIError): string {
@@ -38,7 +46,11 @@ export function toChatMessage(
         content: message.content,
         createdAt: message.creationDate,
         userId:message.userId,
-        username: message.user?.username ?? usernames.get(message.userId) ?? '?',
+        username:
+            message.user?.profile?.displayName?.trim() ||
+            message.user?.username ||
+            (usernames.get(message.userId) ??
+            '?'),
     }
 }
 
@@ -53,7 +65,10 @@ export async function getMessages(chatId: number): Promise<ChatMessage[]> {
     }
 
     const usernames = new Map(
-        response.result.users.map((user): [number, string] => [user.id, user.username])
+        response.result.users.map((user): [number, string] => [
+            user.id,
+            user.profile?.displayName?.trim() || user.username,
+        ])
     )
 
     return response.result.messages.map((message) => toChatMessage(message, usernames))

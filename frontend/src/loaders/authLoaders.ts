@@ -4,28 +4,28 @@ import { redirect } from 'react-router-dom';
 import localStorage from '../services/localStorage';
 
 async function publicPageLoader() {
-  const response = await fetchAPI<AuthUser>({
+  const response = await fetchAPI<AuthUser | null>({
     path: '/auth/me',
     method: 'get',
   });
-  return response.error ? null : response.result;
+  return response.error || response.result === null ? null : response.result;
 }
 
 async function guestOnlyLoader() {
-  const response = await fetchAPI<AuthUser>({
+  const response = await fetchAPI<AuthUser | null>({
     path: '/auth/me',
     method: 'get',
   });
-  if (response.error) return null;
+  if (response.error || response.result === null) return null;
   return redirect('/');
 }
 
 async function requireAuthLoader() {
-  const response = await fetchAPI<AuthUser>({
+  const response = await fetchAPI<AuthUser | null>({
     path: '/auth/me',
     method: 'get',
   });
-  if (response.error) {
+  if (response.error || response.result === null) {
     return redirect('/login');
   }
   return response.result;
@@ -52,9 +52,6 @@ async function githubLoader() {
 }
 
 async function githubCallbackLoader({ request }: { request: Request }) {
-  const redirectResponse = await guestOnlyLoader();
-  if (redirectResponse) return redirectResponse;
-
   const searchParams = new URL(request.url).searchParams;
   const code = searchParams.get('code');
   const state = searchParams.get('state');

@@ -75,6 +75,21 @@
     "loading": "Chargement de tes amis…",
     "noFriends": "Tu n’as pas encore d’amis dans ChessMove.",
     "online": "En ligne",
-    "offline": "Hors ligne"
-  }
+    "offline": "Hors ligne",
+    "checkError": "Impossible de vérifier la partie.",
+    "chooseFriend": "Choisir un ami",
+    "confirmMessage": "Es-tu sûr de vouloir envoyer une demande de partie à {{name}} ?",
+    "confirmTitle": "Confirmation de demande de partie",
+    "selectFriend": "Sélectionner un ami",
+    "sendError": "Impossible d’envoyer la demande.",
+    "sending": "Envoi…",
+    "sendRequest": "Envoyer une demande de partie",
+    "startError": "Impossible de lancer la partie.",
+    "thisFriend": "cet ami"
+  },
+  "invitations": {
+    "gameRequest": "{{name}} souhaite commencer une partie avec toi.",
+    "drawOffer": "{{name}} propose la partie nulle."
+  },
+  "versus": "{{white}} contre {{black}}"
 }

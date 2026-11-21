@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import fetchAPI from '../../services/fetchAPI';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
+import { useAuth } from '../../context/AuthContext';
 import {
   NotificationLayer,
   NotificationCard,
+  PrivateMessageNotificationCard,
   NotificationActions,
 } from './GameInvitationNotifications.styles';
 
@@ -33,12 +36,24 @@ type DrawOffer = {
   };
 };
 
+type PrivateMessageNotification = {
+  id: number;
+  chatId: number;
+  senderName: string;
+  content: string;
+};
+
 export default function GameInvitationNotifications() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { t } = useTranslation('chess');
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [actionError, setActionError] = useState('');
   const [pendingActionId, setPendingActionId] = useState<number | null>(null);
   const [drawOffers, setDrawOffers] = useState<DrawOffer[]>([]);
+  const [privateMessages, setPrivateMessages] = useState<
+    PrivateMessageNotification[]
+  >([]);
 
   async function loadInvitations() {
     const response = await fetchAPI<{ invitations: Invitation[] }>({
@@ -57,6 +72,8 @@ export default function GameInvitationNotifications() {
   }
 
   useEffect(() => {
+    if (!user) return;
+
     void loadInvitations();
     void loadDrawOffers();
 
@@ -79,8 +96,51 @@ export default function GameInvitationNotifications() {
       ) {
         void loadDrawOffers();
       }
+      if (
+        event.type === 'chat.message.received' &&
+        typeof event.chatId === 'number' &&
+        event.message &&
+        typeof event.message === 'object'
+      ) {
+        const message = event.message as Record<string, unknown>;
+        const sender = message.user;
+        if (
+          typeof message.id !== 'number' ||
+          typeof message.content !== 'string' ||
+          !sender ||
+          typeof sender !== 'object'
+        ) return;
+
+        const senderData = sender as Record<string, unknown>;
+        if (
+          typeof senderData.username !== 'string' ||
+          (senderData.profile !== null &&
+            typeof senderData.profile !== 'object')
+        ) return;
+
+        const messageId = message.id;
+        const content = message.content;
+        const profile = senderData.profile as
+          | { displayName?: unknown }
+          | null;
+        const senderName =
+          typeof profile?.displayName === 'string' &&
+          profile.displayName.trim() !== ''
+            ? profile.displayName
+            : senderData.username;
+
+        setPrivateMessages((current) => [
+          ...current.filter((item) => item.id !== messageId),
+          {
+            id: messageId,
+            chatId: event.chatId as number,
+            senderName,
+            content,
+          },
+        ]);
+      }
     });
-  }, [navigate]);
+  }, [navigate, user]);
 
   async function accept(invitationId: number) {
     setActionError('');
@@ -159,7 +219,11 @@ export default function GameInvitationNotifications() {
     setDrawOffers((current) => current.filter((item) => item.id !== offer.id));
   }
 
-  if (invitations.length === 0 && drawOffers.length === 0) return null;
+  if (
+    invitations.length === 0 &&
+    drawOffers.length === 0 &&
+    privateMessages.length === 0
+  ) return null;
 
   return (
     <NotificationLayer aria-live="polite">
@@ -169,21 +233,23 @@ export default function GameInvitationNotifications() {
           invitation.sender.username;
         return (
           <NotificationCard key={invitation.id} role="alert">
-            <p>{name} souhaite commencer une partie avec toi.</p>
+            <p>{t('invitations.gameRequest', { name })}</p>
             <NotificationActions>
               <button
                 type="button"
                 disabled={pendingActionId === invitation.id}
                 onClick={() => void accept(invitation.id)}
               >
-                {pendingActionId === invitation.id ? 'Traitement…' : 'Oui'}
+                {pendingActionId === invitation.id
+                  ? t('processing', { ns: 'common' })
+                  : t('yes', { ns: 'common' })}
               </button>
               <button
                 type="button"
                 disabled={pendingActionId === invitation.id}
                 onClick={() => void decline(invitation.id)}
               >
-                Non
+                {t('no', { ns: 'common' })}
               </button>
             </NotificationActions>
             {actionError && <p role="alert">{actionError}</p>}
@@ -196,26 +262,67 @@ export default function GameInvitationNotifications() {
           offer.sender.username;
         return (
           <NotificationCard key={`draw-${offer.id}`} role="alert">
-            <p>{name} propose la partie nulle.</p>
+            <p>{t('invitations.drawOffer', { name })}</p>
             <NotificationActions>
               <button
                 type="button"
                 disabled={pendingActionId === offer.id}
                 onClick={() => void acceptDrawOffer(offer)}
               >
-                Oui
+                {t('yes', { ns: 'common' })}
               </button>
               <button
                 type="button"
                 disabled={pendingActionId === offer.id}
                 onClick={() => void declineDrawOffer(offer)}
               >
-                Non
+                {t('no', { ns: 'common' })}
               </button>
             </NotificationActions>
           </NotificationCard>
         );
       })}
+      {privateMessages.map((message) => (
+        <PrivateMessageNotificationCard
+          key={`message-${message.id}`}
+          role="alert"
+          onAnimationEnd={(event) => {
+            if (event.animationName !== 'notification-fade') return;
+            setPrivateMessages((current) =>
+              current.filter((item) => item.id !== message.id),
+            );
+          }}
+        >
+          <p>
+            <strong>{message.senderName}</strong> t&apos;a envoyé un message
+            privé.
+          </p>
+          <p>{message.content}</p>
+          <NotificationActions>
+            <button
+              type="button"
+              onClick={() => {
+                setPrivateMessages((current) =>
+                  current.filter((item) => item.id !== message.id),
+                );
+                navigate('/chat');
+              }}
+            >
+              Ouvrir les messages
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setPrivateMessages((current) =>
+                  current.filter((item) => item.id !== message.id),
+                )
+              }
+            >
+              Fermer
+            </button>
+          </NotificationActions>
+        </PrivateMessageNotificationCard>
+      ))}
       {actionError && <p role="alert">{actionError}</p>}
     </NotificationLayer>
   );

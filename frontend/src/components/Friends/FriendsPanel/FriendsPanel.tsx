@@ -99,12 +99,14 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
                 event.type !== 'profile.changed' ||
                 typeof event.userId !== 'number' ||
                 typeof event.username !== 'string' ||
-                (event.avatar !== null && typeof event.avatar !== 'string')
+                (event.avatar !== null && typeof event.avatar !== 'string') ||
+                (event.displayName !== null && typeof event.displayName !== 'string')
             ) return
 
             const userId = event.userId
             const username = event.username
             const avatar = event.avatar ?? undefined
+            const displayName = event.displayName ?? null
             setData((current) => {
                 if (!current) return current
                 const update = (user: FriendUser) => user.id === userId
@@ -112,6 +114,7 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
                         ...user,
                         username,
                         avatar,
+                        displayName,
                     }
                     : user
                 return {

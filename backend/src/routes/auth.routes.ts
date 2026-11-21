@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
-import { requireAuth } from '../middlewares/auth.middleware.js';
+import { requireAuth, optionalAuth } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
-router.get('/me', requireAuth, authController.getCurrentUser);
+router.get('/me', optionalAuth, authController.getCurrentUser);
 router.post('/oauth', authController.oauth);
 
 export default router;

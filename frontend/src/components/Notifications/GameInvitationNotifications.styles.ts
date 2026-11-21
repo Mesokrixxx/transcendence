@@ -33,6 +33,19 @@ export const NotificationCard = styled.section`
   }
 `;
 
+export const PrivateMessageNotificationCard = styled(NotificationCard)`
+  animation:
+    notification-in 180ms ease-out,
+    notification-fade 300ms ease-in 2700ms forwards;
+
+  @keyframes notification-fade {
+    to {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
+  }
+`;
+
 export const NotificationActions = styled.div`
   display: flex;
   gap: 8px;

@@ -70,11 +70,26 @@
   "watchGame": "Watch game",
   "white": "White",
   "lobby": {
+    "checkError": "Could not check the game",
+    "chooseFriend": "Choose a friend",
+    "confirmMessage": "Are you sure you want to send a game request to {{name}}?",
+    "confirmTitle": "Game request confirmation",
     "title": "Play with a friend",
     "loadError": "Could not load your friends.",
     "loading": "Loading your friends…",
     "noFriends": "You don’t have any friends on ChessMove yet.",
     "online": "Online",
-    "offline": "Offline"
-  }
+    "offline": "Offline",
+    "selectFriend": "Select a friend",
+    "sendError": "Could not send the request",
+    "sending": "Sending...",
+    "sendRequest": "Send a game request",
+    "startError": "Could not start the game",
+    "thisFriend": "this friend"
+  },
+  "invitations": {
+    "gameRequest": "{{name}} wants to start a game with you.",
+    "drawOffer": "{{name}} offers a draw."
+  },
+  "versus": "{{white}} vs {{black}}"
 }
