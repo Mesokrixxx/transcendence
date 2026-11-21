@@ -322,7 +322,7 @@ export default interface Resources {
     "progressLoading": "Loading achievements and badges…",
     "progressNoAchievements": "No achievements yet.",
     "progressNoBadges": "No badges yet.",
-    "progressTitle": "Achievements and badges",
+    "progressTitle": "Progress",
     "resetAvatar": "Use default avatar",
     "saveChanges": "Save changes",
     "saveError": "Unable to save your changes. Please try again.",
