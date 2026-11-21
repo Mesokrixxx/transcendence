@@ -9,6 +9,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     const sessionUserId = user?.id
 
     useEffect(() => {
+        realtimeSocket.setEnabled(sessionUserId !== undefined)
         if (sessionUserId === undefined) return
 
         function handleEvent(event: RealtimeEvent) {

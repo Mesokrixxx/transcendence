@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import fetchAPI from '../../services/fetchAPI';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
+import { useAuth } from '../../context/AuthContext';
 import {
   NotificationLayer,
   NotificationCard,
@@ -44,6 +45,7 @@ type PrivateMessageNotification = {
 
 export default function GameInvitationNotifications() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t } = useTranslation('chess');
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [actionError, setActionError] = useState('');
@@ -70,6 +72,8 @@ export default function GameInvitationNotifications() {
   }
 
   useEffect(() => {
+    if (!user) return;
+
     void loadInvitations();
     void loadDrawOffers();
 
@@ -136,7 +140,7 @@ export default function GameInvitationNotifications() {
         ]);
       }
     });
-  }, [navigate]);
+  }, [navigate, user]);
 
   async function accept(invitationId: number) {
     setActionError('');

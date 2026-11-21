@@ -11,6 +11,17 @@ class RealtimeSocket {
   private readonly chatIds = new Set<number>();
   private readonly gameIds = new Set<number>();
   private reconnectTimer: number | null = null;
+  private enabled = false;
+
+  setEnabled(enabled: boolean) {
+    if (this.enabled === enabled) return;
+    this.enabled = enabled;
+    if (enabled) {
+      this.connect();
+    } else {
+      this.disconnect();
+    }
+  }
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
@@ -54,6 +65,7 @@ class RealtimeSocket {
 
   private connect() {
     if (
+      !this.enabled ||
       this.socket?.readyState === WebSocket.OPEN ||
       this.socket?.readyState === WebSocket.CONNECTING ||
       this.listeners.size === 0

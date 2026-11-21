@@ -6,14 +6,14 @@ import GameInvitationNotifications from "../components/Notifications/GameInvitat
 
 function ProtectedPage() {
   const loadedUser = useLoaderData<AuthUser | null>();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   useEffect(() => {
     setUser(loadedUser);
   }, [loadedUser, setUser]);
 
   return (
     <>
-      <GameInvitationNotifications />
+      {loadedUser && user?.id === loadedUser.id && <GameInvitationNotifications />}
       <Outlet />
     </>
   );

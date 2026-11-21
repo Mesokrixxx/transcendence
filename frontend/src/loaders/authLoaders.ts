@@ -52,9 +52,6 @@ async function githubLoader() {
 }
 
 async function githubCallbackLoader({ request }: { request: Request }) {
-  const redirectResponse = await guestOnlyLoader();
-  if (redirectResponse) return redirectResponse;
-
   const searchParams = new URL(request.url).searchParams;
   const code = searchParams.get('code');
   const state = searchParams.get('state');

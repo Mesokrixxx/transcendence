@@ -92,11 +92,13 @@ const routes: RouteObject[] = [
   {
     path: '/github-signin',
     loader: githubLoader,
+    element: loadingFallback,
     hydrateFallbackElement: loadingFallback,
   },
   {
     path: '/github-signin/callback',
     loader: githubCallbackLoader,
+    element: loadingFallback,
     hydrateFallbackElement: loadingFallback,
   },
   {
