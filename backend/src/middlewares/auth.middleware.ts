@@ -25,3 +25,24 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 	req.user = user;
 	return next();
 }
+
+export async function optionalAuth(
+	req: Request,
+	_res: Response,
+	next: NextFunction,
+) {
+	const cookieHeader = req.headers.cookie;
+	const token = cookieHeader
+		? parseCookie(cookieHeader)[authService.SESSION_COOKIE] ?? null
+		: null;
+
+	if (!token)
+		return next();
+
+	const { result: user, error } = await query(() => authService.getSession(token));
+	if (error || !user)
+		return next();
+
+	req.user = user;
+	return next();
+}
