@@ -54,12 +54,5 @@
   "saveError": "Unable to save your changes. Please try again.",
   "saving": "Saving...",
   "yourUsername": "Your username",
-  "activityLoadError": "Could not load data.",
-  "progressAchievements": "Achievements",
-  "progressBadges": "Badges",
-  "progressLoadError": "Unable to load achievements and badges.",
-  "progressLoading": "Loading achievements and badges…",
-  "progressNoAchievements": "No achievements yet.",
-  "progressNoBadges": "No badges yet.",
-  "progressTitle": "Achievements and badges"
+  "activityLoadError": "Could not load data."
 }

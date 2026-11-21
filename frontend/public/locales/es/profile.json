@@ -54,12 +54,5 @@
   "saveError": "No se han podido guardar los cambios. Inténtalo de nuevo.",
   "saving": "Guardando...",
   "yourUsername": "Tu nombre de usuario",
-  "activityLoadError": "No se pudieron cargar los datos.",
-  "progressAchievements": "Logros",
-  "progressBadges": "Insignias",
-  "progressLoadError": "No se pudieron cargar los logros y las insignias.",
-  "progressLoading": "Cargando logros e insignias…",
-  "progressNoAchievements": "Todavía no hay logros.",
-  "progressNoBadges": "Todavía no hay insignias.",
-  "progressTitle": "Logros e insignias"
+  "activityLoadError": "No se pudieron cargar los datos."
 }

@@ -54,12 +54,5 @@
   "saveError": "Impossible d’enregistrer les modifications. Réessaie.",
   "saving": "Enregistrement...",
   "yourUsername": "Votre nom d'utilisateur",
-  "activityLoadError": "Impossible de charger les données.",
-  "progressAchievements": "Succès",
-  "progressBadges": "Badges",
-  "progressLoadError": "Impossible de charger les succès et les badges.",
-  "progressLoading": "Chargement des succès et des badges…",
-  "progressNoAchievements": "Aucun succès pour le moment.",
-  "progressNoBadges": "Aucun badge pour le moment.",
-  "progressTitle": "Succès et badges"
+  "activityLoadError": "Impossible de charger les données."
 }
