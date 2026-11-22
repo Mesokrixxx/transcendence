@@ -23,4 +23,7 @@ re: down all
 certs:
 	./scripts/generate-certs.sh
 
+watch: certs
+	$(COMPOSE) up --build --force-recreate --watch
+
 .PHONY: all up down clean re certs
