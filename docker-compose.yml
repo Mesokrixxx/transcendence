@@ -35,6 +35,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app/backend
+          ignore:
+            - node_modules/
+            - dist/
+        - action: rebuild
+          path: ./backend/package.json
     networks:
       - network-backend-db
       - network-frontend-backend
@@ -47,6 +57,16 @@ services:
     restart: unless-stopped
     depends_on: 
       - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app/frontend
+          ignore:
+            - node_modules/
+            - dist/
+        - action: rebuild
+          path: ./frontend/package.json
     networks:
       - network-frontend-backend
       - network-nginx-frontend

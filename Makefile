@@ -1,4 +1,4 @@
-COMPOSE = podman-compose --env-file .env
+COMPOSE = docker compose --env-file .env
 
 IMAGE = localhost/transcendence_backend:latest
 
