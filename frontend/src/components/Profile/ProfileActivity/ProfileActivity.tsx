@@ -1,12 +1,12 @@
 import { useId, useState, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import Messaging from '../../pages/Chat/Messaging';
-import FriendsPanel from '../../components/Friends/FriendsPanel/FriendsPanel';
-import Statistics from '../../components/Statistics/Statistics';
+import Messaging from '../../../pages/Chat/Messaging';
+import FriendsPanel from '../../Friends/FriendsPanel/FriendsPanel';
+import Statistics from '../../Statistics/Statistics';
 import { ActivityPanel, ActivityTabs, ActivityTab, ActivityContent, StatusMessage } from './ProfileActivity.styles';
-import { getUserGames } from '../../services/game';
-import type { Game } from '../../types/game';
+import { getUserGames } from '../../../services/game';
+import type { Game } from '../../../types/game';
 
 const tabs = ['history', 'friends', 'messages', 'stats'] as const;
 type Tab = (typeof tabs)[number];

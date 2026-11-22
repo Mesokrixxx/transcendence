@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../context/AuthContext';
-import type { AuthUser } from '../../types/auth';
-import { uploadAvatar } from '../../services/avatar';
-import { updateProfileDisplayName } from '../../services/profile';
-import Avatar from '../../components/Avatar/Avatar';
-import Button from '../../components/Button/Button';
-import Form from '../../components/Form/Form';
-import Input from '../../components/Input/Input';
-import { ProfileDialog, DialogHeader, DialogActions } from '../../pages/Profile/Profile.styles';
+import { useAuth } from '../../../context/AuthContext';
+import type { AuthUser } from '../../../types/auth';
+import { uploadAvatar } from '../../../services/avatar';
+import { updateProfileDisplayName } from '../../../services/profile';
+import Avatar from '../../Avatar/Avatar';
+import Button from '../../Button/Button';
+import Form from '../../Form/Form';
+import Input from '../../Input/Input';
+import { ProfileDialog, DialogHeader, DialogActions } from './EditProfileDialog.styles';
 
 export type LocalProfile = {
   displayName: string;

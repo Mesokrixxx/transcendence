@@ -1,53 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Avatar from '../../components/Avatar/Avatar';
-import Footer from '../../components/Footer/Footer';
-import Navbar from '../../components/Navbar/Navbar';
-import { getPlayerProfile, type PlayerProfile } from '../../services/playerProfile';
-import { Page } from '../../pages/Home/Home.styles';
-import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
-import { ProfileHeader, ProfilePanel } from '../../pages/Profile/Profile.styles';
+import Avatar from '../../Avatar/Avatar';
+import Footer from '../../Footer/Footer';
+import Navbar from '../../Navbar/Navbar';
+import { Page } from '../../../pages/Home/Home.styles';
+import { ProfileHeader, ProfilePanel } from '../../../pages/Profile/Profile.styles';
+import { getPlayerProfile, type PlayerProfile } from '../../../services/playerProfile';
 import {
   getFeaturedBadges,
   type FeaturedBadge,
-} from '../../services/gamification';
-import styled from 'styled-components';
+} from '../../../services/gamification';
+import realtimeSocket, { type RealtimeEvent } from '../../../services/websocket';
+import { FeaturedBadges } from './PlayerProfilePage.styles';
 
-const FeaturedBadges = styled.div`
-  margin-top: 24px;
-
-  h2 {
-    margin: 0 0 12px;
-    color: var(--color-primary);
-    font-size: 1.1rem;
-  }
-
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  li {
-    padding: 10px 14px;
-    border: 2px solid var(--color-primary);
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-
-  small {
-    display: block;
-    margin-top: 4px;
-    color: var(--color-text-secondary);
-    font-weight: 400;
-  }
-`;
 
 const badgeNames = {
   'win-streak-record': 'badgeWinStreakName',

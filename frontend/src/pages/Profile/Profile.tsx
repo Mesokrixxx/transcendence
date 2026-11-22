@@ -7,10 +7,10 @@ import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
 import { ProfilePanel, ProfileHeader } from './Profile.styles';
-import EditProfileDialog from '../../components/Profil/EditProfileDialog';
-import type { LocalProfile } from '../../components/Profil/EditProfileDialog';
-import ProfileActivity from '../../components/Profil/ProfileActivity';
-import ProfileProgress from './ProfileProgress';
+import EditProfileDialog from '../../components/Profile/EditProfileDialog/EditProfileDialog';
+import type { LocalProfile } from '../../components/Profile/EditProfileDialog/EditProfileDialog';
+import ProfileActivity from '../../components/Profile/ProfileActivity/ProfileActivity';
+import ProfileProgress from '../../components/Profile/ProfileProgress/ProfileProgress';
 
 function Profile() {
   const { t } = useTranslation();
