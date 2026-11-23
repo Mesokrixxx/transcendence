@@ -35,7 +35,7 @@ export interface Game {
   result: GameResult | null;
   endType: GameEndType | null;
   createdAt: Date;
-  startedAt: Date;
+  startedAt: Date | null;
   endedAt: Date | null;
   moves: string;
   white: GameUser;
