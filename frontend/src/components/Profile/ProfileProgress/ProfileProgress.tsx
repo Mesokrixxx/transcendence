@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../../context/AuthContext';
 import {
   getMyProgress,
+  getFeaturedBadges,
   setBadgeFeatured,
+  type FeaturedBadge,
   type GamificationProgress,
 } from '../../../services/gamification';
 import realtimeSocket, { type RealtimeEvent } from '../../../services/websocket';
@@ -14,6 +15,11 @@ import {
   BadgeStat,
   ProgressCard,
 } from './ProfileProgress.styles';
+
+interface ProfileProgressProps {
+  userId: number;
+  isOwnProfile: boolean;
+}
 
 const achievementTranslations = {
   'first-game': {
@@ -60,11 +66,12 @@ const badgeTranslations = {
 type ProgressState =
   | { status: 'loading' }
   | { status: 'error' }
-  | { status: 'ready'; data: GamificationProgress };
+  | { status: 'own'; data: GamificationProgress }
+  | { status: 'visitor'; data: FeaturedBadge[] };
 
-function ProfileProgress() {
+
+function ProfileProgress({ userId, isOwnProfile }: ProfileProgressProps) {
   const { t } = useTranslation('profile');
-  const { user } = useAuth();
   const [state, setState] = useState<ProgressState>({ status: 'loading' });
   const [actionError, setActionError] = useState(false);
 
@@ -72,16 +79,31 @@ function ProfileProgress() {
     let active = true;
 
     async function loadProgress() {
+      setActionError(false);
+      setState({status: 'loading'});
+
       try {
-        const response = await getMyProgress();
-        if (!active) return;
+        if (isOwnProfile) {
+          const response = await getMyProgress();
+          if (!active) return;
 
-        if (response.error) {
-          setState({ status: 'error' });
-          return;
+          if (response.error) {
+            setState({ status: 'error' });
+            return;
+          }
+
+          setState({ status: 'own', data: response.result });
+        } else {
+          const response = await getFeaturedBadges(userId);
+          if (!active) return;
+
+          if (response.error) {
+            setState({ status: 'error' });
+            return;
+          }
+
+          setState({ status: 'visitor', data: response.result });
         }
-
-        setState({ status: 'ready', data: response.result });
       } catch {
         if (active) setState({ status: 'error' });
       }
@@ -92,25 +114,27 @@ function ProfileProgress() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [userId, isOwnProfile]);
 
   useEffect(() => {
     function updateProgress(event: RealtimeEvent) {
       if (
         event.type !== 'gamification.updated' ||
-        event.userId !== user?.id ||
-        !event.progress ||
-        typeof event.progress !== 'object'
+        event.userId !== userId
       ) return;
 
-      setState({ status: 'ready', data: event.progress as GamificationProgress });
+      if (isOwnProfile && event.progress && typeof event.progress === 'object')
+        setState({ status: 'own', data: event.progress as GamificationProgress });
+      if (!isOwnProfile && Array.isArray(event.featuredBadges))
+        setState({ status: 'visitor', data: event.featuredBadges as FeaturedBadge[]});
     }
 
     return realtimeSocket.subscribe(updateProgress);
-  }, [user?.id]);
+  }, [userId, isOwnProfile]);
 
   async function toggleFeatured(code: string, featured: boolean) {
-    if (featured && state.status === 'ready') {
+    if (state.status !== 'own') return;
+    if (featured) {
       const featuredCount = state.data.badges.filter(
         (badge) => badge.featured,
       ).length;
@@ -118,27 +142,66 @@ function ProfileProgress() {
     }
 
     setActionError(false);
-    const response = await setBadgeFeatured(code, featured);
-    if (response.error) {
-      setActionError(true);
-      return;
-    }
+    try {
+      const response = await setBadgeFeatured(code, featured);
+      if (response.error) {
+        setActionError(true);
+        return;
+      }
 
-    setState((current) =>
-      current.status !== 'ready'
-        ? current
-        : {
-            status: 'ready',
-            data: {
-              ...current.data,
-              badges: current.data.badges.map((item) =>
-                item.badge.code === code ? { ...item, featured } : item,
-              ),
+      setState((current) =>
+        current.status !== 'own'
+          ? current
+          : {
+              status: 'own',
+              data: {
+                ...current.data,
+                badges: current.data.badges.map((item) =>
+                  item.badge.code === code ? { ...item, featured } : item,
+                ),
+              },
             },
-          },
-    );
+      );
+    } catch {
+      setActionError(true);
+    }
   }
 
+  if (state.status === 'visitor') {
+    if (state.data.length === 0) return null;
+
+    return (
+      <ProgressCard aria-labelledby="profile-progress-title">
+        <h2 id="profile-progress-title">{t('featuredBadges')}</h2>
+
+          <BadgeList>
+            {state.data.map(({ badge, record }) => {
+              const translation =
+                badgeTranslations[
+                  badge.code as keyof typeof badgeTranslations
+                ];
+              const name = translation ? t(translation.name) : badge.name;
+              const description = translation
+                ? t(translation.description)
+                : badge.description;
+              const stat =
+                translation && record > 0
+                ? t(translation.stat, { value: record })
+                : '';
+
+              return (
+                <li key={badge.id}>
+                  <span title={description}>
+                    {name}
+                    {stat && <BadgeStat>{stat}</BadgeStat>}
+                  </span>
+                </li>
+              );
+            })}
+          </BadgeList>
+      </ProgressCard>
+    );
+  }
   return (
     <ProgressCard aria-labelledby="profile-progress-title">
       <h2 id="profile-progress-title">{t('progressTitle')}</h2>
@@ -151,7 +214,7 @@ function ProfileProgress() {
         <p role="alert">{t('progressLoadError')}</p>
       )}
 
-      {state.status === 'ready' && (
+      {state.status === 'own' && (
         <>
           <h3>{t('progressAchievements')}</h3>
           {state.data.achievements.length === 0 ? (
@@ -187,7 +250,7 @@ function ProfileProgress() {
             <p>{t('progressNoBadges')}</p>
           ) : (
             <BadgeList>
-              {state.data.badges.map(({ badge }) => {
+              {state.data.badges.map(({ badge, unlocked, featured, record }) => {
                 const translation =
                   badgeTranslations[
                     badge.code as keyof typeof badgeTranslations
@@ -196,31 +259,25 @@ function ProfileProgress() {
                 const description = translation
                   ? t(translation.description)
                   : badge.description;
-                const isUnlocked = state.data.badges.find(
-                  (item) => item.badge.id === badge.id,
-                )?.unlocked ?? false;
-                const currentBadge = state.data.badges.find(
-                  (item) => item.badge.id === badge.id,
-                );
                 const stat =
                   translation &&
-                  currentBadge?.unlocked &&
-                  currentBadge.record > 0
-                  ? t(translation.stat, { value: currentBadge.record })
+                  unlocked &&
+                  record > 0
+                  ? t(translation.stat, { value: record })
                   : '';
 
                 return (
                   <li key={badge.id}>
                     <BadgeButton
                       type="button"
-                      disabled={!isUnlocked}
-                      $featured={currentBadge?.featured ?? false}
+                      disabled={!unlocked}
+                      $featured={featured ?? false}
                       title={stat ? `${description} ${stat}` : description}
                       aria-label={`${name}: ${description}${stat ? ` ${stat}` : ''}`}
-                      aria-pressed={currentBadge?.featured ?? false}
+                      aria-pressed={featured ?? false}
                       onClick={() =>
-                        isUnlocked &&
-                        void toggleFeatured(badge.code, !(currentBadge?.featured ?? false))
+                        unlocked &&
+                        void toggleFeatured(badge.code, !(featured ?? false))
                       }
                     >
                       {name}
