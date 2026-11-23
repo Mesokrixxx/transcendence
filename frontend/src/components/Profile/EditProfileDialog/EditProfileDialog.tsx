@@ -169,9 +169,10 @@ return(
       id="profile-edit"
       aria-labelledby="profile-edit-title"
       onCancel={(event) => {
+        if (event.target !== event.currentTarget) return;
         event.preventDefault();
         closeEditor();
-      }}
+      }}  
     >
       <DialogHeader>
         <h2 id="profile-edit-title">
