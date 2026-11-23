@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react"
 import { useTranslation } from "react-i18next"
+import { useFriendPresence } from "../../../hooks/useFriendPresence"
 import FriendSection from "../FriendSection/FriendSection"
 import FriendRequestForm from "../FriendRequestForm/FriendRequestForm"
 import { getFriends,
@@ -31,6 +32,7 @@ function without(list: FriendUser[], user:FriendUser): FriendUser[] {
 
 function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
     const { t } = useTranslation('friends')
+    const friendPresence = useFriendPresence()
 
     const [data, setData] = useState<FriendsData | null>(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -44,53 +46,6 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
             .then((result) => setData(result))
             .catch(() => setHasError(true))
             .finally(() => setIsLoading(false))
-    }, [])
-
-    useEffect(() => {
-        function updatePresence(event: RealtimeEvent) {
-            if (event.type === 'presence.snapshot' && Array.isArray(event.users)) {
-                const onlineUsers = new Map<number, boolean>()
-                for (const user of event.users) {
-                    if (
-                        user &&
-                        typeof user === 'object' &&
-                        'userId' in user &&
-                        'online' in user &&
-                        typeof user.userId === 'number' &&
-                        typeof user.online === 'boolean'
-                    ) {
-                        onlineUsers.set(user.userId, user.online)
-                    }
-                }
-                setData((current) => current && ({
-                    ...current,
-                    friends: current.friends.map((friend) => ({
-                        ...friend,
-                        isOnline: onlineUsers.get(friend.id) ?? false,
-                    })),
-                }))
-                return
-            }
-
-            if (
-                event.type !== 'presence.changed' ||
-                typeof event.userId !== 'number' ||
-                typeof event.online !== 'boolean'
-            ) return
-
-            const userId = event.userId
-            const online = event.online
-            setData((current) => current && ({
-                ...current,
-                friends: current.friends.map((friend) =>
-                    friend.id === userId
-                        ? { ...friend, isOnline: online }
-                        : friend
-                ),
-            }))
-        }
-
-        return realtimeSocket.subscribe(updatePresence)
     }, [])
 
     useEffect(() => {
@@ -246,7 +201,10 @@ function FriendsPanel({ onClose, embedded = false }: FriendsPanelProps) {
                 <FriendSection
                     title={t('friendsTitle')}
                     emptyMessage={t('noFriendsYet')}
-                    users={data.friends}
+                    users={data.friends.map((friend) => ({
+                        ...friend,
+                        isOnline: friendPresence.get(friend.id) ?? friend.isOnline,
+                    }))}
                     renderActions={(user) => (
                         <>
                             <ActionButton type="button" disabled={isBusy} onClick={() => handleRemove(user)}>

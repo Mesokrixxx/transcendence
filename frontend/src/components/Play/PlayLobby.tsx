@@ -5,8 +5,8 @@ import Avatar from '../../components/Avatar/Avatar';
 import ChessBoard from '../../components/ChessBoard/ChessBoard';
 import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import { useFriendPresence } from '../../hooks/useFriendPresence';
 import { getFriends, type FriendUser } from '../../services/friends';
-import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import fetchAPI from '../../services/fetchAPI';
 import { Page } from '../../pages/Home/Home.styles';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ export default function PlayLobby() {
   const [board] = useState(() => new ChessGame().getBoard());
   const [friends, setFriends] = useState<FriendUser[] | null>(null);
   const [hasError, setHasError] = useState(false);
-  const [presence, setPresence] = useState(new Map<number, boolean>());
+  const presence = useFriendPresence();
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   const [confirmFriendId, setConfirmFriendId] = useState<number | null>(null);
   const [actionError, setActionError] = useState('');
@@ -40,40 +40,6 @@ export default function PlayLobby() {
     return () => {
       active = false;
     };
-  }, []);
-
-  useEffect(() => {
-    function updatePresence(event: RealtimeEvent) {
-      if (event.type === 'presence.snapshot' && Array.isArray(event.users)) {
-        const next = new Map<number, boolean>();
-
-        for (const user of event.users) {
-          if (
-            user &&
-            typeof user === 'object' &&
-            'userId' in user &&
-            'online' in user &&
-            typeof user.userId === 'number' &&
-            typeof user.online === 'boolean'
-          ) {
-            next.set(user.userId, user.online);
-          }
-        }
-
-        setPresence(next);
-      }
-
-      if (
-        event.type === 'presence.changed' &&
-        typeof event.userId === 'number' &&
-        typeof event.online === 'boolean'
-      ) {
-        const { userId, online } = event;
-        setPresence((current) => new Map(current).set(userId, online));
-      }
-    }
-
-    return realtimeSocket.subscribe(updatePresence);
   }, []);
 
   const visibleFriends = (friends ?? [])
