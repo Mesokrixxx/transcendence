@@ -50,9 +50,8 @@ export const Form = styled.form`
 `;
 
 export const Input = styled.input`
-  flex: 1;
+  flex: 1 1 150px;
   min-width: 0;
-  width: 100%;
   padding: 10px 12px;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
@@ -61,6 +60,7 @@ export const Input = styled.input`
 `;
 
 export const SendButton = styled.button`
+  flex: 1 0 auto;
   padding: 10px 16px;
   background-color: var(--color-primary);
   border: none;

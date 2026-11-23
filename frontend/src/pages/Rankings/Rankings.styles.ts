@@ -87,6 +87,18 @@ export const Table = styled.table`
       display: none;
     }
   }
+
+  @media (max-width: 480px) {
+    th,
+    td {
+      padding: 10px 6px;
+    }
+
+    th:nth-child(6),
+    td:nth-child(6) {
+      display: none;
+    }
+  }
 `;
 
 export const PlayerCell = styled.div`
