@@ -1,6 +1,7 @@
 import { useId, useState, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import History from '../../History/History';
 import Messaging from '../../../pages/Chat/Messaging';
 import FriendsPanel from '../../Friends/FriendsPanel/FriendsPanel';
 import Statistics from '../../Statistics/Statistics';
@@ -94,7 +95,13 @@ function ProfileActivity({ userId }: { userId: number }) {
         hidden={activeTab !== 'history'}
         tabIndex={0}
       >
-        <p>{t('historyPlaceholder')}</p>
+        {gamesLoading ? (
+          <StatusMessage>{t('loading', { ns: 'common' })}</StatusMessage>
+        ) : games === null ? (
+          <StatusMessage>{t('activityLoadError')}</StatusMessage>
+        ) : (
+          <History games={games} userId={userId} />
+        )}
       </ActivityContent>
 
       <ActivityContent
