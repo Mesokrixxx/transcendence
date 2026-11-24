@@ -18,12 +18,18 @@ export async function getUserGames(userId: number): Promise<Game[] | null> {
 
   return response.result.map((game) => ({
     ...game,
+    createdAt: new Date(game.createdAt),
+    startedAt: game.startedAt === null ? null : new Date(game.startedAt),
     endedAt: game.endedAt === null ? null : new Date(game.endedAt),
   }));
 }
 
 /*
 export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: number }): Game[] {
+  const statuses: GameStatus[] = [GameStatus.WAITING, GameStatus.PLAYING, GameStatus.OVER];
+  const results: GameResult[] = [GameResult.DRAW, GameResult.WHITE, GameResult.BLACK];
+  const endTypes: GameEndType[] = [GameEndType.CHECKMATE, GameEndType.FORFEIT, GameEndType.TIMEFORFEIT, GameEndType.STALEMATE, GameEndType.INSUFMATERIAL, GameEndType.TRIPLEREPETITION, GameEndType.FIFTYMOVE];
+
   function getFakeGameUser() {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
@@ -59,9 +65,9 @@ export function getFakeGames({ userId, size = 100 }: { userId?: number, size?: n
 
     games.push({
       id: faker.number.int(),
-      status: faker.number.int({ min: GameStatus.WAITING, max: GameStatus.OVER }),
-      result: faker.number.int({ min: GameResult.DRAW, max: GameResult.BLACK }),
-      endType: faker.number.int({ min: GameEndType.CHECKMATE, max: GameEndType.FIFTYMOVE }),
+      status: statuses[faker.number.int({ min: 0, max: statuses.length - 1 })],
+      result: results[faker.number.int({ min: 0, max: results.length - 1})],
+      endType: endTypes[faker.number.int({ min: 0, max: endTypes.length - 1 })],
       createdAt,
       startedAt,
       endedAt,

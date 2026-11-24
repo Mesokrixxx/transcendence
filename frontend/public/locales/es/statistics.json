@@ -23,6 +23,7 @@
   "win": "VICTORIA",
   "loss": "DERROTA",
   "draw": "TABLAS",
+  "ongoing": "En curso",
   "currentStreakValue": "{{result}} × {{count}}",
   "checkmate": "Jaque mate",
   "forfeit": "Abandono",

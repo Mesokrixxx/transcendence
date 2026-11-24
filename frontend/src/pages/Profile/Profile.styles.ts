@@ -92,3 +92,41 @@ export const AvatarUpload = styled.div`
     color: var(--color-text-primary);
   }
 `;
+
+export const ProfileStatus = styled.section`
+  margin: 48px 0 24px;
+  padding: 48px 32px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  text-align: center;
+`;
+
+export const ProfileStatusContent = styled.h2`
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 20px;
+`;
+
+export const ProfileActions = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  @media (max-width: 1000px) {
+    flex-direction: column;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+`;

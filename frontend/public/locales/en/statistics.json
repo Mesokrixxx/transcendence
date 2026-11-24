@@ -23,6 +23,7 @@
   "win": "WIN",
   "loss": "LOSS",
   "draw": "DRAW",
+  "ongoing": "In progress",
   "currentStreakValue": "{{result}} × {{count}}",
   "checkmate": "Checkmate",
   "forfeit": "Forfeit",

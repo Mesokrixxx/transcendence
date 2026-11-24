@@ -372,6 +372,7 @@ export default interface Resources {
     "loss": "LOSS",
     "noGamesPlayed": "No games played yet.",
     "noOpponentsAvailable": "No opponents available.",
+    "ongoing": "Ongoing",
     "peakElo": "Peak ELO",
     "progression": "Progression",
     "stalemate": "Stalemate",
