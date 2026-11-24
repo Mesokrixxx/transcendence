@@ -703,11 +703,20 @@ export async function draw(id: number, userId: number) {
     const game = await tx.game.findUnique({ where: { id } });
     if (!game) throw new BackendError(404, 'game not found');
     if (game.status === 'OVER') throw new BackendError(409, 'game is over');
-    if (game.whiteId !== userId && game.blackId !== userId)
-      throw new BackendError(403, 'user is not a game player');
+    const playerColor =
+      game.whiteId === userId
+        ? 'white'
+        : game.blackId === userId
+          ? 'black'
+          : null;
+    if (!playerColor) throw new BackendError(403, 'user is not a game player');
     const engine = new ChessGame(readMoves(game.moves));
 
-    const reason = engine.canClaimDraw()[0];
+    // A draw can only be claimed by the player whose turn it is.
+    if (engine.getTurn() !== playerColor)
+      throw new BackendError(409, "it is not this player's turn");
+
+    const reason = engine.claimDraw();
     if (!reason) throw new BackendError(409, 'no draw can be claimed');
     return tx.game.update({
       where: { id },

@@ -3,6 +3,7 @@ import type { SubmitEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import fetchAPI from '../services/fetchAPI';
+import { translateApiError } from '../services/apiErrors';
 import type { AuthUser } from '../types/auth';
 import Navbar from '../components/Navbar/Navbar';
 import Form from '../components/Form/Form';
@@ -61,8 +62,7 @@ function Register() {
     const email = emailValue.trim();
 
     const passwordInput = form.elements.namedItem('password');
-    const confirmationInput =
-      form.elements.namedItem('confirmPassword');
+    const confirmationInput = form.elements.namedItem('confirmPassword');
 
     if (
       !(passwordInput instanceof HTMLInputElement) ||
@@ -104,21 +104,7 @@ function Register() {
       });
 
       if (response.error === true) {
-        const message =
-          typeof response.result === 'string'
-            ? response.result
-            : response.result.error;
-
-        if (message === 'username already exists') {
-          setError(t('usernameInUse'));
-        } else if (message === 'email already exists') {
-          setError(t('emailInUse'));
-        } else if (message === 'value(s) already exists') {
-          setError(t('usernameOrEmailInUse'));
-        } else {
-          setError(t('registrationFailed'));
-        }
-
+        setError(translateApiError(response.result, t('registrationFailed')));
         return;
       }
 
@@ -136,9 +122,7 @@ function Register() {
 
       <AuthContent className="container">
         <AuthPanel>
-          <h1>
-            {success ? t('accountCreated') : t('createYourAccount')}
-          </h1>
+          <h1>{success ? t('accountCreated') : t('createYourAccount')}</h1>
 
           {success ? (
             <AuthSuccess role="status">
@@ -209,13 +193,9 @@ function Register() {
                   required
                 />
 
-                <Button type="submit">
-                  {t('createAccount')}
-                </Button>
+                <Button type="submit">{t('createAccount')}</Button>
 
-                {isLoading && (
-                  <p role="status">{t('creatingAccount')}</p>
-                )}
+                {isLoading && <p role="status">{t('creatingAccount')}</p>}
 
                 {error && <p role="alert">{error}</p>}
               </Form>

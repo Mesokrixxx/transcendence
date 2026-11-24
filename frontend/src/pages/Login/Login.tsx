@@ -10,6 +10,7 @@ import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
 import fetchAPI from '../../services/fetchAPI';
+import { translateApiError } from '../../services/apiErrors';
 import type { AuthUser } from '../../types/auth';
 import { Page } from '../Home/Home.styles';
 import { AuthContent, AuthPanel, AuthHint } from './Auth.styles';
@@ -51,11 +52,12 @@ function Login() {
       });
 
       if (response.error === true) {
-        if (typeof response.result === 'string') {
-          setError(response.result);
-        } else {
-          setError(response.result.error);
-        }
+        setError(
+          translateApiError(
+            response.result,
+            t('unknownError', { ns: 'errors' }),
+          ),
+        );
 
         return;
       }
@@ -100,22 +102,16 @@ function Login() {
               required
             />
 
-            <Button type="submit">
-              {t('logIn', { ns: 'auth' })}
-            </Button>
+            <Button type="submit">{t('logIn', { ns: 'auth' })}</Button>
 
-            {isLoading && (
-              <p role="status">{t('loggingIn', { ns: 'auth' })}</p>
-            )}
+            {isLoading && <p role="status">{t('loggingIn', { ns: 'auth' })}</p>}
 
             {error && <p role="alert">{error}</p>}
           </Form>
 
           <AuthHint>
             {t('noAccountYet', { ns: 'auth' })}{' '}
-            <Link to="/register">
-              {t('signUp', { ns: 'auth' })}
-            </Link>
+            <Link to="/register">{t('signUp', { ns: 'auth' })}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

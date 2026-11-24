@@ -5,6 +5,8 @@
   "checkmateWinner": "Checkmate — {{winner}} wins",
   "checkStatus": "{{turnStatus}} — check",
   "choosePromotionPiece": "Choose a promotion piece",
+  "claimDraw": "Claim draw",
+  "claimDrawAvailable": "You can claim a draw by the fifty-move rule or threefold repetition.",
   "demoGame": "Demo game",
   "demoGameForSpectators": "Demo game for spectators",
   "draw": "Draw",
@@ -26,6 +28,7 @@
   "offerDraw": "Offer draw",
   "drawRequestSent": "Draw request sent",
   "drawRequestDeclined": "The draw request was declined",
+  "unableToClaimDraw": "Unable to claim the draw.",
   "unableToSendDrawRequest": "Unable to send the draw request.",
   "resign": "Resign",
   "games": "Games",
@@ -89,7 +92,9 @@
   },
   "invitations": {
     "gameRequest": "{{name}} wants to start a game with you.",
-    "drawOffer": "{{name}} offers a draw."
+    "drawOffer": "{{name}} offers a draw.",
+    "openMessages": "Open messages",
+    "privateMessage": "{{name}} sent you a private message."
   },
   "versus": "{{white}} vs {{black}}"
 }
