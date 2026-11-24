@@ -62,6 +62,7 @@ function gameView(game: StoredGame & { white?: GamePlayer; black?: GamePlayer })
             id: game.white.id,
             username: game.white.username,
             avatar: game.white.profile?.avatar ?? null,
+            online: presenceService.isOnline(game.white.id),
           },
         }
       : {}),
@@ -71,6 +72,7 @@ function gameView(game: StoredGame & { white?: GamePlayer; black?: GamePlayer })
             id: game.black.id,
             username: game.black.username,
             avatar: game.black.profile?.avatar ?? null,
+            online: presenceService.isOnline(game.black.id),
           },
         }
       : {}),

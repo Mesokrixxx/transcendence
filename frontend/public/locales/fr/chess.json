@@ -80,6 +80,8 @@
     "noOnlineFriends": "Aucun de tes amis n’est en ligne pour le moment.",
     "online": "En ligne",
     "offline": "Hors ligne",
+    "activeGame": "Partie en cours",
+    "joinActiveGame": "Rejoindre la partie",
     "checkError": "Impossible de vérifier la partie.",
     "chooseFriend": "Choisir un ami",
     "confirmMessage": "Es-tu sûr de vouloir envoyer une demande de partie à {{name}} ?",

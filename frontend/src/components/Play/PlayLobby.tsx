@@ -8,19 +8,29 @@ import Navbar from '../../components/Navbar/Navbar';
 import { getFriends, type FriendUser } from '../../services/friends';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import fetchAPI from '../../services/fetchAPI';
+import { useAuth } from '../../context/AuthContext';
 import { Page } from '../../pages/Home/Home.styles';
 import { useTranslation } from 'react-i18next';
 import { PlayContent, GameArea, GameInfo } from '../../pages/Play/Play.styles';
 import Button from '../../components/Button/Button';
 import { FriendSelect, ConfirmationDialog } from './PlayLobby.styles';
 
+type ActiveGame = {
+  id: number;
+  whiteId: number;
+  blackId: number;
+  isPlayer: boolean;
+};
+
 export default function PlayLobby() {
   const { t } = useTranslation('chess');
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [board] = useState(() => new ChessGame().getBoard());
   const [friends, setFriends] = useState<FriendUser[] | null>(null);
   const [hasError, setHasError] = useState(false);
   const [presence, setPresence] = useState(new Map<number, boolean>());
+  const [activeGames, setActiveGames] = useState(new Map<number, number>());
   const [selectedFriendId, setSelectedFriendId] = useState<number | null>(null);
   const [confirmFriendId, setConfirmFriendId] = useState<number | null>(null);
   const [actionError, setActionError] = useState('');
@@ -41,6 +51,41 @@ export default function PlayLobby() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    const currentUserId = user?.id;
+    if (currentUserId === undefined) return;
+
+    let active = true;
+
+    async function loadActiveGames() {
+      const response = await fetchAPI<{ games: ActiveGame[] }>({
+        path: '/games',
+        method: 'get',
+      });
+      if (!active || response.error) return;
+
+      const next = new Map<number, number>();
+      for (const game of response.result.games) {
+        if (!game.isPlayer) continue;
+        const friendId =
+          game.whiteId === currentUserId ? game.blackId : game.whiteId;
+        if (friendId === currentUserId || next.has(friendId)) continue;
+        next.set(friendId, game.id);
+      }
+      setActiveGames(next);
+    }
+
+    void loadActiveGames();
+    const interval = window.setInterval(() => {
+      void loadActiveGames();
+    }, 10000);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     function updatePresence(event: RealtimeEvent) {
@@ -81,10 +126,22 @@ export default function PlayLobby() {
       ...friend,
       isOnline: presence.get(friend.id) ?? friend.isOnline ?? false,
       name: friend.displayName?.trim() || friend.username,
+      activeGameId: activeGames.get(friend.id),
     }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort(
+      (a, b) =>
+        Number(b.isOnline) - Number(a.isOnline) ||
+        Number(b.activeGameId !== undefined) -
+          Number(a.activeGameId !== undefined) ||
+        a.name.localeCompare(b.name),
+    );
 
-  const visibleFriends = allFriends.filter((friend) => friend.isOnline);
+  const visibleFriends = allFriends.filter(
+    (friend) => friend.isOnline || friend.activeGameId !== undefined,
+  );
+  const selectedFriend = visibleFriends.find(
+    (friend) => friend.id === selectedFriendId,
+  );
 
   async function handleFriendSelected(friendId: number) {
     setSelectedFriendId(friendId);
@@ -176,32 +233,41 @@ export default function PlayLobby() {
                   </option>
                   {visibleFriends.map((friend) => (
                     <option key={friend.id} value={friend.id}>
-                      {friend.name} — {t('lobby.online')}
+                      {friend.name}
+                      {friend.activeGameId !== undefined
+                        ? ` (${t('lobby.activeGame')})`
+                        : ''}
+                      {friend.isOnline ? ` — ${t('lobby.online')}` : ''}
                     </option>
                   ))}
                 </FriendSelect>
 
-                {selectedFriendId !== null &&
-                  (() => {
-                    const friend = visibleFriends.find(
-                      (item) => item.id === selectedFriendId,
-                    );
-                    return friend ? (
-                      <div className="opponent">
-                        <Avatar
-                          src={friend.avatar || '/avatars/default.svg'}
-                          username={friend.name}
-                          isOnline={friend.isOnline}
-                          size={40}
-                        />
-                        <span>{friend.name}</span>
-                      </div>
-                    ) : null;
-                  })()}
+                {selectedFriend && (
+                  <div className="opponent">
+                    <Avatar
+                      src={selectedFriend.avatar || '/avatars/default.svg'}
+                      username={selectedFriend.name}
+                      isOnline={selectedFriend.isOnline}
+                      size={40}
+                    />
+                    <span>{selectedFriend.name}</span>
+                  </div>
+                )}
 
-                <Button variant="primary" onClick={() => void handlePlay()}>
-                  {isSending ? t('lobby.sending') : t('lobby.sendRequest')}
-                </Button>
+                {selectedFriend?.activeGameId !== undefined ? (
+                  <Button
+                    variant="primary"
+                    onClick={() =>
+                      navigate(`/play/${selectedFriend.activeGameId}`)
+                    }
+                  >
+                    {t('lobby.joinActiveGame')}
+                  </Button>
+                ) : (
+                  <Button variant="primary" onClick={() => void handlePlay()}>
+                    {isSending ? t('lobby.sending') : t('lobby.sendRequest')}
+                  </Button>
+                )}
                 {confirmFriendId !== null &&
                   (() => {
                     const friend = visibleFriends.find(

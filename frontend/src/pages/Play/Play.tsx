@@ -43,12 +43,14 @@ type RemoteGameState = {
     username?: string;
     displayName?: string | null;
     avatar?: string | null;
+    online?: boolean;
   };
   black?: {
     id: number;
     username?: string;
     displayName?: string | null;
     avatar?: string | null;
+    online?: boolean;
   };
   whiteId?: number;
   blackId?: number;
@@ -63,6 +65,19 @@ function isRemoteGameState(value: unknown): value is RemoteGameState {
   );
 }
 
+function isPresenceEntry(
+  value: unknown,
+): value is { userId: number; online: boolean } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'userId' in value &&
+    typeof value.userId === 'number' &&
+    'online' in value &&
+    typeof value.online === 'boolean'
+  );
+}
+
 function Play() {
   const { gameId: gameIdParam } = useParams();
   const [gamePresence, setGamePresence] = useState<{
@@ -74,8 +89,10 @@ function Play() {
   const [onlineSide, setOnlineSide] = useState<{
     gameId: number;
     playerColor: 'white' | 'black';
+    opponentId: number | null;
     opponentName: string | null;
     opponentAvatar: string | null;
+    opponentOnline: boolean | null;
     chatId: number | undefined;
   } | null>(null);
   const { t: tChess } = useTranslation('chess');
@@ -174,9 +191,11 @@ function Play() {
       setOnlineSide({
         gameId,
         playerColor,
+        opponentId: opponent?.id ?? null,
         opponentName:
           opponent?.displayName?.trim() || opponent?.username || null,
         opponentAvatar: opponent?.avatar ?? null,
+        opponentOnline: opponent?.online ?? null,
         chatId: response.result.chatId,
       });
       setRemoteChatId(
@@ -197,6 +216,44 @@ function Play() {
         setDrawRequestSent(false);
         setError(tChess('drawRequestDeclined'));
       }
+
+      if (event.type === 'presence.snapshot' && Array.isArray(event.users)) {
+        const users: unknown[] = event.users;
+        setOnlineSide((current) => {
+          if (
+            !current ||
+            current.gameId !== gameId ||
+            current.opponentId === null
+          )
+            return current;
+
+          const opponentId = current.opponentId;
+          const entry = users.find(
+            (item): item is { userId: number; online: boolean } =>
+              isPresenceEntry(item) && item.userId === opponentId,
+          );
+
+          return entry ? { ...current, opponentOnline: entry.online } : current;
+        });
+        return;
+      }
+
+      if (
+        event.type === 'presence.changed' &&
+        typeof event.userId === 'number' &&
+        typeof event.online === 'boolean'
+      ) {
+        const { userId: changedUserId, online } = event;
+        setOnlineSide((current) =>
+          current &&
+          current.gameId === gameId &&
+          current.opponentId === changedUserId
+            ? { ...current, opponentOnline: online }
+            : current,
+        );
+        return;
+      }
+
       if (event.type === 'game.presence') {
         if (
           event.gameId === gameId &&
@@ -415,7 +472,9 @@ function Play() {
                 src={opponentAvatar || '/avatars/default.svg'}
                 username={opponentName}
                 size={64}
-                isOnline={true}
+                isOnline={Boolean(
+                  onlineSide?.gameId === gameId && onlineSide.opponentOnline,
+                )}
               />
               <span>{opponentName}</span>
             </div>

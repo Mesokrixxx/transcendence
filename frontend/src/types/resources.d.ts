@@ -100,10 +100,12 @@ export default interface Resources {
     "legalCapture": "Legal capture",
     "legalMove": "Legal move",
     "lobby": {
+      "activeGame": "Game in progress",
       "checkError": "Could not check the game",
       "chooseFriend": "Choose a friend",
       "confirmMessage": "Are you sure you want to send a game request to {{name}}?",
       "confirmTitle": "Game request confirmation",
+      "joinActiveGame": "Join game",
       "loadError": "Could not load your friends.",
       "loading": "Loading your friends…",
       "noFriends": "You don’t have any friends on ChessMove yet.",

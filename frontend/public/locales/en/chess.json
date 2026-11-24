@@ -84,6 +84,8 @@
     "noOnlineFriends": "None of your friends are online right now.",
     "online": "Online",
     "offline": "Offline",
+    "activeGame": "Game in progress",
+    "joinActiveGame": "Join game",
     "selectFriend": "Select a friend",
     "sendError": "Could not send the request",
     "sending": "Sending...",
