@@ -57,12 +57,18 @@ function PlayGame({ gameId }: { gameId: number }) {
   const gameIsOver = game.isOver() || remoteStatus === 'OVER';
   const waitingForFriend =
     isRemoteGame && !online.bothPlayersPresent && !gameIsOver;
+  const isOpponentTurn =
+    isRemoteGame && online.side?.playerColor !== game.getTurn();
+  const isBoardDisabled =
+    isOpponentTurn ||
+    (waitingForFriend && game.getHistory().length === 0) ||
+    gameIsOver ||
+    promotionMoves.length > 0 ||
+    isRotating;
   const error = isRemoteGame ? online.error : localError;
   const board = game.getBoard();
   const legalMoves =
-    selectedSquare && !isRotating && promotionMoves.length === 0
-      ? game.getMoves(selectedSquare)
-      : [];
+    selectedSquare && !isBoardDisabled ? game.getMoves(selectedSquare) : [];
 
   useEffect(() => {
     if (isRemoteGame || orientation === game.getTurn()) return;
@@ -95,7 +101,7 @@ function PlayGame({ gameId }: { gameId: number }) {
   }
 
   function handleSquareClick(square: SquareName) {
-    if (gameIsOver || promotionMoves.length > 0 || isRotating) return;
+    if (isBoardDisabled) return;
 
     if (isRemoteGame) online.clearError();
     else setLocalError('');
@@ -192,12 +198,7 @@ function PlayGame({ gameId }: { gameId: number }) {
               selectedSquare={selectedSquare}
               onSquareClick={handleSquareClick}
               legalMoves={legalMoves}
-              disabled={
-                (waitingForFriend && game.getHistory().length === 0) ||
-                gameIsOver ||
-                promotionMoves.length > 0 ||
-                isRotating
-              }
+              disabled={isBoardDisabled}
             />
           )}
 
