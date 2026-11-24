@@ -114,6 +114,7 @@ function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [loadedProfile, setLoadedProfile] = useState<ProfileState>({status: 'loading'});
   const [relationship, setRelationship] = useState<RelationshipState | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   const playerId = id === undefined ? null : Number(id);
 
@@ -123,7 +124,7 @@ function Profile() {
       playerId! > 0
   );
 
-  const targetUserId = playerId ?? user?.id;
+  const targetUserId = validId ? playerId ?? user?.id : undefined;
 
   useEffect(() => {
     if (!user || !validId) {
@@ -207,9 +208,12 @@ function Profile() {
             ...current,
             data: {
               ...current.data,
-              username,
-              avatar,
-              displayName,
+              profile: {
+                ...current.data.profile,
+                username,
+                avatar,
+                displayName,
+              }
             }
           }
         } else
@@ -220,7 +224,86 @@ function Profile() {
     return realtimeSocket.subscribe(updateProfile);
   }, [targetUserId, user?.id]);
 
-  function handleSave(profile: LocalProfile) {
+  useEffect(() => {
+    if (!user || !targetUserId || targetUserId === user?.id) return;
+
+    const profileUserId = targetUserId;
+
+    function updateRelationship(event: RealtimeEvent) {
+        if (
+            event.type !== 'friend.request.sent' &&
+            event.type !== 'friend.request.accepted' &&
+            event.type !== 'friend.changed' &&
+            event.type !== 'friend.blocked' &&
+            event.type !== 'friend.unblocked'
+        ) return
+
+        getRelationship(profileUserId)
+            .then((result) => setRelationship({ status: 'ready', relationship: result }))
+            .catch(() => setRelationship({ status: 'error' }))
+    }
+
+    return realtimeSocket.subscribe(updateRelationship)
+  }, [targetUserId, user])
+
+  useEffect(() => {
+    if (!user || !targetUserId || targetUserId === user.id || relationship?.status !== 'ready' || relationship.relationship !== 'friend') {
+      setIsOnline(null);
+      return;
+    }
+
+    const profileUserId = targetUserId;
+    let active = true;
+    let hasPresenceUpdate = false;
+
+    getFriends()
+      .then((res) => {
+        if (!active || hasPresenceUpdate) return;
+
+        const friend = res.friends.find((f) => f.id === profileUserId);
+        setIsOnline(friend?.isOnline ?? null);
+      })
+      .catch(() => {
+        if (active && !hasPresenceUpdate) setIsOnline(null);
+      });
+
+    function updatePresence(event: RealtimeEvent) {
+      if (event.type === 'presence.snapshot' && Array.isArray(event.users)) {
+        const target = event.users.find(
+          (user) =>
+            user &&
+            typeof user === 'object' &&
+            'userId' in user &&
+            'online' in user &&
+            typeof user.userId === 'number' &&
+            typeof user.online === 'boolean' &&
+            user.userId === profileUserId 
+        );
+        hasPresenceUpdate = true;
+        setIsOnline(target ? target.online : false);
+        return;
+      }
+
+      if (
+        event.type === 'presence.changed' &&
+        typeof event.userId === 'number' &&
+        typeof event.online === 'boolean' &&
+        event.userId === targetUserId
+      ) {
+        hasPresenceUpdate = true;
+        setIsOnline(event.online);
+      }
+    }
+
+    const unsubscribe = realtimeSocket.subscribe(updatePresence);
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, [targetUserId, user, relationship]);
+
+function handleSave(profile: LocalProfile) {
     if (user) {
       setUser({
         ...user,
@@ -260,7 +343,14 @@ function Profile() {
             <Avatar
               src={profile.avatar || '/avatars/default.svg'}
               username={profile.username}
-              isOnline={isOwnProfile || undefined}
+              isOnline={
+                relationship?.status === 'ready' && 
+                  relationship.relationship === 'friend'
+                ? isOnline ?? undefined
+                : isOwnProfile
+                  ? true
+                  : undefined
+              }
               size={96}
             />
 
