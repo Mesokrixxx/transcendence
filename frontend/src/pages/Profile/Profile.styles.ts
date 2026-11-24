@@ -113,3 +113,20 @@ export const ProfileStatusContent = styled.h2`
   color: var(--color-text-primary);
   font-size: 20px;
 `;
+
+export const ProfileActions = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  @media (max-width: 1000px) {
+    flex-direction: column;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+`;

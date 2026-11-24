@@ -7,7 +7,7 @@ import Footer from '../../components/Footer/Footer';
 import Avatar from '../../components/Avatar/Avatar';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
-import { ProfilePanel, ProfileHeader, ProfileStatus, ProfileStatusContent } from './Profile.styles';
+import { ProfilePanel, ProfileHeader, ProfileStatus, ProfileStatusContent, ProfileActions } from './Profile.styles';
 import EditProfileDialog from '../../components/Profile/EditProfileDialog/EditProfileDialog';
 import type { LocalProfile } from '../../components/Profile/EditProfileDialog/EditProfileDialog';
 import ProfileActivity from '../../components/Profile/ProfileActivity/ProfileActivity';
@@ -15,6 +15,7 @@ import ProfileProgress from '../../components/Profile/ProfileProgress/ProfilePro
 import type { AuthUser } from '../../types/auth';
 import { getPlayerProfile } from '../../services/playerProfile';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
+import { getFriends, sendFriendRequest, acceptFriendRequest, removeFriendRequest, removeFriend, blockUser, unblockUser } from '../../services/friends';
 
 interface ProfileData {
   id: number;
@@ -80,12 +81,39 @@ async function loadProfile(
   }
 };
 
+type RelationshipStatus =
+  | 'none'
+  | 'friend'
+  | 'incoming'
+  | 'outgoing'
+  | 'blocked';
+
+type RelationshipState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'ready', relationship: RelationshipStatus };
+
+async function getRelationship(userId: number): Promise<RelationshipStatus> {
+  const data = await getFriends();
+
+  if (data.blocked.some((u) => u.id === userId))
+    return 'blocked';
+  if (data.friends.some((u) => u.id === userId))
+    return 'friend';
+  if (data.received.some((u) => u.id === userId))
+    return 'incoming';
+  if (data.sent.some((u) => u.id === userId))
+    return 'outgoing';
+  return 'none';
+}
+
 function Profile() {
   const { id } = useParams();
   const { t } = useTranslation();
   const { user , setUser} = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loadedProfile, setLoadedProfile] = useState<ProfileState>({status: 'loading'});
+  const [relationship, setRelationship] = useState<RelationshipState | null>(null);
 
   const playerId = id === undefined ? null : Number(id);
 
@@ -119,6 +147,43 @@ function Profile() {
       active = false;
     };
   }, [playerId, user, validId]);
+
+  useEffect(() => {
+    if (!user || !targetUserId || targetUserId === user?.id) {
+      setRelationship(null);
+      return;
+    }
+
+    setRelationship({ status: 'loading'});
+    let active = true;
+    getRelationship(targetUserId)
+      .then((r) => {
+        if (active) setRelationship({ status: 'ready', relationship: r });
+      })
+      .catch(() => {
+        if (active) setRelationship({ status: 'error' });
+      })
+
+      return () => {
+        active = false;
+      };
+  }, [targetUserId, user]);
+
+  async function changeRelationship<ArgT>(action: (arg: ArgT) => Promise<void>, arg: ArgT) {
+    try {
+      if (!user || !targetUserId || targetUserId === user?.id)
+        return;
+
+      setRelationship({ status: 'loading' });
+
+      await action(arg);
+
+      const r = await getRelationship(targetUserId);
+      setRelationship({ status: 'ready', relationship: r });
+    } catch {
+      setRelationship({ status: 'error' });
+    }
+  }
 
   useEffect(() => {
     if (!targetUserId || targetUserId === user?.id) return;
@@ -218,6 +283,125 @@ function Profile() {
             >
               {t('editProfile', { ns: 'profile' })}
             </Button>}
+            {!isOwnProfile && relationship?.status === 'ready' && (
+              <ProfileActions>
+                {relationship.relationship === 'none' && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(
+                          sendFriendRequest,
+                          profile.username,
+                        )
+                      }
+                    >
+                      {t('sendRequest', { ns: 'friends' })}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(blockUser, profile.id)
+                      }
+                    >
+                      {t('block', { ns: 'friends' })}
+                    </Button>
+                  </>
+                )}
+
+                {relationship.relationship === 'outgoing' && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(removeFriendRequest, profile.id)
+                      }
+                    >
+                      {t('cancel', { ns: 'friends' })}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(blockUser, profile.id)
+                      }
+                    >
+                      {t('block', { ns: 'friends' })}
+                    </Button>
+                  </>
+                )}
+
+                {relationship.relationship === 'incoming' && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(acceptFriendRequest, profile.id)
+                      }
+                    >
+                      {t('accept', { ns: 'friends' })}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(removeFriendRequest, profile.id)
+                      }
+                    >
+                      {t('decline', { ns: 'friends' })}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(blockUser, profile.id)
+                      }
+                    >
+                      {t('block', { ns: 'friends' })}
+                    </Button>
+                  </>
+                )}
+
+                {relationship.relationship === 'friend' && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(removeFriend, profile.id)
+                      }
+                    >
+                      {t('remove', { ns: 'friends' })}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        changeRelationship(blockUser, profile.id)
+                      }
+                    >
+                      {t('block', { ns: 'friends' })}
+                    </Button>
+                  </>
+                )}
+
+                {relationship.relationship === 'blocked' && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() =>
+                      changeRelationship(unblockUser, profile.id)
+                    }
+                  >
+                    {t('unblock', { ns: 'friends' })}
+                  </Button>
+                )}
+              </ProfileActions>
+            )}
           </ProfileHeader>
           </ProfilePanel>}
           {profile && <ProfileProgress userId={profile.id} isOwnProfile={isOwnProfile} />}
