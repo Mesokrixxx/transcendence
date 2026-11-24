@@ -171,14 +171,14 @@ function Profile() {
   }, [targetUserId, user]);
 
   async function changeRelationship<ArgT>(action: (arg: ArgT) => Promise<void>, arg: ArgT) {
+    if (!user || !targetUserId || targetUserId === user?.id)
+      return;
+    setRelationship({ status: 'loading' });
     try {
-      if (!user || !targetUserId || targetUserId === user?.id)
-        return;
-
-      setRelationship({ status: 'loading' });
-
       await action(arg);
-
+    } catch {
+    }
+    try {
       const r = await getRelationship(targetUserId);
       setRelationship({ status: 'ready', relationship: r });
     } catch {
