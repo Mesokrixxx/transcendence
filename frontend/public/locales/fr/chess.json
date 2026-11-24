@@ -77,6 +77,7 @@
     "loadError": "Impossible de charger tes amis.",
     "loading": "Chargement de tes amis…",
     "noFriends": "Tu n’as pas encore d’amis dans ChessMove.",
+    "noOnlineFriends": "Aucun de tes amis n’est en ligne pour le moment.",
     "online": "En ligne",
     "offline": "Hors ligne",
     "checkError": "Impossible de vérifier la partie.",

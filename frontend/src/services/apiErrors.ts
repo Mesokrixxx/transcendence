@@ -61,6 +61,7 @@ const backendErrorKeys = {
   'id shall be a positive integer': 'invalidRequest',
   'friendId shall be a positive integer': 'invalidRequest',
   'Invalid body request': 'invalidRequest',
+  'Invalid request body': 'invalidRequest',
 } as const;
 
 type BackendErrorMessage = keyof typeof backendErrorKeys;

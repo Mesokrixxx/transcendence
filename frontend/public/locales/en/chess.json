@@ -81,6 +81,7 @@
     "loadError": "Could not load your friends.",
     "loading": "Loading your friends…",
     "noFriends": "You don’t have any friends on ChessMove yet.",
+    "noOnlineFriends": "None of your friends are online right now.",
     "online": "Online",
     "offline": "Offline",
     "selectFriend": "Select a friend",

@@ -29,13 +29,25 @@ function Login() {
     if (isLoading) return;
 
     const formData = new FormData(event.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const emailValue = formData.get('email');
+    const passwordValue = formData.get('password');
+    const email = typeof emailValue === 'string' ? emailValue.trim() : '';
+    const password = typeof passwordValue === 'string' ? passwordValue : '';
 
     setError('');
 
-    if (typeof email !== 'string' || typeof password !== 'string') {
+    if (email === '' || password === '') {
       setError(t('enterEmailAndPassword', { ns: 'auth' }));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError(t('invalidEmail', { ns: 'auth' }));
+      return;
+    }
+
+    if (password.length < 8) {
+      setError(t('passwordTooShort', { ns: 'auth' }));
       return;
     }
 
@@ -46,7 +58,7 @@ function Login() {
         path: '/auth/login',
         method: 'post',
         body: {
-          email: email.trim(),
+          email,
           password,
         },
       });
@@ -78,6 +90,7 @@ function Login() {
           <h1>{t('welcomeBack', { ns: 'auth' })}</h1>
           <GitHubSignIn />
           <Form
+            noValidate
             onSubmit={(event) => {
               void handleSubmit(event);
             }}
@@ -90,6 +103,7 @@ function Login() {
               placeholder={t('emailPlaceholder', { ns: 'auth' })}
               autoComplete="email"
               required
+              onChange={() => setError('')}
             />
 
             <Input
@@ -100,6 +114,8 @@ function Login() {
               placeholder={t('yourPassword', { ns: 'auth' })}
               autoComplete="current-password"
               required
+              minLength={8}
+              onChange={() => setError('')}
             />
 
             <Button type="submit">{t('logIn', { ns: 'auth' })}</Button>

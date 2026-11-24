@@ -76,16 +76,15 @@ export default function PlayLobby() {
     return realtimeSocket.subscribe(updatePresence);
   }, []);
 
-  const visibleFriends = (friends ?? [])
+  const allFriends = (friends ?? [])
     .map((friend) => ({
       ...friend,
       isOnline: presence.get(friend.id) ?? friend.isOnline ?? false,
       name: friend.displayName?.trim() || friend.username,
     }))
-    .sort(
-      (a, b) => Number(b.isOnline) - Number(a.isOnline) ||
-        a.name.localeCompare(b.name),
-    );
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const visibleFriends = allFriends.filter((friend) => friend.isOnline);
 
   async function handleFriendSelected(friendId: number) {
     setSelectedFriendId(friendId);
@@ -109,7 +108,9 @@ export default function PlayLobby() {
       }
       setConfirmFriendId(selectedFriendId);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : t('lobby.startError'));
+      setActionError(
+        error instanceof Error ? error.message : t('lobby.startError'),
+      );
     } finally {
       setIsSending(false);
     }
@@ -119,7 +120,10 @@ export default function PlayLobby() {
     setIsSending(true);
     setActionError('');
     try {
-      const invitationResponse = await fetchAPI<{ invitationId?: number; gameId?: number }>({
+      const invitationResponse = await fetchAPI<{
+        invitationId?: number;
+        gameId?: number;
+      }>({
         path: `/games/invitations/${friendId}`,
         method: 'post',
       });
@@ -130,7 +134,9 @@ export default function PlayLobby() {
       }
       setConfirmFriendId(null);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : t('lobby.sendError'));
+      setActionError(
+        error instanceof Error ? error.message : t('lobby.sendError'),
+      );
     } finally {
       setIsSending(false);
     }
@@ -149,27 +155,37 @@ export default function PlayLobby() {
               <p role="alert">{t('lobby.loadError')}</p>
             ) : friends === null ? (
               <p role="status">{t('lobby.loading')}</p>
-            ) : visibleFriends.length === 0 ? (
+            ) : friends.length === 0 ? (
               <p>{t('lobby.noFriends')}</p>
+            ) : visibleFriends.length === 0 ? (
+              <p>{t('lobby.noOnlineFriends')}</p>
             ) : (
               <>
-                <label htmlFor="friend-game-select">{t('lobby.chooseFriend')}</label>
+                <label htmlFor="friend-game-select">
+                  {t('lobby.chooseFriend')}
+                </label>
                 <FriendSelect
                   id="friend-game-select"
                   value={selectedFriendId ?? ''}
-                  onChange={(event) => void handleFriendSelected(Number(event.target.value))}
+                  onChange={(event) =>
+                    void handleFriendSelected(Number(event.target.value))
+                  }
                 >
-                  <option value="" disabled>{t('lobby.selectFriend')}</option>
+                  <option value="" disabled>
+                    {t('lobby.selectFriend')}
+                  </option>
                   {visibleFriends.map((friend) => (
                     <option key={friend.id} value={friend.id}>
-                      {friend.name} — {friend.isOnline ? t('lobby.online') : t('lobby.offline')}
+                      {friend.name} — {t('lobby.online')}
                     </option>
                   ))}
                 </FriendSelect>
 
                 {selectedFriendId !== null &&
                   (() => {
-                    const friend = visibleFriends.find((item) => item.id === selectedFriendId);
+                    const friend = visibleFriends.find(
+                      (item) => item.id === selectedFriendId,
+                    );
                     return friend ? (
                       <div className="opponent">
                         <Avatar
@@ -183,17 +199,19 @@ export default function PlayLobby() {
                     ) : null;
                   })()}
 
-                <Button
-                  variant="primary"
-                  onClick={() => void handlePlay()}
-                >
+                <Button variant="primary" onClick={() => void handlePlay()}>
                   {isSending ? t('lobby.sending') : t('lobby.sendRequest')}
                 </Button>
                 {confirmFriendId !== null &&
                   (() => {
-                    const friend = visibleFriends.find((item) => item.id === confirmFriendId);
+                    const friend = visibleFriends.find(
+                      (item) => item.id === confirmFriendId,
+                    );
                     return (
-                      <ConfirmationDialog role="dialog" aria-label={t('lobby.confirmTitle')}>
+                      <ConfirmationDialog
+                        role="dialog"
+                        aria-label={t('lobby.confirmTitle')}
+                      >
                         <p>
                           {t('lobby.confirmMessage', {
                             name: friend?.name ?? t('lobby.thisFriend'),
