@@ -18,7 +18,7 @@ type StoredGame = NonNullable<Awaited<ReturnType<typeof get>>>;
 type GamePlayer = {
   id: number;
   username: string;
-  profile: { avatar: string | null } | null;
+  profile: { avatar: string | null; displayName: string | null } | null;
 };
 
 async function serializableGameTransaction<T>(
@@ -46,7 +46,10 @@ function readMoves(moves: unknown): Move[] {
   }
 }
 
-function gameView(game: StoredGame & { white?: GamePlayer; black?: GamePlayer }) {
+function gameView(
+  game: StoredGame & { white?: GamePlayer; black?: GamePlayer },
+  includeDisplayNames = false,
+) {
   const engine = new ChessGame(readMoves(game.moves));
   return {
     ...game,
@@ -62,6 +65,9 @@ function gameView(game: StoredGame & { white?: GamePlayer; black?: GamePlayer })
             id: game.white.id,
             username: game.white.username,
             avatar: game.white.profile?.avatar ?? null,
+            ...(includeDisplayNames
+              ? { displayName: game.white.profile?.displayName ?? null }
+              : {}),
           },
         }
       : {}),
@@ -71,6 +77,9 @@ function gameView(game: StoredGame & { white?: GamePlayer; black?: GamePlayer })
             id: game.black.id,
             username: game.black.username,
             avatar: game.black.profile?.avatar ?? null,
+            ...(includeDisplayNames
+              ? { displayName: game.black.profile?.displayName ?? null }
+              : {}),
           },
         }
       : {}),
@@ -169,7 +178,7 @@ export async function listActive(userId: number) {
 
 	return games
 		.map((game) => ({
-			...gameView(game),
+			...gameView(game, true),
 			isPlayer: game.whiteId === userId || game.blackId === userId,
 		}))
 		.sort((left, right) =>
@@ -526,19 +535,7 @@ export async function getState(id: number, includeDisplayNames = false) {
   });
 
   if (!game) return null;
-
-  const view = gameView(game);
-  if (!includeDisplayNames) return view;
-
-  return {
-    ...view,
-    ...(view.white
-      ? { white: { ...view.white, displayName: game.white?.profile?.displayName ?? null } }
-      : {}),
-    ...(view.black
-      ? { black: { ...view.black, displayName: game.black?.profile?.displayName ?? null } }
-      : {}),
-  };
+  return gameView(game, includeDisplayNames);
 }
 
 type PlayerStats = {
