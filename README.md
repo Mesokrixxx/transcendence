@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by aflandin, nhoussier, shasinan, ecid.*
+*This project has been created as part of the 42 curriculum by aflandin, nhoussie, shasinan, ecid.*
 
 # ChessMove
 
@@ -10,7 +10,7 @@ ChessMove is a real-time chess web application built for the 42 `ft_transcendenc
 
 | Login | Role | Responsibilities |
 | --- | --- | --- |
-| `nhoussier` | Product Owner | Initiated the chess project, defined the product direction, provided technical direction, developed the chess engine and tests, statistics/history, i18n architecture, public profile refactor and Docker/TLS/Makefile improvements. |
+| `nhoussie` | Product Owner | Initiated the chess project, defined the product direction, provided technical direction, developed the chess engine and tests, statistics/history, i18n architecture, public profile refactor and Docker/TLS/Makefile improvements. |
 | `aflandin` | Project Manager / Backend Lead | Backend architecture, authentication/OAuth, game/friends APIs, WebSocket real-time layer, notifications, spectating and gamification backends, containerization and final integration. |
 | `ecid` | Frontend Lead / UI-UX | Design system, landing/legal/auth pages, profiles and avatars, play/spectator UI, error pages, responsive layouts, translations and frontend integration. |
 | `shasinan` | Frontend Developer | Rankings, chat UI, friends/ranking integration, end-of-game actions and UI/translation/console fixes. |
@@ -18,7 +18,7 @@ ChessMove is a real-time chess web application built for the 42 `ft_transcendenc
 ## Project Management
 
 - Trello for task tracking; GitHub feature branches and pull requests for development and review.
-- Work split by domain: backend/real-time (`aflandin`), chess engine/statistics (`nhoussier`), frontend/UI (`ecid`, `shasinan`), with regular integration phases.
+- Work split by domain: backend/real-time (`aflandin`), chess engine/statistics (`nhoussie`), frontend/UI (`ecid`, `shasinan`), with regular integration phases.
 - Discord for daily communication; short syncs at milestones and a final bug-fixing/validation phase.
 
 ## Technical Stack
@@ -49,18 +49,18 @@ Users have one profile and many sessions/games/messages; each game has two playe
 
 | Feature | Description | Main contributors |
 | --- | --- | --- |
-| Authentication | Email/password, bcrypt hashing, sessions, password policy and GitHub OAuth 2.0. | `aflandin`, `ecid`, `nhoussier` |
-| Profiles and avatars | Public/own profiles, display names, avatar upload/removal, default avatar and real-time updates. | `ecid`, `aflandin`, `nhoussier` |
+| Authentication | Email/password, bcrypt hashing, sessions, password policy and GitHub OAuth 2.0. | `aflandin`, `ecid`, `nhoussie` |
+| Profiles and avatars | Public/own profiles, display names, avatar upload/removal, default avatar and real-time updates. | `ecid`, `aflandin`, `nhoussie` |
 | Friends and presence | Requests, accept/decline, remove, block/unblock and live online status. | `aflandin`, `ecid`, `shasinan` |
 | Chat and notifications | Private messages, game/spectator chat and real-time game/friend/draw notifications. | `aflandin`, `shasinan`, `ecid` |
-| Chess engine | Legal moves, castling, en passant, promotion, checkmate, stalemate, draws, repetition and move rules. | `nhoussier` |
-| Online matches | Invitations, move validation, reconnection, resign, draw offers and forced draw claims. | `aflandin`, `ecid`, `nhoussier` |
+| Chess engine | Legal moves, castling, en passant, promotion, checkmate, stalemate, draws, repetition and move rules. | `nhoussie` |
+| Online matches | Invitations, move validation, reconnection, resign, draw offers and forced draw claims. | `aflandin`, `ecid`, `nhoussie` |
 | Spectator mode | Live game viewing with a read-only board and spectator chat. | `aflandin`, `ecid` |
-| Rankings and statistics | Elo leaderboard, match history, streaks, opponent/termination stats and Elo progression. | `shasinan`, `nhoussier`, `ecid` |
-| Gamification | Achievements, badges, featured badges and leaderboard progression. | `aflandin`, `ecid`, `nhoussier` |
+| Rankings and statistics | Elo leaderboard, match history, streaks, opponent/termination stats and Elo progression. | `shasinan`, `nhoussie`, `ecid` |
+| Gamification | Achievements, badges, featured badges and leaderboard progression. | `aflandin`, `ecid`, `nhoussie` |
 | Internationalization | English, French and Spanish UI with language switcher and localized errors/notifications. | all team members |
 | Design system | Responsive reusable components, palette, typography and icons. | `ecid`, `shasinan` |
-| Legal and infrastructure | Privacy/Terms pages, Podman stack, Nginx TLS and environment-based configuration. | `ecid`, `aflandin`, `nhoussier` |
+| Legal and infrastructure | Privacy/Terms pages, Podman stack, Nginx TLS and environment-based configuration. | `ecid`, `aflandin`, `nhoussie` |
 
 ## Modules
 
@@ -71,21 +71,21 @@ Users have one profile and many sessions/games/messages; each game has two playe
 | Use a framework for both the frontend and backend. | React/TypeScript + Express/TypeScript. | all team members |
 | Implement real-time features using WebSockets or similar technology. | `ws` rooms for presence, chat, games and notifications, with reconnection. | `aflandin`, `ecid` |
 | Allow users to interact with other users. | Profiles, friends/blocking, private/game/spectator chat. | all team members |
-| Standard user management and authentication. | bcrypt, sessions, protected routes, profile editing, avatars and GitHub OAuth. | `aflandin`, `ecid`, `nhoussier` |
-| Implement a complete web-based game where users can play against each other. | Full chess rules engine and live matches. | `nhoussier`, `aflandin`, `ecid` |
-| Remote players — Enable two players on separate computers to play the same game in real-time. | HTTPS/WebSocket multi-client play, LAN instructions and reconnect logic. | `aflandin`, `ecid`, `nhoussier` |
+| Standard user management and authentication. | bcrypt, sessions, protected routes, profile editing, avatars and GitHub OAuth. | `aflandin`, `ecid`, `nhoussie` |
+| Implement a complete web-based game where users can play against each other. | Full chess rules engine and live matches. | `nhoussie`, `aflandin`, `ecid` |
+| Remote players — Enable two players on separate computers to play the same game in real-time. | HTTPS/WebSocket multi-client play, LAN instructions and reconnect logic. | `aflandin`, `ecid`, `nhoussie` |
 
 ### Minor modules (1 point each)
 
 | Module | Implementation | Contributors |
 | --- | --- | --- |
-| Use an ORM for the database. | Prisma 7 with PostgreSQL and typed transactions. | `aflandin`, `nhoussier` |
+| Use an ORM for the database. | Prisma 7 with PostgreSQL and typed transactions. | `aflandin`, `nhoussie` |
 | Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components). | styled-components library, shared styles and responsive layouts. | `ecid`, `shasinan` |
-| Game statistics and match history (requires a game module). | Match history, results, streaks, opponents, terminations and Elo chart. | `nhoussier`, `ecid`, `shasinan` |
-| Support for multiple languages (at least 3 languages). | English, French and Spanish catalogs with language switcher. | `nhoussier`, `ecid`, `shasinan`, `aflandin` |
-| A gamification system to reward users for their actions. | Persistent achievements, badges and leaderboard integration. | `aflandin`, `ecid`, `nhoussier` |
+| Game statistics and match history (requires a game module). | Match history, results, streaks, opponents, terminations and Elo chart. | `nhoussie`, `ecid`, `shasinan` |
+| Support for multiple languages (at least 3 languages). | English, French and Spanish catalogs with language switcher. | `nhoussie`, `ecid`, `shasinan`, `aflandin` |
+| A gamification system to reward users for their actions. | Persistent achievements, badges and leaderboard integration. | `aflandin`, `ecid`, `nhoussie` |
 | Implement spectator mode for games. | Live watch pages, game rooms and spectator chat. | `aflandin`, `ecid` |
-| Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.). | GitHub OAuth authorization-code flow with state validation. | `aflandin`, `nhoussier`, `ecid` |
+| Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.). | GitHub OAuth authorization-code flow with state validation. | `aflandin`, `nhoussie`, `ecid` |
 
 **Total: 19 points** (6 major × 2 + 7 minor × 1). Remote Players and Gamification were completed after the initial tracking checklist. No custom module of choice was used.
 
@@ -144,7 +144,7 @@ AI (GitHub Copilot in VS Code, including agent/chat sessions visible in Git) was
 
 ## Individual Contributions
 
-- **`nhoussier` — Product Owner:** initiated the chess project and technical direction; built the `chessgame` engine and tests (special moves, checkmate, stalemate, draws, repetition, move rules); statistics/history components; i18n architecture; public profile refactor; Docker/TLS/Makefile improvements. *Challenges:* chess-rule edge cases, aligning frontend types with the database, and sharing TLS certificates between containers.
+- **`nhoussie` — Product Owner:** initiated the chess project and technical direction; built the `chessgame` engine and tests (special moves, checkmate, stalemate, draws, repetition, move rules); statistics/history components; i18n architecture; public profile refactor; Docker/TLS/Makefile improvements. *Challenges:* chess-rule edge cases, aligning frontend types with the database, and sharing TLS certificates between containers.
 - **`aflandin` — Project Manager / Backend Lead:** backend architecture, authentication/OAuth, game/friends APIs, WebSocket presence/rooms/notifications, spectating and gamification backends, containerization and final integration. *Challenges:* real-time consistency across reconnects and game-end events that omit player relations.
 - **`ecid` — Frontend Lead / UI-UX:** design system, landing/legal/auth pages, profiles and avatars, play lobby/online game/spectator UI, error pages, responsive layouts and translations. *Challenges:* real-time UI synchronization, avatar upload/preview, and integrating parallel branches.
 - **`shasinan` — Frontend Developer:** rankings/search, chat UI and backend integration, friends/ranking integration, end-of-game actions and translation/avatar/console fixes. *Challenges:* evolving backend contracts and stabilizing the UI after merges.
