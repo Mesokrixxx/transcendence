@@ -59,6 +59,9 @@ function PlayGame({ gameId }: { gameId: number }) {
     isRemoteGame && !online.bothPlayersPresent && !gameIsOver;
   const isOpponentTurn =
     isRemoteGame && online.side?.playerColor !== game.getTurn();
+  const canClaimDraw =
+    isRemoteGame && !isOpponentTurn && !gameIsOver &&
+    game.canClaimDraw().length > 0;
   const isBoardDisabled =
     isOpponentTurn ||
     (waitingForFriend && game.getHistory().length === 0) ||
@@ -161,6 +164,7 @@ function PlayGame({ gameId }: { gameId: number }) {
             {isRemoteGame && !gameIsOver && (
               <PlayGameActions
                 drawRequestSent={online.drawRequestSent}
+                onClaimDraw={canClaimDraw ? () => void online.claimDraw() : undefined}
                 onOfferDraw={() => void online.offerDraw()}
                 onResign={() => void online.resign()}
               />

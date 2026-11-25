@@ -3,12 +3,14 @@ import Button from '../Button/Button';
 
 type PlayGameActionsProps = {
   drawRequestSent: boolean;
+  onClaimDraw?: () => void;
   onOfferDraw: () => void;
   onResign: () => void;
 };
 
 export default function PlayGameActions({
   drawRequestSent,
+  onClaimDraw,
   onOfferDraw,
   onResign,
 }: PlayGameActionsProps) {
@@ -16,12 +18,19 @@ export default function PlayGameActions({
 
   return (
     <div role="group" aria-label={t('gameActions')}>
-      <Button variant="secondary" onClick={onOfferDraw}>
-        {drawRequestSent ? t('drawRequestSent') : t('offerDraw')}
-      </Button>
+      {onClaimDraw ? (
+        <Button variant="secondary" onClick={onClaimDraw}>
+          {t('claimDraw')}
+        </Button>
+      ) : (
+        <Button variant="secondary" onClick={onOfferDraw}>
+          {drawRequestSent ? t('drawRequestSent') : t('offerDraw')}
+        </Button>
+      )}
       <Button variant="secondary" onClick={onResign}>
         {t('resign')}
       </Button>
+      {onClaimDraw && <p>{t('claimDrawAvailable')}</p>}
     </div>
   );
 }

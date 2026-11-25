@@ -1,4 +1,11 @@
-import type { Board, Color, Move, Piece, Square } from './chessgame.types.js';
+import type {
+  Board,
+  Color,
+  DrawClaimReason,
+  Move,
+  Piece,
+  Square,
+} from './chessgame.types.js';
 import { boardSquares, InternalBoard } from './internal-board.js';
 
 type CastleSide = 'queenside' | 'kingside';
@@ -103,6 +110,8 @@ class InternalGame {
   private halfMoves = 0;
   private history: History = [];
   private gameFlags: GameFlags = GameFlags.NONE;
+  // Set when a player claims a draw (threefold repetition or fifty moves).
+  private claimedDraw: DrawClaimReason | null = null;
 
   // Store legalMoves once computed for the current state
   private legalMoves: InternalMove[] | null = null;
@@ -763,8 +772,34 @@ class InternalGame {
     return !this.isOver() && this.hasSomeFlags(GameFlags.FIFTYMOVES);
   }
 
+  /**
+   * Claims a draw in the current position, if allowed by the rules.
+   *
+   * A draw can be claimed when the same position occurred three times or
+   * when fifty moves were played without a capture or a pawn move.
+   * Unlike automatic draws, a claim ends the game immediately and does not
+   * require the opponent's agreement.
+   *
+   * @returns The reason of the claimed draw, or `null` if no draw can be claimed.
+   */
+  claimDraw(): DrawClaimReason | null {
+    if (this.isOver()) return null;
+
+    if (this.canClaimDrawByThreefoldRepetition())
+      this.claimedDraw = 'threefold-repetition';
+    else if (this.canClaimDrawByFiftyMoves())
+      this.claimedDraw = 'fifty moves';
+    else return null;
+
+    return this.claimedDraw;
+  }
+
+  getClaimedDraw(): DrawClaimReason | null {
+    return this.claimedDraw;
+  }
+
   isOver(): boolean {
-    return this.hasSomeFlags(GameFlags.OVER);
+    return this.claimedDraw !== null || this.hasSomeFlags(GameFlags.OVER);
   }
 }
 

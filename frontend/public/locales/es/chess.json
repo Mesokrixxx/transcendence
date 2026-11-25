@@ -5,6 +5,8 @@
   "checkmateWinner": "Jaque mate: ganan las {{winner}}",
   "checkStatus": "{{turnStatus}} — jaque",
   "choosePromotionPiece": "Elige una pieza para la promoción",
+  "claimDraw": "Reclamar tablas",
+  "claimDrawAvailable": "Puedes reclamar tablas por la regla de los cincuenta movimientos o por triple repetición.",
   "demoGame": "Partida de demostración",
   "demoGameForSpectators": "Partida de demostración para espectadores",
   "draw": "Tablas",
@@ -26,6 +28,7 @@
   "offerDraw": "Proponer tablas",
   "drawRequestSent": "Solicitud de tablas enviada",
   "drawRequestDeclined": "La solicitud de tablas fue rechazada",
+  "unableToClaimDraw": "No se pudieron reclamar las tablas.",
   "unableToSendDrawRequest": "No se pudo enviar la solicitud de tablas.",
   "resign": "Abandonar",
   "games": "Partidas",
@@ -74,8 +77,11 @@
     "loadError": "No se pudo cargar tu lista de amigos.",
     "loading": "Cargando tu lista de amigos…",
     "noFriends": "Aún no tienes amigos en ChessMove.",
+    "noOnlineFriends": "Ninguno de tus amigos está en línea ahora mismo.",
     "online": "En línea",
     "offline": "Sin conexión",
+    "activeGame": "Partida en curso",
+    "joinActiveGame": "Unirse a la partida",
     "checkError": "No se pudo comprobar la partida.",
     "chooseFriend": "Elegir un amigo",
     "confirmMessage": "¿Seguro que quieres enviar una solicitud de partida a {{name}}?",
@@ -89,7 +95,9 @@
   },
   "invitations": {
     "gameRequest": "{{name}} quiere empezar una partida contigo.",
-    "drawOffer": "{{name}} ofrece tablas."
+    "drawOffer": "{{name}} ofrece tablas.",
+    "openMessages": "Abrir los mensajes",
+    "privateMessage": "{{name}} te ha enviado un mensaje privado."
   },
   "versus": "{{white}} contra {{black}}"
 }

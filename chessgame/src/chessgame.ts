@@ -172,10 +172,11 @@ class ChessGame {
   /**
    * Checks if the game ended in a draw.
    *
-   * @returns `true` if an automatic draw pattern ended the game and `false` otherwise.
+   * @returns `true` if the game ended in a draw (automatically or by claim) and `false` otherwise.
    */
   isDraw(): boolean {
     return (
+      this.game.getClaimedDraw() !== null ||
       this.game.isStalemate() ||
       this.game.isInsufficientMaterial() ||
       this.game.isDrawByFivefoldRepetition() ||
@@ -189,6 +190,8 @@ class ChessGame {
    * @returns A draw reason if the game ended in a draw, or null otherwise.
    */
   getDrawReason(): DrawReason | null {
+    const claimedDraw = this.game.getClaimedDraw();
+    if (claimedDraw) return claimedDraw;
     if (this.game.isStalemate()) return 'stalemate';
     if (this.game.isInsufficientMaterial()) return 'insufficient material';
     if (this.game.isDrawByFivefoldRepetition()) return 'fivefold-repetition';
@@ -208,6 +211,19 @@ class ChessGame {
       drawReasons.push('threefold-repetition');
     if (this.game.canClaimDrawByFiftyMoves()) drawReasons.push('fifty moves');
     return drawReasons;
+  }
+
+  /**
+   * Claims a draw in the current position, if allowed by the rules.
+   *
+   * A draw can be claimed after a threefold repetition of the same position
+   * or after fifty moves without a capture or a pawn move. Claiming a draw
+   * ends the game immediately, without requiring the opponent's agreement.
+   *
+   * @returns The reason of the claimed draw, or `null` if no draw can be claimed.
+   */
+  claimDraw(): DrawClaimReason | null {
+    return this.game.claimDraw();
   }
 
   /**

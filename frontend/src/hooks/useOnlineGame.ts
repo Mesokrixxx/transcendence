@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import ChessGame from '../../../chessgame/src/chessgame';
 import type { Move } from '../../../chessgame/src/chessgame.types';
 import { useAuth } from '../context/AuthContext';
+import { translateApiError } from '../services/apiErrors';
 import fetchAPI from '../services/fetchAPI';
 import { getFriends } from '../services/friends';
 import realtimeSocket, { type RealtimeEvent } from '../services/websocket';
@@ -15,6 +16,7 @@ type GamePlayer = {
   username?: string;
   displayName?: string | null;
   avatar?: string | null;
+  online?: boolean;
 };
 
 type RemoteGameState = {
@@ -33,6 +35,7 @@ type OnlineSide = {
   opponentId: number | undefined;
   opponentName: string | null;
   opponentAvatar: string | null;
+  opponentOnline: boolean | undefined;
   chatId: number | undefined;
 };
 
@@ -57,19 +60,6 @@ function readPosition(state: RemoteGameState, defaultStatus: GameStatus) {
       ? result
       : null,
   };
-}
-
-function apiErrorMessage(value: unknown, fallback: string) {
-  if (typeof value === 'string') return value;
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'error' in value &&
-    typeof value.error === 'string'
-  ) {
-    return value.error;
-  }
-  return fallback;
 }
 
 export function useOnlineGame(
@@ -115,7 +105,7 @@ export function useOnlineGame(
       if (!active) return;
 
       if (response.error || !isRemoteGameState(response.result)) {
-        setError(apiErrorMessage(response.result, t('unableToPlayThisMove')));
+        setError(translateApiError(response.result, t('unableToPlayThisMove')));
         return;
       }
 
@@ -136,6 +126,7 @@ export function useOnlineGame(
         opponentId: playerColor === 'white' ? blackId : whiteId,
         opponentName: opponent?.displayName?.trim() || opponent?.username || null,
         opponentAvatar: opponent?.avatar ?? null,
+        opponentOnline: opponent?.online,
         chatId: state.chatId,
       });
       setPosition(readPosition(state, 'PLAYING'));
@@ -182,15 +173,15 @@ export function useOnlineGame(
       });
 
       if (response.error || !isRemoteGameState(response.result)) {
-        setError(apiErrorMessage(response.result, t('unableToPlayThisMove')));
+        setError(translateApiError(response.result, t('unableToPlayThisMove')));
         return;
       }
 
       setPosition(readPosition(response.result, 'PLAYING'));
       onPositionChanged();
       setError('');
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : t('unableToPlayThisMove'));
+    } catch {
+      setError(t('unableToPlayThisMove'));
     }
   }
 
@@ -202,7 +193,7 @@ export function useOnlineGame(
       method: 'post',
     });
     if (response.error) {
-      setError(apiErrorMessage(response.result, t('unableToSendDrawRequest')));
+      setError(translateApiError(response.result, t('unableToSendDrawRequest')));
       return;
     }
 
@@ -210,15 +201,15 @@ export function useOnlineGame(
     setDrawRequestSent(true);
   }
 
-  async function resign() {
+  async function finishGame(action: 'resign' | 'draw', fallback: string) {
     if (gameId === undefined) return;
 
     const response = await fetchAPI<RemoteGameState>({
-      path: `/games/${gameId}/resign`,
+      path: `/games/${gameId}/${action}`,
       method: 'post',
     });
     if (response.error || !isRemoteGameState(response.result)) {
-      setError(t('unableToPlayThisMove'));
+      setError(translateApiError(response.result, fallback));
       return;
     }
 
@@ -228,11 +219,14 @@ export function useOnlineGame(
   }
 
   const opponentId = side?.opponentId;
-  const opponentIsOnline = opponentId === undefined
-    ? bothPlayersPresent
-    : friendPresence.get(opponentId) ??
+  const opponentIsOnline = bothPlayersPresent || (
+    opponentId !== undefined && (
+      friendPresence.get(opponentId) ??
+      side?.opponentOnline ??
       initialFriendPresence.get(opponentId) ??
-      bothPlayersPresent;
+      false
+    )
+  );
 
   return {
     ...position,
@@ -244,6 +238,7 @@ export function useOnlineGame(
     clearError: () => setError(''),
     playMove,
     offerDraw,
-    resign,
+    claimDraw: () => finishGame('draw', t('unableToClaimDraw')),
+    resign: () => finishGame('resign', t('unableToPlayThisMove')),
   };
 }

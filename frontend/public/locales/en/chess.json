@@ -5,6 +5,8 @@
   "checkmateWinner": "Checkmate — {{winner}} wins",
   "checkStatus": "{{turnStatus}} — check",
   "choosePromotionPiece": "Choose a promotion piece",
+  "claimDraw": "Claim draw",
+  "claimDrawAvailable": "You can claim a draw by the fifty-move rule or threefold repetition.",
   "demoGame": "Demo game",
   "demoGameForSpectators": "Demo game for spectators",
   "draw": "Draw",
@@ -26,6 +28,7 @@
   "offerDraw": "Offer draw",
   "drawRequestSent": "Draw request sent",
   "drawRequestDeclined": "The draw request was declined",
+  "unableToClaimDraw": "Unable to claim the draw.",
   "unableToSendDrawRequest": "Unable to send the draw request.",
   "resign": "Resign",
   "games": "Games",
@@ -78,8 +81,11 @@
     "loadError": "Could not load your friends.",
     "loading": "Loading your friends…",
     "noFriends": "You don’t have any friends on ChessMove yet.",
+    "noOnlineFriends": "None of your friends are online right now.",
     "online": "Online",
     "offline": "Offline",
+    "activeGame": "Game in progress",
+    "joinActiveGame": "Join game",
     "selectFriend": "Select a friend",
     "sendError": "Could not send the request",
     "sending": "Sending...",
@@ -89,7 +95,9 @@
   },
   "invitations": {
     "gameRequest": "{{name}} wants to start a game with you.",
-    "drawOffer": "{{name}} offers a draw."
+    "drawOffer": "{{name}} offers a draw.",
+    "openMessages": "Open messages",
+    "privateMessage": "{{name}} sent you a private message."
   },
   "versus": "{{white}} vs {{black}}"
 }

@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import fetchAPI from '../../services/fetchAPI';
+import { translateApiError } from '../../services/apiErrors';
 import i18n from '../../services/i18n';
 import Button from '../Button/Button';
 import UserMenu from '../UserMenu/UserMenu';
@@ -53,10 +54,7 @@ function Navbar() {
     function handleClickOutside(event: PointerEvent) {
       if (!(event.target instanceof Node)) return;
 
-      if (
-        headerRef.current &&
-        !headerRef.current.contains(event.target)
-      ) {
+      if (headerRef.current && !headerRef.current.contains(event.target)) {
         setShowMenu(false);
         setShowLanguages(false);
       } else if (
@@ -101,11 +99,12 @@ function Navbar() {
       });
 
       if (response.error === true) {
-        if (typeof response.result === 'string') {
-          setLogoutError(response.result);
-        } else {
-          setLogoutError(response.result.error);
-        }
+        setLogoutError(
+          translateApiError(
+            response.result,
+            t('unknownError', { ns: 'errors' }),
+          ),
+        );
 
         return;
       }
@@ -150,28 +149,19 @@ function Navbar() {
           id={menuId}
           $open={showMenu}
           onClick={(event) => {
-            if (
-              event.target instanceof Element &&
-              event.target.closest('a')
-            ) {
+            if (event.target instanceof Element && event.target.closest('a')) {
               closeMenus();
             }
           }}
         >
-          <Navigation
-            aria-label={t('mainNavigation', { ns: 'common' })}
-          >
-            <NavLink to="/play">
-              {t('play', { ns: 'navigation' })}
-            </NavLink>
+          <Navigation aria-label={t('mainNavigation', { ns: 'common' })}>
+            <NavLink to="/play">{t('play', { ns: 'navigation' })}</NavLink>
 
             <NavLink to="/training">
               {t('training', { ns: 'navigation' })}
             </NavLink>
 
-            <NavLink to="/watch">
-              {t('watch', { ns: 'navigation' })}
-            </NavLink>
+            <NavLink to="/watch">{t('watch', { ns: 'navigation' })}</NavLink>
 
             <NavLink to="/rankings">
               {t('rankings', { ns: 'navigation' })}
@@ -195,7 +185,6 @@ function Navbar() {
                 <Button to="/register" variant="primary">
                   {t('signUp', { ns: 'auth' })}
                 </Button>
-
               </>
             )}
 
@@ -218,9 +207,7 @@ function Navbar() {
                     <button
                       type="button"
                       lang="fr"
-                      aria-current={
-                        i18n.language === 'fr' ? 'true' : undefined
-                      }
+                      aria-current={i18n.language === 'fr' ? 'true' : undefined}
                       onClick={() => changeLanguage('fr')}
                     >
                       {t('french', { ns: 'navigation' })}
@@ -231,9 +218,7 @@ function Navbar() {
                     <button
                       type="button"
                       lang="es"
-                      aria-current={
-                        i18n.language === 'es' ? 'true' : undefined
-                      }
+                      aria-current={i18n.language === 'es' ? 'true' : undefined}
                       onClick={() => changeLanguage('es')}
                     >
                       {t('spanish', { ns: 'navigation' })}
@@ -244,9 +229,7 @@ function Navbar() {
                     <button
                       type="button"
                       lang="en"
-                      aria-current={
-                        i18n.language === 'en' ? 'true' : undefined
-                      }
+                      aria-current={i18n.language === 'en' ? 'true' : undefined}
                       onClick={() => changeLanguage('en')}
                     >
                       {t('english', { ns: 'navigation' })}
