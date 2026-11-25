@@ -63,14 +63,24 @@ export function useChat(chatId: number | undefined) {
             )
         }
 
-        getMessages(chatId)
-            .then((history) =>
-                update((current) => ({
-                    messages: mergeMessages(current.messages, history),
-                    isLoading: false,
-                }))
-            )
-            .catch(() => update(() => ({ hasError: true, isLoading: false })))
+        const loadHistory = () => {
+            getMessages(chatId)
+                .then((history) =>
+                    update((current) => ({
+                        messages: mergeMessages(current.messages, history),
+                        isLoading: false,
+                        hasError: false,
+                    }))
+                )
+                .catch(() =>
+                    update((current) => ({
+                        hasError: current.isLoading || current.hasError,
+                        isLoading: false,
+                    }))
+                )
+        }
+
+        loadHistory()
 
         // Shared socket: reconnects automatically and re-joins the chat.
         function handleEvent(event: RealtimeEvent) {
@@ -88,6 +98,11 @@ export function useChat(chatId: number | undefined) {
                             : message
                     ),
                 }))
+                return
+            }
+
+            if (event.type === 'chat.joined' && event.chatId === chatId) {
+                loadHistory()
                 return
             }
 
