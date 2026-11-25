@@ -170,6 +170,15 @@ function PlayGame({ gameId }: { gameId: number }) {
               />
             )}
 
+            {isRemoteGame && gameIsOver && (
+              <div role="group" aria-label={tChess('gameOver')}>
+                <Button to="/play">{tChess('newGame')}</Button>
+                <Button to="/" variant="secondary">
+                  {tChess('backHome', { ns: 'errors' })}
+                </Button>
+              </div>
+            )}
+
             {promotionMoves.length > 0 && (
               <div role="group" aria-label={tChess('choosePromotionPiece')}>
                 <p>{tChess('promoteYourPawn')}</p>

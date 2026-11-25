@@ -121,6 +121,7 @@ export default interface Resources {
       "title": "Play with a friend"
     },
     "localChessGame": "Local chess game",
+    "newGame": "New game",
     "noGamesInProgress": "No games in progress.",
     "offerDraw": "Offer draw",
     "opponent": "Opponent",
@@ -418,7 +419,7 @@ export default interface Resources {
     "loss": "LOSS",
     "noGamesPlayed": "No games played yet.",
     "noOpponentsAvailable": "No opponents available.",
-    "ongoing": "Ongoing",
+    "ongoing": "In progress",
     "peakElo": "Peak ELO",
     "progression": "Progression",
     "stalemate": "Stalemate",
