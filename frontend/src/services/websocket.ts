@@ -10,7 +10,6 @@ class RealtimeSocket {
   private readonly listeners = new Set<Listener>();
   private readonly chatIds = new Set<number>();
   private readonly gameIds = new Set<number>();
-  private readonly rankingsListeners = new Set<Listener>();
   private reconnectTimer: number | null = null;
   private enabled = false;
 
@@ -58,18 +57,6 @@ class RealtimeSocket {
     };
   }
 
-  joinRankings(listener: Listener) {
-    this.rankingsListeners.add(listener);
-    const unsubscribe = this.subscribe(listener);
-    if (this.rankingsListeners.size === 1) this.send({ type: 'rankings.join' });
-
-    return () => {
-      if (!this.rankingsListeners.delete(listener)) return;
-      if (this.rankingsListeners.size === 0) this.send({ type: 'rankings.leave' });
-      unsubscribe();
-    };
-  }
-
   send(message: object) {
     if (this.socket?.readyState !== WebSocket.OPEN) return false;
     this.socket.send(JSON.stringify(message));
@@ -96,8 +83,6 @@ class RealtimeSocket {
         this.send({ type: 'chat.join', chatId });
       for (const gameId of this.gameIds)
         this.send({ type: 'game.join', gameId });
-      if (this.rankingsListeners.size > 0)
-        this.send({ type: 'rankings.join' });
     });
 
     socket.addEventListener('message', (message) => {

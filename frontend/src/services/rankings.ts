@@ -9,7 +9,6 @@ export type Player = {
   wins: number
   games: number
   avatar?: string
-  online?: boolean
 }
 
 function getErrorMessage(error: APIError): string {

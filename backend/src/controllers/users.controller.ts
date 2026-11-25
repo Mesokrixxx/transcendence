@@ -4,7 +4,6 @@ import { getAll as getGamesByUserId } from '../services/games.service.js';
 import { createUserSchema, updateUserSchema } from '../validations/users.validation.js';
 import { query } from '../utils/query.js'
 import { treatError } from '../utils/errors.js';
-import { isOnline } from '../services/presence.service.js';
 import { broadcastProfileChanged } from '../services/profilePresence.service.js';
 
 export async function getUser(req: Request, res: Response) {
@@ -110,8 +109,5 @@ export async function getUsersByRanking(req: Request, res: Response) {
 	if (!result)
 		return res.status(200).json([]);
 
-	return res.status(200).json(result.map((rankingUser) => ({
-		...rankingUser,
-		online: isOnline(rankingUser.id),
-	})));
+	return res.status(200).json(result);
 }
