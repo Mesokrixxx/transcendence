@@ -128,7 +128,8 @@ function Rankings() {
 
   const searchTerm = search.trim().toLowerCase()
   const visiblePlayers = rankedPlayers.filter((player) =>
-      player.username.toLowerCase().includes(searchTerm))
+      player.username.toLowerCase().includes(searchTerm) ||
+      player.displayName?.toLowerCase().includes(searchTerm))
 
   let content: ReactNode
   if (isLoading) {
