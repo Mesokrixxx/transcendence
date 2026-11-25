@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import fetchAPI from '../../services/fetchAPI';
+import { translateApiError } from '../../services/apiErrors';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -109,20 +110,20 @@ export default function GameInvitationNotifications() {
           typeof message.content !== 'string' ||
           !sender ||
           typeof sender !== 'object'
-        ) return;
+        )
+          return;
 
         const senderData = sender as Record<string, unknown>;
         if (
           typeof senderData.username !== 'string' ||
           (senderData.profile !== null &&
             typeof senderData.profile !== 'object')
-        ) return;
+        )
+          return;
 
         const messageId = message.id;
         const content = message.content;
-        const profile = senderData.profile as
-          | { displayName?: unknown }
-          | null;
+        const profile = senderData.profile as { displayName?: unknown } | null;
         const senderName =
           typeof profile?.displayName === 'string' &&
           profile.displayName.trim() !== ''
@@ -152,13 +153,13 @@ export default function GameInvitationNotifications() {
     setPendingActionId(null);
     if (response.error) {
       setActionError(
-        typeof response.result === 'string'
-          ? response.result
-          : response.result.error,
+        translateApiError(response.result, t('unknownError', { ns: 'errors' })),
       );
       return;
     }
-    setInvitations((current) => current.filter((item) => item.id !== invitationId));
+    setInvitations((current) =>
+      current.filter((item) => item.id !== invitationId),
+    );
     navigate(`/play/${response.result.gameId}`);
   }
 
@@ -172,13 +173,13 @@ export default function GameInvitationNotifications() {
     setPendingActionId(null);
     if (response.error) {
       setActionError(
-        typeof response.result === 'string'
-          ? response.result
-          : response.result.error,
+        translateApiError(response.result, t('unknownError', { ns: 'errors' })),
       );
       return;
     }
-    setInvitations((current) => current.filter((item) => item.id !== invitationId));
+    setInvitations((current) =>
+      current.filter((item) => item.id !== invitationId),
+    );
   }
 
   async function acceptDrawOffer(offer: DrawOffer) {
@@ -191,9 +192,7 @@ export default function GameInvitationNotifications() {
     setPendingActionId(null);
     if (response.error) {
       setActionError(
-        typeof response.result === 'string'
-          ? response.result
-          : response.result.error,
+        translateApiError(response.result, t('unknownError', { ns: 'errors' })),
       );
       return;
     }
@@ -210,9 +209,7 @@ export default function GameInvitationNotifications() {
     setPendingActionId(null);
     if (response.error) {
       setActionError(
-        typeof response.result === 'string'
-          ? response.result
-          : response.result.error,
+        translateApiError(response.result, t('unknownError', { ns: 'errors' })),
       );
       return;
     }
@@ -223,7 +220,8 @@ export default function GameInvitationNotifications() {
     invitations.length === 0 &&
     drawOffers.length === 0 &&
     privateMessages.length === 0
-  ) return null;
+  )
+    return null;
 
   return (
     <NotificationLayer aria-live="polite">
@@ -258,8 +256,7 @@ export default function GameInvitationNotifications() {
       })}
       {drawOffers.map((offer) => {
         const name =
-          offer.sender.profile?.displayName?.trim() ||
-          offer.sender.username;
+          offer.sender.profile?.displayName?.trim() || offer.sender.username;
         return (
           <NotificationCard key={`draw-${offer.id}`} role="alert">
             <p>{t('invitations.drawOffer', { name })}</p>
@@ -294,8 +291,9 @@ export default function GameInvitationNotifications() {
           }}
         >
           <p>
-            <strong>{message.senderName}</strong> t&apos;a envoyé un message
-            privé.
+            {t('invitations.privateMessage', {
+              name: message.senderName,
+            })}
           </p>
           <p>{message.content}</p>
           <NotificationActions>
@@ -308,7 +306,7 @@ export default function GameInvitationNotifications() {
                 navigate('/chat');
               }}
             >
-              Ouvrir les messages
+              {t('invitations.openMessages')}
             </button>
             <button
               type="button"
@@ -318,7 +316,7 @@ export default function GameInvitationNotifications() {
                 )
               }
             >
-              Fermer
+              {t('close', { ns: 'common' })}
             </button>
           </NotificationActions>
         </PrivateMessageNotificationCard>

@@ -23,6 +23,7 @@
   "win": "VICTOIRE",
   "loss": "DÉFAITE",
   "draw": "NULLE",
+  "ongoing": "En cours",
   "currentStreakValue": "{{result}} × {{count}}",
   "checkmate": "Échec et mat",
   "forfeit": "Abandon",

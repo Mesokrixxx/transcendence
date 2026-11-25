@@ -5,6 +5,8 @@
   "checkmateWinner": "Échec et mat — les {{winner}} gagnent",
   "checkStatus": "{{turnStatus}} — échec",
   "choosePromotionPiece": "Choisissez une pièce de promotion",
+  "claimDraw": "Réclamer la nulle",
+  "claimDrawAvailable": "Tu peux réclamer la nulle grâce à la règle des cinquante coups ou à la triple répétition.",
   "demoGame": "Partie de démonstration",
   "demoGameForSpectators": "Partie de démonstration pour les spectateurs",
   "draw": "Partie nulle",
@@ -26,6 +28,7 @@
   "offerDraw": "Proposer la partie nulle",
   "drawRequestSent": "Demande de nulle envoyée",
   "drawRequestDeclined": "La demande de nulle a été refusée",
+  "unableToClaimDraw": "Impossible de réclamer la nulle.",
   "unableToSendDrawRequest": "Impossible d’envoyer la demande de nulle.",
   "resign": "Abandonner",
   "games": "Parties",
@@ -74,8 +77,11 @@
     "loadError": "Impossible de charger tes amis.",
     "loading": "Chargement de tes amis…",
     "noFriends": "Tu n’as pas encore d’amis dans ChessMove.",
+    "noOnlineFriends": "Aucun de tes amis n’est en ligne pour le moment.",
     "online": "En ligne",
     "offline": "Hors ligne",
+    "activeGame": "Partie en cours",
+    "joinActiveGame": "Rejoindre la partie",
     "checkError": "Impossible de vérifier la partie.",
     "chooseFriend": "Choisir un ami",
     "confirmMessage": "Es-tu sûr de vouloir envoyer une demande de partie à {{name}} ?",
@@ -89,7 +95,9 @@
   },
   "invitations": {
     "gameRequest": "{{name}} souhaite commencer une partie avec toi.",
-    "drawOffer": "{{name}} propose la partie nulle."
+    "drawOffer": "{{name}} propose la partie nulle.",
+    "openMessages": "Ouvrir les messages",
+    "privateMessage": "{{name}} t’a envoyé un message privé."
   },
   "versus": "{{white}} contre {{black}}"
 }

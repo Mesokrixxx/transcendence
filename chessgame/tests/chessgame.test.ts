@@ -73,4 +73,26 @@ describe('ChessGame', () => {
       type: 'rook',
     });
   });
+
+  it('claims a draw by threefold repetition', () => {
+    const game = new ChessGame();
+
+    const cycle: Move[] = [
+      { from: 'g1', to: 'f3' },
+      { from: 'g8', to: 'f6' },
+      { from: 'f3', to: 'g1' },
+      { from: 'f6', to: 'g8' },
+    ];
+
+    for (let i = 0; i < 3; i++)
+      for (const move of cycle) game.move(move);
+
+    expect(game.canClaimDraw()).toContain('threefold-repetition');
+    expect(game.claimDraw()).toBe('threefold-repetition');
+    expect(game.isDraw()).toBeTruthy();
+    expect(game.getDrawReason()).toBe('threefold-repetition');
+    expect(game.getGameStatus()).toBe(GameStatus.DRAW);
+    expect(game.isOver()).toBeTruthy();
+    expect(game.claimDraw()).toBeNull();
+  });
 });

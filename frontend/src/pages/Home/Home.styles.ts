@@ -18,7 +18,7 @@ export const Page = styled.div`
 export const Content = styled.main`
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.5fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
   align-items: center;
   gap: 24px;
 
@@ -50,11 +50,17 @@ export const Intro = styled.div`
   align-items: flex-start;
   gap: 24px;
   min-width: 0;
+  container-type: inline-size;
+  width: 100%;
 
   h1 {
-    font-size: clamp(32px, 4vw, 56px);
+    font-size: clamp(32px, 15cqi, 56px);
     font-weight: 800;
     line-height: 1.1;
+    max-width: 100%;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 
   span {

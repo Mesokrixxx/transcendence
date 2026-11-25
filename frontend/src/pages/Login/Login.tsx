@@ -10,6 +10,7 @@ import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
 import fetchAPI from '../../services/fetchAPI';
+import { translateApiError } from '../../services/apiErrors';
 import type { AuthUser } from '../../types/auth';
 import { Page } from '../Home/Home.styles';
 import { AuthContent, AuthPanel, AuthHint } from './Auth.styles';
@@ -28,13 +29,25 @@ function Login() {
     if (isLoading) return;
 
     const formData = new FormData(event.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const emailValue = formData.get('email');
+    const passwordValue = formData.get('password');
+    const email = typeof emailValue === 'string' ? emailValue.trim() : '';
+    const password = typeof passwordValue === 'string' ? passwordValue : '';
 
     setError('');
 
-    if (typeof email !== 'string' || typeof password !== 'string') {
+    if (email === '' || password === '') {
       setError(t('enterEmailAndPassword', { ns: 'auth' }));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError(t('invalidEmail', { ns: 'auth' }));
+      return;
+    }
+
+    if (password.length < 8) {
+      setError(t('passwordTooShort', { ns: 'auth' }));
       return;
     }
 
@@ -45,17 +58,18 @@ function Login() {
         path: '/auth/login',
         method: 'post',
         body: {
-          email: email.trim(),
+          email,
           password,
         },
       });
 
       if (response.error === true) {
-        if (typeof response.result === 'string') {
-          setError(response.result);
-        } else {
-          setError(response.result.error);
-        }
+        setError(
+          translateApiError(
+            response.result,
+            t('unknownError', { ns: 'errors' }),
+          ),
+        );
 
         return;
       }
@@ -76,6 +90,7 @@ function Login() {
           <h1>{t('welcomeBack', { ns: 'auth' })}</h1>
           <GitHubSignIn />
           <Form
+            noValidate
             onSubmit={(event) => {
               void handleSubmit(event);
             }}
@@ -88,6 +103,7 @@ function Login() {
               placeholder={t('emailPlaceholder', { ns: 'auth' })}
               autoComplete="email"
               required
+              onChange={() => setError('')}
             />
 
             <Input
@@ -98,24 +114,20 @@ function Login() {
               placeholder={t('yourPassword', { ns: 'auth' })}
               autoComplete="current-password"
               required
+              minLength={8}
+              onChange={() => setError('')}
             />
 
-            <Button type="submit">
-              {t('logIn', { ns: 'auth' })}
-            </Button>
+            <Button type="submit">{t('logIn', { ns: 'auth' })}</Button>
 
-            {isLoading && (
-              <p role="status">{t('loggingIn', { ns: 'auth' })}</p>
-            )}
+            {isLoading && <p role="status">{t('loggingIn', { ns: 'auth' })}</p>}
 
             {error && <p role="alert">{error}</p>}
           </Form>
 
           <AuthHint>
             {t('noAccountYet', { ns: 'auth' })}{' '}
-            <Link to="/register">
-              {t('signUp', { ns: 'auth' })}
-            </Link>
+            <Link to="/register">{t('signUp', { ns: 'auth' })}</Link>
           </AuthHint>
         </AuthPanel>
       </AuthContent>

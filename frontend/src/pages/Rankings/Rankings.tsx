@@ -56,6 +56,7 @@ function Rankings() {
   const { t } = useTranslation('rankings');
 
   const [players, setPlayers] = useState<Player[]>([])
+  const [onlinePlayerIds, setOnlinePlayerIds] = useState<Set<number> | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [search, setSearch] = useState('')
@@ -90,23 +91,34 @@ function Rankings() {
     return realtimeSocket.subscribe(updateProfile)
   }, [])
 
-  // Live online status (the backend only sends presence.changed for friends).
   useEffect(() => {
     function updatePresence(event: RealtimeEvent) {
       if (
-        event.type !== 'presence.changed' ||
+        event.type === 'rankings.presence.snapshot' &&
+        Array.isArray(event.onlineUserIds)
+      ) {
+        const ids: unknown[] = event.onlineUserIds
+        setOnlinePlayerIds(new Set(ids.filter((id) => typeof id === 'number')))
+        return
+      }
+
+      if (
+        event.type !== 'rankings.presence.changed' ||
         typeof event.userId !== 'number' ||
         typeof event.online !== 'boolean'
       ) return
 
-      const userId = event.userId
-      const online = event.online
-      setPlayers((current) => current.map((player) =>
-        player.id === userId ? { ...player, online } : player
-      ))
+      const { userId, online } = event
+      setOnlinePlayerIds((current) => {
+        if (current === null || current.has(userId) === online) return current
+        const next = new Set(current)
+        if (online) next.add(userId)
+        else next.delete(userId)
+        return next
+      })
     }
 
-    return realtimeSocket.subscribe(updatePresence)
+    return realtimeSocket.joinRankings(updatePresence)
   }, [])
 
   const rankedPlayers = players.map((player, index) => ({
@@ -116,7 +128,8 @@ function Rankings() {
 
   const searchTerm = search.trim().toLowerCase()
   const visiblePlayers = rankedPlayers.filter((player) =>
-      player.username.toLowerCase().includes(searchTerm))
+      player.username.toLowerCase().includes(searchTerm) ||
+      player.displayName?.toLowerCase().includes(searchTerm))
 
   let content: ReactNode
   if (isLoading) {
@@ -150,7 +163,10 @@ function Rankings() {
                                       <Avatar
                                           src={player.avatar||'/avatars/default.svg'}
                                           username={player.username}
-                                          isOnline={player.id === user?.id || player.online}
+                                          isOnline={
+                                            player.id === user?.id ||
+                                            (onlinePlayerIds?.has(player.id) ?? player.online)
+                                          }
                                           size={48}
                                       />
                                       <Link to={`/profile/${player.id}`}>

@@ -109,6 +109,7 @@ function ChatBox({ title, chatId }: ChatBoxProps) {
             setSendError(null)
           }}
           placeholder={t('writeAMessage', { ns: 'chat' })}
+          aria-label={t('writeAMessage', { ns: 'chat' })}
           maxLength={2048}
           disabled={!canWrite}
         />

@@ -534,6 +534,31 @@ describe('InternalGame', () => {
     expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
   });
 
+  it('claims a draw by fifty moves', () => {
+    const game = new InternalGame({
+      board: boardFromVisual([
+        '........',
+        '........',
+        '....k...',
+        '........',
+        '........',
+        '....BKN.',
+        '........',
+        '........',
+      ]),
+      halfMoves: 99,
+    });
+
+    expect(game.claimDraw()).toBeNull();
+    playLegalMove(game, { from: 'e3', to: 'd4' });
+    expect(game.canClaimDrawByFiftyMoves()).toBeTruthy();
+    expect(game.claimDraw()).toBe('fifty moves');
+    expect(game.getClaimedDraw()).toBe('fifty moves');
+    expect(game.canClaimDrawByFiftyMoves()).toBeFalsy();
+    expect(game.isOver()).toBeTruthy();
+    expect(game.claimDraw()).toBeNull();
+  });
+
   it('handles seventy-five moves rule', () => {
     const game = new InternalGame({
       board: boardFromVisual([
