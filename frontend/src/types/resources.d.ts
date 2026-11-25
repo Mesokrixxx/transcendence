@@ -121,6 +121,7 @@ export default interface Resources {
       "title": "Play with a friend"
     },
     "localChessGame": "Local chess game",
+    "newGame": "New game",
     "noGamesInProgress": "No games in progress.",
     "offerDraw": "Offer draw",
     "opponent": "Opponent",

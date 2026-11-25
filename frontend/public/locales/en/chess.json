@@ -24,6 +24,7 @@
   "joinGame": "Join game",
   "gameActions": "Game actions",
   "gameOver": "Game over",
+  "newGame": "New game",
   "winnerStatus": "{{winner}} won",
   "offerDraw": "Offer draw",
   "drawRequestSent": "Draw request sent",

@@ -24,6 +24,7 @@
   "joinGame": "Rejoindre la partie",
   "gameActions": "Actions de la partie",
   "gameOver": "Partie terminée",
+  "newGame": "Nouvelle partie",
   "winnerStatus": "Victoire des {{winner}}",
   "offerDraw": "Proposer la partie nulle",
   "drawRequestSent": "Demande de nulle envoyée",

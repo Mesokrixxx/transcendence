@@ -24,6 +24,7 @@
   "joinGame": "Unirse a la partida",
   "gameActions": "Acciones de la partida",
   "gameOver": "Partida terminada",
+  "newGame": "Nueva partida",
   "winnerStatus": "Victoria de las {{winner}}",
   "offerDraw": "Proponer tablas",
   "drawRequestSent": "Solicitud de tablas enviada",
