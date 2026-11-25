@@ -13,6 +13,7 @@
   "noFriendsYet": "No friends yet.",
   "noReceivedRequests": "No received requests.",
   "noSentRequests": "No sent requests.",
+  "notificationFriendRequest": "{{name}} sent you a friend request.",
   "receivedRequestsTitle": "Received requests",
   "remove": "Remove",
   "requestError": "Could not send the request.",

@@ -102,6 +102,30 @@ function WatchGame() {
     });
 
     function handleGameEvent(event: RealtimeEvent) {
+      if (
+        event.type === 'profile.changed' &&
+        typeof event.userId === 'number' &&
+        typeof event.username === 'string' &&
+        (event.avatar === null || typeof event.avatar === 'string')
+      ) {
+        const { userId: changedUserId, username, avatar } = event;
+        setPlayers((current) => {
+          if (!current) return current;
+          if (current.white.id === changedUserId)
+            return {
+              ...current,
+              white: { ...current.white, username, avatar },
+            };
+          if (current.black.id === changedUserId)
+            return {
+              ...current,
+              black: { ...current.black, username, avatar },
+            };
+          return current;
+        });
+        return;
+      }
+
       if (event.type !== 'game.updated' || !isGameUpdate(event.game)) return;
       if (isGameState(event.game)) setPlayers(event.game);
       setGame(new ChessGame(event.game.moves));
@@ -116,7 +140,7 @@ function WatchGame() {
   }, [gameId, isValidGameId, t]);
 
   function flipBoard() {
-    setOrientation((current) => current === 'white' ? 'black' : 'white');
+    setOrientation((current) => (current === 'white' ? 'black' : 'white'));
   }
 
   return (
@@ -129,7 +153,9 @@ function WatchGame() {
             <div className="opponent">
               <Avatar
                 src={players?.white.avatar || '/avatars/default.svg'}
-                username={players?.white.username ?? t('playerWhite', { ns: 'chess' })}
+                username={
+                  players?.white.username ?? t('playerWhite', { ns: 'chess' })
+                }
                 size={48}
               />
               <span>
@@ -141,7 +167,9 @@ function WatchGame() {
             <div className="opponent">
               <Avatar
                 src={players?.black.avatar || '/avatars/default.svg'}
-                username={players?.black.username ?? t('playerBlack', { ns: 'chess' })}
+                username={
+                  players?.black.username ?? t('playerBlack', { ns: 'chess' })
+                }
                 size={48}
               />
               <span>

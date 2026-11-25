@@ -13,6 +13,7 @@
   "noFriendsYet": "Todavía no tienes amigos.",
   "noReceivedRequests": "No hay solicitudes recibidas.",
   "noSentRequests": "No hay solicitudes enviadas.",
+  "notificationFriendRequest": "{{name}} te ha enviado una solicitud de amistad.",
   "receivedRequestsTitle": "Solicitudes recibidas",
   "remove": "Eliminar",
   "requestError": "No se pudo enviar la solicitud.",

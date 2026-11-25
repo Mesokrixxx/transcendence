@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import fetchAPI from '../../services/fetchAPI';
 import { translateApiError } from '../../services/apiErrors';
+import {
+  acceptFriendRequest,
+  getIncomingFriendRequests,
+  removeFriendRequest,
+} from '../../services/friends';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -44,6 +49,13 @@ type PrivateMessageNotification = {
   content: string;
 };
 
+type FriendRequest = {
+  id: number;
+  username: string;
+  displayName?: string | null;
+  avatar?: string;
+};
+
 export default function GameInvitationNotifications() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -52,6 +64,10 @@ export default function GameInvitationNotifications() {
   const [actionError, setActionError] = useState('');
   const [pendingActionId, setPendingActionId] = useState<number | null>(null);
   const [drawOffers, setDrawOffers] = useState<DrawOffer[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [pendingFriendRequestId, setPendingFriendRequestId] = useState<
+    number | null
+  >(null);
   const [privateMessages, setPrivateMessages] = useState<
     PrivateMessageNotification[]
   >([]);
@@ -72,11 +88,20 @@ export default function GameInvitationNotifications() {
     if (!response.error) setDrawOffers(response.result.offers);
   }
 
+  async function loadFriendRequests() {
+    try {
+      setFriendRequests(await getIncomingFriendRequests());
+    } catch {
+      // Keep the current list if the request fails.
+    }
+  }
+
   useEffect(() => {
     if (!user) return;
 
     void loadInvitations();
     void loadDrawOffers();
+    void loadFriendRequests();
 
     return realtimeSocket.subscribe((event: RealtimeEvent) => {
       if (event.type === 'game.invitation.received') {
@@ -96,6 +121,36 @@ export default function GameInvitationNotifications() {
         event.type === 'game.draw.declined'
       ) {
         void loadDrawOffers();
+      }
+      if (
+        event.type === 'friend.request.sent' ||
+        event.type === 'friend.request.accepted' ||
+        event.type === 'friend.changed' ||
+        event.type === 'friend.blocked' ||
+        event.type === 'friend.unblocked'
+      ) {
+        void loadFriendRequests();
+      }
+      if (
+        event.type === 'profile.changed' &&
+        typeof event.userId === 'number' &&
+        typeof event.username === 'string' &&
+        (event.avatar === null || typeof event.avatar === 'string') &&
+        (event.displayName === null || typeof event.displayName === 'string')
+      ) {
+        const { userId, username, avatar, displayName } = event;
+        setFriendRequests((current) =>
+          current.map((request) =>
+            request.id === userId
+              ? {
+                  ...request,
+                  username,
+                  avatar: typeof avatar === 'string' ? avatar : undefined,
+                  displayName,
+                }
+              : request,
+          ),
+        );
       }
       if (
         event.type === 'chat.message.received' &&
@@ -216,15 +271,72 @@ export default function GameInvitationNotifications() {
     setDrawOffers((current) => current.filter((item) => item.id !== offer.id));
   }
 
+  async function handleAcceptFriendRequest(requestId: number) {
+    setActionError('');
+    setPendingFriendRequestId(requestId);
+    try {
+      await acceptFriendRequest(requestId);
+      setFriendRequests((current) =>
+        current.filter((request) => request.id !== requestId),
+      );
+    } catch {
+      setActionError(t('actionError', { ns: 'friends' }));
+    } finally {
+      setPendingFriendRequestId(null);
+    }
+  }
+
+  async function handleDeclineFriendRequest(requestId: number) {
+    setActionError('');
+    setPendingFriendRequestId(requestId);
+    try {
+      await removeFriendRequest(requestId);
+      setFriendRequests((current) =>
+        current.filter((request) => request.id !== requestId),
+      );
+    } catch {
+      setActionError(t('actionError', { ns: 'friends' }));
+    } finally {
+      setPendingFriendRequestId(null);
+    }
+  }
+
   if (
     invitations.length === 0 &&
     drawOffers.length === 0 &&
+    friendRequests.length === 0 &&
     privateMessages.length === 0
   )
     return null;
 
   return (
     <NotificationLayer aria-live="polite">
+      {friendRequests.map((request) => {
+        const name = request.displayName?.trim() || request.username;
+        return (
+          <NotificationCard key={`friend-${request.id}`} role="alert">
+            <p>{t('notificationFriendRequest', { ns: 'friends', name })}</p>
+            <NotificationActions>
+              <button
+                type="button"
+                disabled={pendingFriendRequestId === request.id}
+                onClick={() => void handleAcceptFriendRequest(request.id)}
+              >
+                {pendingFriendRequestId === request.id
+                  ? t('processing', { ns: 'common' })
+                  : t('yes', { ns: 'common' })}
+              </button>
+              <button
+                type="button"
+                disabled={pendingFriendRequestId === request.id}
+                onClick={() => void handleDeclineFriendRequest(request.id)}
+              >
+                {t('no', { ns: 'common' })}
+              </button>
+            </NotificationActions>
+          </NotificationCard>
+        );
+      })}
       {invitations.map((invitation) => {
         const name =
           invitation.sender.profile?.displayName?.trim() ||
