@@ -26,22 +26,45 @@ type Player = {
   avatar: string | null;
 };
 
+type RemoteStatus = 'WAITING' | 'PLAYING' | 'OVER';
+type RemoteResult = 'DRAW' | 'WHITE' | 'BLACK' | null;
+
 type GameState = {
   moves: Move[];
   specChatId: number;
+  status?: RemoteStatus;
+  result?: RemoteResult;
+  endType?: string | null;
   white: Player;
   black: Player;
 };
 
+type GameUpdate = {
+  moves: Move[];
+  status?: unknown;
+  result?: unknown;
+  endType?: unknown;
+  specChatId?: unknown;
+  white?: unknown;
+  black?: unknown;
+};
+
+function readRemoteStatus(value: unknown): RemoteStatus | undefined {
+  return value === 'WAITING' || value === 'PLAYING' || value === 'OVER'
+    ? value
+    : undefined;
+}
+
+function readRemoteResult(value: unknown): RemoteResult {
+  return value === 'DRAW' || value === 'WHITE' || value === 'BLACK'
+    ? value
+    : null;
+}
+
 function isGameState(value: unknown): value is GameState {
   if (!isGameUpdate(value)) return false;
 
-  const game = value as {
-    moves?: unknown;
-    specChatId?: unknown;
-    white?: unknown;
-    black?: unknown;
-  };
+  const game = value;
   const isPlayer = (player: unknown): player is Player =>
     typeof player === 'object' &&
     player !== null &&
@@ -60,7 +83,7 @@ function isGameState(value: unknown): value is GameState {
   );
 }
 
-function isGameUpdate(value: unknown): value is { moves: Move[] } {
+function isGameUpdate(value: unknown): value is GameUpdate {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -74,6 +97,8 @@ function WatchGame() {
   const { t } = useTranslation();
   const [game, setGame] = useState(() => new ChessGame());
   const [players, setPlayers] = useState<GameState | null>(null);
+  const [remoteStatus, setRemoteStatus] = useState<RemoteStatus | undefined>();
+  const [remoteResult, setRemoteResult] = useState<RemoteResult>(null);
   const [orientation, setOrientation] = useState<'white' | 'black'>('white');
   const [error, setError] = useState('');
   const gameId = Number(gameIdParam);
@@ -98,6 +123,8 @@ function WatchGame() {
       }
       setPlayers(response.result);
       setGame(new ChessGame(response.result.moves));
+      setRemoteStatus(readRemoteStatus(response.result.status));
+      setRemoteResult(readRemoteResult(response.result.result));
       setError('');
     });
 
@@ -127,8 +154,12 @@ function WatchGame() {
       }
 
       if (event.type !== 'game.updated' || !isGameUpdate(event.game)) return;
-      if (isGameState(event.game)) setPlayers(event.game);
-      setGame(new ChessGame(event.game.moves));
+
+      const update = event.game;
+      setGame(new ChessGame(update.moves));
+      setRemoteStatus(readRemoteStatus(update.status));
+      setRemoteResult(readRemoteResult(update.result));
+      if (isGameState(update)) setPlayers(update);
       setError('');
     }
 
@@ -184,7 +215,11 @@ function WatchGame() {
               {t('flipBoard', { ns: 'chess' })}
             </Button>
 
-            <GameStatus game={game} />
+            <GameStatus
+              game={game}
+              remoteStatus={remoteStatus}
+              remoteResult={remoteResult}
+            />
           </GameInfo>
 
           <ChessBoard
