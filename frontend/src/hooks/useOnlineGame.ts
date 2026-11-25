@@ -56,9 +56,10 @@ function readPosition(state: RemoteGameState, defaultStatus: GameStatus) {
       status === 'WAITING' || status === 'PLAYING' || status === 'OVER'
         ? status
         : defaultStatus,
-    result: result === 'DRAW' || result === 'WHITE' || result === 'BLACK'
-      ? result
-      : null,
+    result:
+      result === 'DRAW' || result === 'WHITE' || result === 'BLACK'
+        ? result
+        : null,
   };
 }
 
@@ -74,7 +75,9 @@ export function useOnlineGame(
     readPosition({ moves: [] }, 'WAITING'),
   );
   const [bothPlayersPresent, setBothPlayersPresent] = useState(false);
-  const friendPresence = useFriendPresence(gameId !== undefined && userId != null);
+  const friendPresence = useFriendPresence(
+    gameId !== undefined && userId != null,
+  );
   const [initialFriendPresence, setInitialFriendPresence] = useState(
     () => new Map<number, boolean>(),
   );
@@ -90,9 +93,11 @@ export function useOnlineGame(
       .then(({ friends }) => {
         if (!active) return;
 
-        setInitialFriendPresence(new Map(
-          friends.map((friend) => [friend.id, friend.isOnline ?? false]),
-        ));
+        setInitialFriendPresence(
+          new Map(
+            friends.map((friend) => [friend.id, friend.isOnline ?? false]),
+          ),
+        );
       })
       .catch(() => {
         // Presence can still be received over the WebSocket.
@@ -124,7 +129,8 @@ export function useOnlineGame(
       setSide({
         playerColor,
         opponentId: playerColor === 'white' ? blackId : whiteId,
-        opponentName: opponent?.displayName?.trim() || opponent?.username || null,
+        opponentName:
+          opponent?.displayName?.trim() || opponent?.username || null,
         opponentAvatar: opponent?.avatar ?? null,
         opponentOnline: opponent?.online,
         chatId: state.chatId,
@@ -139,6 +145,29 @@ export function useOnlineGame(
         return;
       }
 
+      if (
+        event.type === 'profile.changed' &&
+        typeof event.userId === 'number' &&
+        typeof event.username === 'string' &&
+        (event.avatar === null || typeof event.avatar === 'string') &&
+        (event.displayName === null || typeof event.displayName === 'string')
+      ) {
+        const { userId: changedUserId, username, avatar, displayName } = event;
+        setSide((current) =>
+          current && current.opponentId === changedUserId
+            ? {
+                ...current,
+                opponentName:
+                  typeof displayName === 'string' && displayName.trim() !== ''
+                    ? displayName
+                    : username,
+                opponentAvatar: typeof avatar === 'string' ? avatar : null,
+              }
+            : current,
+        );
+        return;
+      }
+
       if (event.type === 'game.presence') {
         if (
           event.gameId === gameId &&
@@ -149,7 +178,8 @@ export function useOnlineGame(
         return;
       }
 
-      if (event.type !== 'game.updated' || !isRemoteGameState(event.game)) return;
+      if (event.type !== 'game.updated' || !isRemoteGameState(event.game))
+        return;
 
       setPosition(readPosition(event.game, 'PLAYING'));
       onPositionChanged();
@@ -193,7 +223,9 @@ export function useOnlineGame(
       method: 'post',
     });
     if (response.error) {
-      setError(translateApiError(response.result, t('unableToSendDrawRequest')));
+      setError(
+        translateApiError(response.result, t('unableToSendDrawRequest')),
+      );
       return;
     }
 
@@ -219,14 +251,13 @@ export function useOnlineGame(
   }
 
   const opponentId = side?.opponentId;
-  const opponentIsOnline = bothPlayersPresent || (
-    opponentId !== undefined && (
-      friendPresence.get(opponentId) ??
-      side?.opponentOnline ??
-      initialFriendPresence.get(opponentId) ??
-      false
-    )
-  );
+  const opponentIsOnline =
+    bothPlayersPresent ||
+    (opponentId !== undefined &&
+      (friendPresence.get(opponentId) ??
+        side?.opponentOnline ??
+        initialFriendPresence.get(opponentId) ??
+        false));
 
   return {
     ...position,

@@ -13,6 +13,7 @@
   "noFriendsYet": "Aucun ami pour le moment.",
   "noReceivedRequests": "Aucune demande reçue.",
   "noSentRequests": "Aucune demande envoyée.",
+  "notificationFriendRequest": "{{name}} t’a envoyé une demande d’ami.",
   "receivedRequestsTitle": "Demandes reçues",
   "remove": "Supprimer",
   "requestError": "Impossible d'envoyer la demande.",

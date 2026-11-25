@@ -7,6 +7,7 @@ import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import { getFriends, type FriendUser } from '../../services/friends';
 import { useFriendPresence } from '../../hooks/useFriendPresence';
+import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
 import fetchAPI from '../../services/fetchAPI';
 import { useAuth } from '../../context/AuthContext';
 import { Page } from '../../pages/Home/Home.styles';
@@ -50,6 +51,37 @@ export default function PlayLobby() {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    function updateProfile(event: RealtimeEvent) {
+      if (
+        event.type !== 'profile.changed' ||
+        typeof event.userId !== 'number' ||
+        typeof event.username !== 'string' ||
+        (event.avatar !== null && typeof event.avatar !== 'string') ||
+        (event.displayName !== null && typeof event.displayName !== 'string')
+      )
+        return;
+
+      const { userId, username, avatar, displayName } = event;
+      setFriends((current) =>
+        current
+          ? current.map((friend) =>
+              friend.id === userId
+                ? {
+                    ...friend,
+                    username,
+                    avatar: typeof avatar === 'string' ? avatar : undefined,
+                    displayName,
+                  }
+                : friend,
+            )
+          : current,
+      );
+    }
+
+    return realtimeSocket.subscribe(updateProfile);
   }, []);
 
   useEffect(() => {
