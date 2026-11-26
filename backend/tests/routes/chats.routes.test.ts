@@ -54,7 +54,9 @@ describe('chat routes', () => {
     const response = await request(app).get('/api/chats/4');
 
     expect(response.status).toBe(403);
-    expect(response.body).toEqual({ error: 'user is not a member of this chat' });
+    expect(response.body).toEqual({
+      error: 'user is not a member of this chat',
+    });
     expect(chatService.get).not.toHaveBeenCalled();
   });
 

@@ -1,4 +1,4 @@
-import { defineConfig } from 'i18next-cli'
+import { defineConfig } from 'i18next-cli';
 
 export default defineConfig({
   locales: ['en', 'fr', 'es'],
@@ -12,4 +12,4 @@ export default defineConfig({
     input: 'public/locales/en/*.json',
     output: 'src/types/i18next.d.ts',
   },
-})
+});

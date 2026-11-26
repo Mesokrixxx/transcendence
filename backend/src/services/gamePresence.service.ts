@@ -7,7 +7,8 @@ export function subscribe(
   socket: WebSocket,
   playerId: number | null,
 ) {
-  const sockets = connections.get(gameId) ?? new Map<WebSocket, number | null>();
+  const sockets =
+    connections.get(gameId) ?? new Map<WebSocket, number | null>();
   sockets.set(socket, playerId);
   connections.set(gameId, sockets);
   broadcastPresence(gameId);

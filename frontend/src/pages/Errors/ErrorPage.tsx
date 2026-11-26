@@ -3,7 +3,13 @@ import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
-import { ErrorContent, ErrorCard, ErrorIllustration, ErrorCode, ErrorActions } from './ErrorPage.styles';
+import {
+  ErrorContent,
+  ErrorCard,
+  ErrorIllustration,
+  ErrorCode,
+  ErrorActions,
+} from './ErrorPage.styles';
 
 type ErrorPageProps = {
   code: 401 | 403 | 404 | 500;
@@ -13,10 +19,10 @@ function ErrorPage({ code }: ErrorPageProps) {
   const { t } = useTranslation('errors');
 
   const pieces = {
-  401: '/pieces/kosal/white_pawn.svg',
-  403: '/pieces/kosal/white_rook.svg',
-  404: '/pieces/kosal/white_knight.svg',
-  500: '/pieces/kosal/white_king.svg',
+    401: '/pieces/kosal/white_pawn.svg',
+    403: '/pieces/kosal/white_rook.svg',
+    404: '/pieces/kosal/white_knight.svg',
+    500: '/pieces/kosal/white_king.svg',
   };
 
   const messages = {
@@ -46,28 +52,26 @@ function ErrorPage({ code }: ErrorPageProps) {
 
       <ErrorContent className="container">
         <ErrorCard aria-labelledby="error-title">
-         <ErrorIllustration aria-hidden="true">
+          <ErrorIllustration aria-hidden="true">
             <img
-                src={pieces[code]}
-                alt=""
-                className={code === 500 ? 'fallen' : undefined}
+              src={pieces[code]}
+              alt=""
+              className={code === 500 ? 'fallen' : undefined}
             />
 
             <ErrorCode>
-                <span>{String(code).slice(0, 1)}</span>
-                {String(code).slice(1)}
+              <span>{String(code).slice(0, 1)}</span>
+              {String(code).slice(1)}
             </ErrorCode>
-         </ErrorIllustration>
+          </ErrorIllustration>
 
-          <h1 id="error-title" className="visually-hidden">{message.title}</h1>
+          <h1 id="error-title" className="visually-hidden">
+            {message.title}
+          </h1>
           <p>{message.description}</p>
 
           <ErrorActions>
-            {code === 401 && (
-              <Button to="/login">
-                {t('signIn')}
-              </Button>
-            )}
+            {code === 401 && <Button to="/login">{t('signIn')}</Button>}
 
             {code === 500 && (
               <Button onClick={() => window.location.reload()}>

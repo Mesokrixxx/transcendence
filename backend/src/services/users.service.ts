@@ -1,5 +1,5 @@
-import prisma from '../db/prisma.js'
-import bcrypt from 'bcrypt'
+import prisma from '../db/prisma.js';
+import bcrypt from 'bcrypt';
 import { BackendError } from '../types/backendError.types.js';
 import { randomBytes } from 'node:crypto';
 import { PrismaClientKnownRequestError } from '../generated/prisma/internal/prismaNamespace.js';
@@ -89,19 +89,27 @@ export async function create(name: string, email: string, password: string) {
   return get(user.id);
 }
 
-export async function createGithubUser(login: string, email: string, githubId: number) {
+export async function createGithubUser(
+  login: string,
+  email: string,
+  githubId: number,
+) {
   const maxUsernameLength = 32;
   const randomSize = Math.floor(maxUsernameLength / 3);
 
   function getRandomUsername(): string {
-    const base = login.slice(0, Math.min(login.length, maxUsernameLength - randomSize));
+    const base = login.slice(
+      0,
+      Math.min(login.length, maxUsernameLength - randomSize),
+    );
     const random = randomBytes(Math.floor(randomSize / 2)).toString('hex');
     return base + random;
   }
 
   login = login.trim();
   if (login.length === 0) login = getRandomUsername();
-  else if (login.length > maxUsernameLength) login = login.slice(0, maxUsernameLength);
+  else if (login.length > maxUsernameLength)
+    login = login.slice(0, maxUsernameLength);
 
   for (let tries = 0; tries < 42; tries++) {
     const username = !tries ? login : getRandomUsername();
@@ -187,7 +195,9 @@ export async function update(
   }
 
   const profileData = {
-    ...(data.displayName !== undefined ? { displayName: data.displayName } : {}),
+    ...(data.displayName !== undefined
+      ? { displayName: data.displayName }
+      : {}),
     ...(data.avatar !== undefined ? { avatar: data.avatar } : {}),
   };
 

@@ -1,5 +1,5 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,15 +10,15 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://backend:8080',
-        changeOrigin: true
+        changeOrigin: true,
       },
       '/ws': {
         target: 'https://backend:8080',
         changeOrigin: true,
         secure: false,
-        ws: true
-      }
-    }
+        ws: true,
+      },
+    },
   },
   preview: {
     host: '0.0.0.0',
@@ -26,14 +26,14 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://backend:8080',
-        changeOrigin: true
+        changeOrigin: true,
       },
       '/ws': {
         target: 'https://backend:8080',
         changeOrigin: true,
         secure: false,
-        ws: true
-      }
-    }
-  }
-})
+        ws: true,
+      },
+    },
+  },
+});

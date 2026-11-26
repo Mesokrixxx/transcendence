@@ -14,7 +14,7 @@ const namespaces = [
   'rankings',
   'legal',
   'errors',
-  'friends'
+  'friends',
 ];
 
 const supportedLanguages = ['en', 'fr', 'es'];
@@ -27,7 +27,7 @@ const language =
       ? browserLanguage
       : 'en';
 
-i18n
+void i18n
   .use(backend)
   .use(initReactI18next)
   .init({

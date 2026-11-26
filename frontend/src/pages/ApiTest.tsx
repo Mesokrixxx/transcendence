@@ -1,4 +1,3 @@
-
 // import { fakerEN as faker } from '@faker-js/faker'
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +41,7 @@ function ApiTest() {
       </Button>
 
       <pre style={{ whiteSpace: 'pre-wrap', marginTop: 24 }}>
-        {isLoading
-          ? t('loading')
-          : result ?? t('testNotStarted')}
+        {isLoading ? t('loading') : (result ?? t('testNotStarted'))}
       </pre>
     </main>
   );

@@ -6,8 +6,8 @@ const router = Router();
 router.get('/me', requireAuth, controller.getProgress);
 router.get('/users/:id/featured', requireAuth, controller.getFeaturedBadges);
 router.patch(
-	'/badges/:code/featured',
-	requireAuth,
-	controller.setBadgeFeatured,
+  '/badges/:code/featured',
+  requireAuth,
+  controller.setBadgeFeatured,
 );
 export default router;

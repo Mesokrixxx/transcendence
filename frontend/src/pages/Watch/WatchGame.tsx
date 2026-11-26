@@ -105,28 +105,29 @@ function WatchGame() {
   const isValidGameId = Number.isInteger(gameId) && gameId > 0;
 
   useEffect(() => {
-    if (!isValidGameId) {
-      setError(t('gameNotFound', { ns: 'chess' }));
-      return;
-    }
+    if (!isValidGameId) return;
 
     let active = true;
 
-    fetchAPI<GameState>({
+    void fetchAPI<GameState>({
       path: `/games/${gameId}`,
       method: 'get',
-    }).then((response) => {
-      if (!active) return;
-      if (response.error || !isGameState(response.result)) {
-        setError(t('gameNotFound', { ns: 'chess' }));
-        return;
-      }
-      setPlayers(response.result);
-      setGame(new ChessGame(response.result.moves));
-      setRemoteStatus(readRemoteStatus(response.result.status));
-      setRemoteResult(readRemoteResult(response.result.result));
-      setError('');
-    });
+    })
+      .then((response) => {
+        if (!active) return;
+        if (response.error || !isGameState(response.result)) {
+          setError(t('gameNotFound', { ns: 'chess' }));
+          return;
+        }
+        setPlayers(response.result);
+        setGame(new ChessGame(response.result.moves));
+        setRemoteStatus(readRemoteStatus(response.result.status));
+        setRemoteResult(readRemoteResult(response.result.result));
+        setError('');
+      })
+      .catch(() => {
+        if (active) setError(t('gameNotFound', { ns: 'chess' }));
+      });
 
     function handleGameEvent(event: RealtimeEvent) {
       if (
@@ -209,7 +210,11 @@ function WatchGame() {
               </span>
             </div>
 
-            {error && <p role="alert">{error}</p>}
+            {(!isValidGameId || error) && (
+              <p role="alert">
+                {isValidGameId ? error : t('gameNotFound', { ns: 'chess' })}
+              </p>
+            )}
 
             <Button variant="secondary" onClick={flipBoard}>
               {t('flipBoard', { ns: 'chess' })}

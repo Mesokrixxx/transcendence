@@ -65,7 +65,8 @@ class RealtimeSocket {
 
     return () => {
       if (!this.rankingsListeners.delete(listener)) return;
-      if (this.rankingsListeners.size === 0) this.send({ type: 'rankings.leave' });
+      if (this.rankingsListeners.size === 0)
+        this.send({ type: 'rankings.leave' });
       unsubscribe();
     };
   }
@@ -96,8 +97,7 @@ class RealtimeSocket {
         this.send({ type: 'chat.join', chatId });
       for (const gameId of this.gameIds)
         this.send({ type: 'game.join', gameId });
-      if (this.rankingsListeners.size > 0)
-        this.send({ type: 'rankings.join' });
+      if (this.rankingsListeners.size > 0) this.send({ type: 'rankings.join' });
     });
 
     socket.addEventListener('message', (message) => {

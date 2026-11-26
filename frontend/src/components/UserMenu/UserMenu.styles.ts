@@ -1,10 +1,10 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const AccountMenu = styled.div`
   position: relative;
   min-width: 0;
   max-width: 100%;
-`
+`;
 
 export const AccountButton = styled.button`
   display: flex;
@@ -34,7 +34,7 @@ export const AccountButton = styled.button`
     outline: 2px solid var(--color-primary);
     outline-offset: 4px;
   }
-`
+`;
 
 export const AccountOptions = styled.nav`
   position: absolute;
@@ -79,4 +79,4 @@ export const AccountOptions = styled.nav`
     opacity: 0.6;
     cursor: wait;
   }
-`
+`;

@@ -75,7 +75,7 @@ function Login() {
       }
 
       setUser(response.result);
-      navigate('/profile', { replace: true });
+      void navigate('/profile', { replace: true });
     } finally {
       setIsLoading(false);
     }

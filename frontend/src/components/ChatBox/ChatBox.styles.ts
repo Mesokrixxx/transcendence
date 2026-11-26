@@ -82,8 +82,8 @@ export const Placeholder = styled.p`
   margin: 0;
   padding: 12px 16px;
   text-align: center;
-  color: var(--color-text-secondary)
-`
+  color: var(--color-text-secondary);
+`;
 
 export const Notice = styled.p<{ $isError?: boolean }>`
   margin: 0;
@@ -91,4 +91,4 @@ export const Notice = styled.p<{ $isError?: boolean }>`
   font-size: 13px;
   color: ${({ $isError }) =>
     $isError ? 'var(--color-error, #f87171)' : 'var(--color-text-secondary)'};
-`
+`;

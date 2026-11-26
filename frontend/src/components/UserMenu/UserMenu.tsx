@@ -11,12 +11,7 @@ type UserMenuProps = {
   onLogout: () => Promise<void>;
 };
 
-function UserMenu({
-  username,
-  avatar,
-  isLoggingOut,
-  onLogout,
-}: UserMenuProps) {
+function UserMenu({ username, avatar, isLoggingOut, onLogout }: UserMenuProps) {
   const { t } = useTranslation('navigation');
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -70,7 +65,12 @@ function UserMenu({
         onClick={() => setIsOpen((open) => !open)}
       >
         <span aria-hidden="true">
-          <Avatar src={avatar || '/avatars/default.svg'} username={username} size={36} isOnline={true} />
+          <Avatar
+            src={avatar || '/avatars/default.svg'}
+            username={username}
+            size={36}
+            isOnline={true}
+          />
         </span>
 
         <span className="username">{username}</span>
@@ -79,10 +79,7 @@ function UserMenu({
       </AccountButton>
 
       {isOpen && (
-        <AccountOptions
-          id={optionsId}
-          aria-label={t('accountNavigation')}
-        >
+        <AccountOptions id={optionsId} aria-label={t('accountNavigation')}>
           <Link to="/profile" onClick={() => setIsOpen(false)}>
             {t('profile')}
           </Link>

@@ -111,7 +111,7 @@ function Navbar() {
 
       setUser(null);
       closeMenus();
-      navigate('/login', { replace: true });
+      void navigate('/login', { replace: true });
     } finally {
       setIsLoggingOut(false);
     }

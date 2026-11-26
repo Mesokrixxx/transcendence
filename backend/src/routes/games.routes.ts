@@ -5,12 +5,28 @@ import { requireAuth } from '../middlewares/auth.middleware.js';
 const router = Router();
 
 router.get('/', requireAuth, gamesController.listGames);
-router.get('/active/:friendId', requireAuth, gamesController.getActiveGameWithFriend);
+router.get(
+  '/active/:friendId',
+  requireAuth,
+  gamesController.getActiveGameWithFriend,
+);
 router.get('/invitations', requireAuth, gamesController.getInvitations);
 router.get('/draw/offers', requireAuth, gamesController.getDrawOffers);
-router.post('/invitations/:friendId', requireAuth, gamesController.createInvitation);
-router.post('/invitations/:id/accept', requireAuth, gamesController.acceptInvitation);
-router.post('/invitations/:id/decline', requireAuth, gamesController.declineInvitation);
+router.post(
+  '/invitations/:friendId',
+  requireAuth,
+  gamesController.createInvitation,
+);
+router.post(
+  '/invitations/:id/accept',
+  requireAuth,
+  gamesController.acceptInvitation,
+);
+router.post(
+  '/invitations/:id/decline',
+  requireAuth,
+  gamesController.declineInvitation,
+);
 router.get('/:id', requireAuth, gamesController.getGame);
 router.post('/', requireAuth, gamesController.createGame); // see CreateGameBody
 router.post('/:id/moves', requireAuth, gamesController.playMove);

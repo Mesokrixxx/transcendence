@@ -141,7 +141,7 @@ export default function PlayLobby() {
     (friend) => friend.id === selectedFriendId,
   );
 
-  async function handleFriendSelected(friendId: number) {
+  function handleFriendSelected(friendId: number) {
     setSelectedFriendId(friendId);
     setActionError('');
   }
@@ -158,7 +158,7 @@ export default function PlayLobby() {
       });
       if (activeResponse.error) throw new Error(t('lobby.checkError'));
       if (activeResponse.result) {
-        navigate(`/play/${activeResponse.result.id}`);
+        void navigate(`/play/${activeResponse.result.id}`);
         return;
       }
       setConfirmFriendId(selectedFriendId);
@@ -184,7 +184,7 @@ export default function PlayLobby() {
       });
       if (invitationResponse.error) throw new Error(t('lobby.sendError'));
       if (invitationResponse.result.gameId) {
-        navigate(`/play/${invitationResponse.result.gameId}`);
+        void navigate(`/play/${invitationResponse.result.gameId}`);
         return;
       }
       setConfirmFriendId(null);
@@ -256,7 +256,7 @@ export default function PlayLobby() {
                   <Button
                     variant="primary"
                     onClick={() =>
-                      navigate(`/play/${selectedFriend.activeGameId}`)
+                      void navigate(`/play/${selectedFriend.activeGameId}`)
                     }
                   >
                     {t('lobby.joinActiveGame')}

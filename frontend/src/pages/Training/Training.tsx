@@ -12,20 +12,14 @@ import ChessBoard from '../../components/ChessBoard/ChessBoard';
 import GameStatus from '../../components/GameStatus/GameStatus';
 import Button from '../../components/Button/Button';
 import { Page } from '../Home/Home.styles';
-import {
-  TrainingContent,
-  GameArea,
-  GameInfo,
-} from './Training.styles';
+import { TrainingContent, GameArea, GameInfo } from './Training.styles';
 
 function Training() {
   const { t } = useTranslation('chess');
   const [game, setGame] = useState(() => new ChessGame());
-  const [orientation, setOrientation] =
-    useState<'white' | 'black'>('white');
+  const [orientation, setOrientation] = useState<'white' | 'black'>('white');
   const [isRotating, setIsRotating] = useState(false);
-  const [selectedSquare, setSelectedSquare] =
-    useState<SquareName | null>(null);
+  const [selectedSquare, setSelectedSquare] = useState<SquareName | null>(null);
   const [promotionMoves, setPromotionMoves] = useState<Move[]>([]);
   const [hasError, setHasError] = useState(false);
 
@@ -121,17 +115,11 @@ function Training() {
             <GameStatus game={game} />
 
             {promotionMoves.length > 0 && (
-              <div
-                role="group"
-                aria-label={t('choosePromotionPiece')}
-              >
+              <div role="group" aria-label={t('choosePromotionPiece')}>
                 <p>{t('promoteYourPawn')}</p>
 
                 {promotionMoves.map((move) => (
-                  <Button
-                    key={move.promotion}
-                    onClick={() => playMove(move)}
-                  >
+                  <Button key={move.promotion} onClick={() => playMove(move)}>
                     {promotionLabels[move.promotion ?? '']}
                   </Button>
                 ))}
@@ -145,9 +133,7 @@ function Training() {
               </div>
             )}
 
-            {hasError && (
-              <p role="alert">{t('unableToPlayThisMove')}</p>
-            )}
+            {hasError && <p role="alert">{t('unableToPlayThisMove')}</p>}
           </GameInfo>
 
           <ChessBoard
@@ -156,11 +142,7 @@ function Training() {
             selectedSquare={selectedSquare}
             onSquareClick={handleSquareClick}
             legalMoves={legalMoves}
-            disabled={
-              game.isOver() ||
-              promotionMoves.length > 0 ||
-              isRotating
-            }
+            disabled={game.isOver() || promotionMoves.length > 0 || isRotating}
           />
         </GameArea>
       </TrainingContent>

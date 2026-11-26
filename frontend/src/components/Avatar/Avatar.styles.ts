@@ -4,7 +4,7 @@ export const AvatarWrapper = styled.div<{ $size: number }>`
   position: relative;
   width: ${({ $size }) => $size}px;
   height: ${({ $size }) => $size}px;
-    font-size: ${({ $size }) => Math.max(24, $size * 0.45)}px;
+  font-size: ${({ $size }) => Math.max(24, $size * 0.45)}px;
   flex-shrink: 0;
 `;
 
@@ -36,8 +36,8 @@ export const StatusDot = styled.span<{ $isOnline: boolean }>`
   transform: translate(-50%, -50%);
 
   box-sizing: border-box;
-  width: max(11px,22%);
-  height: max(11px,22%);
+  width: max(11px, 22%);
+  height: max(11px, 22%);
   border-radius: 50%;
   border: 2px solid var(--color-surface);
   background: ${({ $isOnline }) => ($isOnline ? 'var(--color-accent)' : 'var(--color-text-secondary)')};
