@@ -54,6 +54,7 @@ function RankBadge({ rank }: { rank: number }) {
 
 function Rankings() {
   const { t } = useTranslation('rankings');
+  const { user } = useAuth()
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [onlinePlayerIds, setOnlinePlayerIds] = useState<Set<number> | null>(
@@ -72,7 +73,37 @@ function Rankings() {
   }, []);
 
   useEffect(() => {
-    function updateProfile(event: RealtimeEvent) {
+    let active = true
+    let latestLoad = 0
+
+    async function loadFriends() {
+      const load = ++latestLoad
+      try {
+        const { friends } = await getFriends()
+        if (active && load === latestLoad) {
+          setFriendStatuses(new Map(friends.map((friend) => [
+            friend.id,
+            friend.isOnline ?? false,
+          ])))
+        }
+      } catch {
+        // A friends API failure does not prevent the rankings from loading.
+      }
+    }
+
+    function handleRealtimeEvent(event: RealtimeEvent) {
+      if (
+        event.type === 'presence.snapshot' ||
+        event.type === 'friend.request.sent' ||
+        event.type === 'friend.request.accepted' ||
+        event.type === 'friend.changed' ||
+        event.type === 'friend.blocked' ||
+        event.type === 'friend.unblocked'
+      ) {
+        void loadFriends()
+        return
+      }
+
       if (
         event.type !== 'profile.changed' ||
         typeof event.userId !== 'number' ||

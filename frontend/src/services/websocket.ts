@@ -10,7 +10,6 @@ class RealtimeSocket {
   private readonly listeners = new Set<Listener>();
   private readonly chatIds = new Set<number>();
   private readonly gameIds = new Set<number>();
-  private readonly rankingsListeners = new Set<Listener>();
   private reconnectTimer: number | null = null;
   private enabled = false;
 
