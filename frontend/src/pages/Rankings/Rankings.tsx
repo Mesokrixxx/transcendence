@@ -18,9 +18,11 @@ import {
 } from './Rankings.styles';
 import Avatar from '../../components/Avatar/Avatar';
 import { useTranslation, Trans } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext'
+import { useFriendPresence } from '../../hooks/useFriendPresence'
+import { getFriends } from '../../services/friends'
 import { getRankings , type Player } from '../../services/rankings'
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket'
-import { useAuth } from '../../context/AuthContext'
 
 function getWinRate(wins: number, games: number): number {
   if (games === 0) return 0;
@@ -54,13 +56,14 @@ function RankBadge({ rank }: { rank: number }) {
 
 function Rankings() {
   const { t } = useTranslation('rankings');
+  const { user } = useAuth()
 
   const [players, setPlayers] = useState<Player[]>([])
-  const [onlinePlayerIds, setOnlinePlayerIds] = useState<Set<number> | null>(null)
+  const [friendStatuses, setFriendStatuses] = useState(() => new Map<number, boolean>())
+  const friendPresence = useFriendPresence()
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [search, setSearch] = useState('')
-  const { user } = useAuth()
 
   useEffect(() => {
       getRankings()
@@ -70,7 +73,37 @@ function Rankings() {
   }, [])
 
   useEffect(() => {
-    function updateProfile(event: RealtimeEvent) {
+    let active = true
+    let latestLoad = 0
+
+    async function loadFriends() {
+      const load = ++latestLoad
+      try {
+        const { friends } = await getFriends()
+        if (active && load === latestLoad) {
+          setFriendStatuses(new Map(friends.map((friend) => [
+            friend.id,
+            friend.isOnline ?? false,
+          ])))
+        }
+      } catch {
+        // A friends API failure does not prevent the rankings from loading.
+      }
+    }
+
+    function handleRealtimeEvent(event: RealtimeEvent) {
+      if (
+        event.type === 'presence.snapshot' ||
+        event.type === 'friend.request.sent' ||
+        event.type === 'friend.request.accepted' ||
+        event.type === 'friend.changed' ||
+        event.type === 'friend.blocked' ||
+        event.type === 'friend.unblocked'
+      ) {
+        void loadFriends()
+        return
+      }
+
       if (
         event.type !== 'profile.changed' ||
         typeof event.userId !== 'number' ||
@@ -88,43 +121,24 @@ function Rankings() {
       ))
     }
 
-    return realtimeSocket.subscribe(updateProfile)
-  }, [])
-
-  useEffect(() => {
-    function updatePresence(event: RealtimeEvent) {
-      if (
-        event.type === 'rankings.presence.snapshot' &&
-        Array.isArray(event.onlineUserIds)
-      ) {
-        const ids: unknown[] = event.onlineUserIds
-        setOnlinePlayerIds(new Set(ids.filter((id) => typeof id === 'number')))
-        return
-      }
-
-      if (
-        event.type !== 'rankings.presence.changed' ||
-        typeof event.userId !== 'number' ||
-        typeof event.online !== 'boolean'
-      ) return
-
-      const { userId, online } = event
-      setOnlinePlayerIds((current) => {
-        if (current === null || current.has(userId) === online) return current
-        const next = new Set(current)
-        if (online) next.add(userId)
-        else next.delete(userId)
-        return next
-      })
+    const unsubscribe = realtimeSocket.subscribe(handleRealtimeEvent)
+    void loadFriends()
+    return () => {
+      active = false
+      unsubscribe()
     }
-
-    return realtimeSocket.joinRankings(updatePresence)
   }, [])
 
-  const rankedPlayers = players.map((player, index) => ({
+  const rankedPlayers = players.map((player, index) => {
+    const friendStatus = friendStatuses.get(player.id)
+    return {
       ...player,
       rank: index + 1,
-  }))
+      isOnline: friendStatus === undefined
+        ? undefined
+        : friendPresence.get(player.id) ?? friendStatus,
+    }
+  })
 
   const searchTerm = search.trim().toLowerCase()
   const visiblePlayers = rankedPlayers.filter((player) =>
@@ -163,10 +177,7 @@ function Rankings() {
                                       <Avatar
                                           src={player.avatar||'/avatars/default.svg'}
                                           username={player.username}
-                                          isOnline={
-                                            player.id === user?.id ||
-                                            (onlinePlayerIds?.has(player.id) ?? player.online)
-                                          }
+                                          isOnline={player.id === user?.id || player.isOnline}
                                           size={48}
                                       />
                                       <Link to={`/profile/${player.id}`}>

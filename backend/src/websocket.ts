@@ -51,16 +51,6 @@ async function onConnection(socket: WebSocket, userId: number) {
 			return;
 		}
 
-		if (message.type === 'rankings.join') {
-			presenceService.joinRankings(socket);
-			return;
-		}
-
-		if (message.type === 'rankings.leave') {
-			presenceService.leaveRankings(socket);
-			return;
-		}
-
 		if (
 			message.type !== 'chat.join' &&
 			message.type !== 'chat.leave' &&

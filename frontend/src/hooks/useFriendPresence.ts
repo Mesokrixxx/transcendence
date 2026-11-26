@@ -35,6 +35,19 @@ export function useFriendPresence(enabled = true) {
         const { userId, online } = event;
         setPresence((current) => new Map(current).set(userId, online));
       }
+
+      if (
+        (event.type === 'friend.changed' || event.type === 'friend.blocked') &&
+        typeof event.userId === 'number'
+      ) {
+        const { userId } = event;
+        setPresence((current) => {
+          if (!current.has(userId)) return current;
+          const next = new Map(current);
+          next.delete(userId);
+          return next;
+        });
+      }
     }
 
     return realtimeSocket.subscribe(updatePresence);
