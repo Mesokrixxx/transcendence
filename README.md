@@ -66,26 +66,26 @@ Users have one profile and many sessions/games/messages; each game has two playe
 
 ### Major modules (2 points each)
 
-| Module | Implementation | Contributors |
-| --- | --- | --- |
-| Use a framework for both the frontend and backend. | React/TypeScript + Express/TypeScript. | all team members |
-| Implement real-time features using WebSockets or similar technology. | `ws` rooms for presence, chat, games and notifications, with reconnection. | `aflandin`, `ecid` |
-| Allow users to interact with other users. | Profiles, friends/blocking, private/game/spectator chat. | all team members |
-| Standard user management and authentication. | bcrypt, sessions, protected routes, profile editing, avatars and GitHub OAuth. | `aflandin`, `ecid`, `nhoussie` |
-| Implement a complete web-based game where users can play against each other. | Full chess rules engine and live matches. | `nhoussie`, `aflandin`, `ecid` |
-| Remote players — Enable two players on separate computers to play the same game in real-time. | HTTPS/WebSocket multi-client play, LAN instructions and reconnect logic. | `aflandin`, `ecid`, `nhoussie` |
+| Module | Why | Implementation | Contributors |
+| --- | --- | --- | --- |
+| Use a framework for both the frontend and backend. | Structured, maintainable code and a clear SPA/API separation. | React/TypeScript + Express/TypeScript. | all team members |
+| Implement real-time features using WebSockets or similar technology. | Live games, chat, presence and notifications need instant updates. | `ws` rooms for presence, chat, games and notifications, with reconnection. | `aflandin`, `ecid` |
+| Allow users to interact with other users. | The social features are central to the platform experience. | Profiles, friends/blocking, private/game/spectator chat. | all team members |
+| Standard user management and authentication. | Needed for secure accounts, profiles, friends and protected actions. | bcrypt, sessions, protected routes, profile editing, avatars and GitHub OAuth. | `aflandin`, `ecid`, `nhoussie` |
+| Implement a complete web-based game where users can play against each other. | The chess game is the core feature of the project. | Full chess rules engine and live matches. | `nhoussie`, `aflandin`, `ecid` |
+| Remote players — Enable two players on separate computers to play the same game in real-time. | Validates real multiplayer use and network handling. | HTTPS/WebSocket multi-client play, LAN instructions and reconnect logic. | `aflandin`, `ecid`, `nhoussie` |
 
 ### Minor modules (1 point each)
 
-| Module | Implementation | Contributors |
-| --- | --- | --- |
-| Use an ORM for the database. | Prisma 7 with PostgreSQL and typed transactions. | `aflandin`, `nhoussie` |
-| Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components). | styled-components library, shared styles and responsive layouts. | `ecid`, `shasinan` |
-| Game statistics and match history (requires a game module). | Match history, results, streaks, opponents, terminations and Elo chart. | `nhoussie`, `ecid`, `shasinan` |
-| Support for multiple languages (at least 3 languages). | English, French and Spanish catalogs with language switcher. | `nhoussie`, `ecid`, `shasinan`, `aflandin` |
-| A gamification system to reward users for their actions. | Persistent achievements, badges and leaderboard integration. | `aflandin`, `ecid`, `nhoussie` |
-| Implement spectator mode for games. | Live watch pages, game rooms and spectator chat. | `aflandin`, `ecid` |
-| Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.). | GitHub OAuth authorization-code flow with state validation. | `aflandin`, `nhoussie`, `ecid` |
+| Module | Why | Implementation | Contributors |
+| --- | --- | --- | --- |
+| Use an ORM for the database. | Easier and safer than writing SQL by hand; typed queries and transactions. | Prisma 7 with PostgreSQL and typed transactions. | `aflandin`, `nhoussie` |
+| Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components). | Consistent UI, reusable components and responsive screens. | styled-components library, shared styles and responsive layouts. | `ecid`, `shasinan` |
+| Game statistics and match history (requires a game module). | Gives players feedback and a sense of progression. | Match history, results, streaks, opponents, terminations and Elo chart. | `nhoussie`, `ecid`, `shasinan` |
+| Support for multiple languages (at least 3 languages). | Makes the app accessible to more users. | English, French and Spanish catalogs with language switcher. | `nhoussie`, `ecid`, `shasinan`, `aflandin` |
+| A gamification system to reward users for their actions. | Rewards and progression improve engagement and retention. | Persistent achievements, badges and leaderboard integration. | `aflandin`, `ecid`, `nhoussie` |
+| Implement spectator mode for games. | Adds social value and showcases real-time updates. | Live watch pages, game rooms and spectator chat. | `aflandin`, `ecid` |
+| Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.). | Simplifies sign-in and avoids managing another password. | GitHub OAuth authorization-code flow with state validation. | `aflandin`, `nhoussie`, `ecid` |
 
 **Total: 19 points** (6 major × 2 + 7 minor × 1). Remote Players and Gamification were completed after the initial tracking checklist. No custom module of choice was used.
 
@@ -128,6 +128,12 @@ cd frontend && npm ci && npm run build
 ```
 
 For local frontend/backend development, use `npm run dev`. The Vite proxy targets the Compose service name `backend`, so adjust `frontend/vite.config.ts` if running outside the Compose network.
+
+## Usage
+
+1. Run `make`, then open `https://localhost:4243`.
+2. GitHub OAuth works only after setting `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_REDIRECT_URI` and the matching `VITE_OAUTH_*` variables in `.env`; otherwise use email/password.
+3. To play on a LAN, open `https://<HOST-IP>:4243` from both machines on the same network.
 
 ## Resources
 
