@@ -42,8 +42,8 @@ const fetchAPI = async <Data = unknown>({
 }): Promise<APIResponse<Data>> => {
   try {
     const response = await fetch(`${getURL()}${path}`, {
-    ...getFetchOptions(body ?? null, method),
-    method: method.toUpperCase(),
+      ...getFetchOptions(body ?? null, method),
+      method: method.toUpperCase(),
     });
 
     const text = await response.text();

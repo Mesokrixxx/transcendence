@@ -129,7 +129,9 @@ describe('game routes', () => {
       blackId: 1,
     } as never);
 
-    const response = await request(app).post('/api/games/invitations/12/accept');
+    const response = await request(app).post(
+      '/api/games/invitations/12/accept',
+    );
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ gameId: 7 });

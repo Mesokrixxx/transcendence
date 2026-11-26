@@ -3,230 +3,235 @@ import * as friendsService from '../services/friends.service.js';
 import { query } from '../utils/query.js';
 import { treatError } from '../utils/errors.js';
 import * as presenceService from '../services/presence.service.js';
-import { friendParamsSchema, friendRequestSchema } from '../validations/friends.validation.js';
+import {
+  friendParamsSchema,
+  friendRequestSchema,
+} from '../validations/friends.validation.js';
 
-function notifyFriendChanged(
-	userId: number,
-	friendId: number,
-	type: string,
-) {
-	presenceService.send(userId, { type, userId: friendId });
-	presenceService.send(friendId, { type, userId });
+function notifyFriendChanged(userId: number, friendId: number, type: string) {
+  presenceService.send(userId, { type, userId: friendId });
+  presenceService.send(friendId, { type, userId });
 }
 
 function getFriendId(req: Request, res: Response) {
-	const parsed = friendParamsSchema.safeParse(req.params);
-	if (!parsed.success) {
-		res.status(400).json({
-			error: 'invalid request parameters',
-			details: parsed.error.issues,
-		});
-		return null;
-	}
-	return parsed.data.id;
+  const parsed = friendParamsSchema.safeParse(req.params);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: 'invalid request parameters',
+      details: parsed.error.issues,
+    });
+    return null;
+  }
+  return parsed.data.id;
 }
 
 export async function getList(req: Request, res: Response) {
-	const user = req.user;
-	if (!user) 
-		return res.status(401).json({ error: 'user must be logged in' });
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'user must be logged in' });
 
-	const { result, error } = await query(() => friendsService.getList(user.id));
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
+  const { result, error } = await query(() => friendsService.getList(user.id));
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
 
-	if (!result) 
-		return res.status(404).json({ error: 'user not found' });
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	return res.status(200).json(
-		result.map((friend) => ({
-			...friend,
-			online: presenceService.isOnline(friend.id),
-		})));
+  return res.status(200).json(
+    result.map((friend) => ({
+      ...friend,
+      online: presenceService.isOnline(friend.id),
+    })),
+  );
 }
 
 export async function getRequests(req: Request, res: Response) {
-	if (!req.user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  if (!req.user)
+    return res.status(401).json({ error: 'user must be logged in' });
 
-	const { result, error } = await query(() =>
-		friendsService.getRequests(req.user!.id),
-	);
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const { result, error } = await query(() =>
+    friendsService.getRequests(req.user!.id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	return res.status(200).json(result.map((friend) => ({
-		...friend,
-		online: presenceService.isOnline(friend.id),
-	})));
+  return res.status(200).json(
+    result.map((friend) => ({
+      ...friend,
+      online: presenceService.isOnline(friend.id),
+    })),
+  );
 }
 
 export async function getBlocked(req: Request, res: Response) {
-	if (!req.user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  if (!req.user)
+    return res.status(401).json({ error: 'user must be logged in' });
 
-	const { result, error } = await query(() =>
-		friendsService.getBlocked(req.user!.id),
-	);
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const { result, error } = await query(() =>
+    friendsService.getBlocked(req.user!.id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	return res.status(200).json(result.map((friend) => ({
-		...friend,
-		online: presenceService.isOnline(friend.id),
-	})));
+  return res.status(200).json(
+    result.map((friend) => ({
+      ...friend,
+      online: presenceService.isOnline(friend.id),
+    })),
+  );
 }
 
 export async function addFriend(req: Request, res: Response) {
-	const user = req.user;
-	if (!user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'user must be logged in' });
 
-	const id = getFriendId(req, res);
-	if (id === null) return;
-	if (id === user.id)
-		return res.status(400).json({ error: 'cannot add yourself as a friend' });
+  const id = getFriendId(req, res);
+  if (id === null) return;
+  if (id === user.id)
+    return res.status(400).json({ error: 'cannot add yourself as a friend' });
 
-	const { result, error } = await query(() => friendsService.addFriend(user.id, id));
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
+  const { result, error } = await query(() =>
+    friendsService.addFriend(user.id, id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
 
-	if (!result) 
-		return res.status(404).json({ error: 'user not found' });
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	notifyFriendChanged(user.id, id, 'friend.request.sent');
-	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
+  notifyFriendChanged(user.id, id, 'friend.request.sent');
+  return res
+    .status(201)
+    .json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function addFriendByUsername(req: Request, res: Response) {
-	const user = req.user;
-	if (!user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'user must be logged in' });
 
-	const parsed = friendRequestSchema.safeParse(req.body);
-	if (!parsed.success) {
-		return res.status(400).json({
-			error: 'invalid request body',
-			details: parsed.error.issues,
-		});
-	}
+  const parsed = friendRequestSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'invalid request body',
+      details: parsed.error.issues,
+    });
+  }
 
-	const { result: friend, error: lookupError } = await query(() =>
-		friendsService.getByUsername(parsed.data.username),
-	);
-	if (lookupError) {
-		const treatedErr = treatError(lookupError);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!friend)
-		return res.status(404).json({ error: 'user not found' });
-	if (friend.id === user.id)
-		return res.status(400).json({ error: 'cannot add yourself as a friend' });
+  const { result: friend, error: lookupError } = await query(() =>
+    friendsService.getByUsername(parsed.data.username),
+  );
+  if (lookupError) {
+    const treatedErr = treatError(lookupError);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!friend) return res.status(404).json({ error: 'user not found' });
+  if (friend.id === user.id)
+    return res.status(400).json({ error: 'cannot add yourself as a friend' });
 
-	const { result, error } = await query(() => friendsService.addFriend(user.id, friend.id));
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const { result, error } = await query(() =>
+    friendsService.addFriend(user.id, friend.id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	notifyFriendChanged(user.id, friend.id, 'friend.request.sent');
-	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
+  notifyFriendChanged(user.id, friend.id, 'friend.request.sent');
+  return res
+    .status(201)
+    .json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function acceptFriend(req: Request, res: Response) {
-	if (!req.user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  if (!req.user)
+    return res.status(401).json({ error: 'user must be logged in' });
 
-	const id = getFriendId(req, res);
-	if (id === null) return;
+  const id = getFriendId(req, res);
+  if (id === null) return;
 
-	const { result, error } = await query(() =>
-		friendsService.acceptFriend(req.user!.id, id),
-	);
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'friend request not found' });
+  const { result, error } = await query(() =>
+    friendsService.acceptFriend(req.user!.id, id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result)
+    return res.status(404).json({ error: 'friend request not found' });
 
-	notifyFriendChanged(req.user!.id, id, 'friend.request.accepted');
-	return res.status(200).json({ ...result, online: presenceService.isOnline(result.id) });
+  notifyFriendChanged(req.user!.id, id, 'friend.request.accepted');
+  return res
+    .status(200)
+    .json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function delFriend(req: Request, res: Response) {
-	const user = req.user;
-	if (!user) 
-		return res.status(401).json({ error: 'user must be logged in' });
-	
-	const id = getFriendId(req, res);
-	if (id === null) return;
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'user must be logged in' });
 
-	const { result, error } = await query(() => friendsService.delFriend(user.id, id));
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const id = getFriendId(req, res);
+  if (id === null) return;
 
-	notifyFriendChanged(user.id, id, 'friend.changed');
-	return res.status(204).send();
+  const { result, error } = await query(() =>
+    friendsService.delFriend(user.id, id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+
+  if (!result) return res.status(404).json({ error: 'user not found' });
+
+  notifyFriendChanged(user.id, id, 'friend.changed');
+  return res.status(204).send();
 }
 
 export async function block(req: Request, res: Response) {
-	if (!req.user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  if (!req.user)
+    return res.status(401).json({ error: 'user must be logged in' });
 
-	const id = getFriendId(req, res);
-	if (id === null) return;
+  const id = getFriendId(req, res);
+  if (id === null) return;
 
-	const { result, error } = await query(() =>
-		friendsService.block(req.user!.id, id),
-	);
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const { result, error } = await query(() =>
+    friendsService.block(req.user!.id, id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	notifyFriendChanged(req.user!.id, id, 'friend.blocked');
-	return res.status(201).json({ ...result, online: presenceService.isOnline(result.id) });
+  notifyFriendChanged(req.user!.id, id, 'friend.blocked');
+  return res
+    .status(201)
+    .json({ ...result, online: presenceService.isOnline(result.id) });
 }
 
 export async function unblock(req: Request, res: Response) {
-	if (!req.user)
-		return res.status(401).json({ error: 'user must be logged in' });
+  if (!req.user)
+    return res.status(401).json({ error: 'user must be logged in' });
 
-	const id = getFriendId(req, res);
-	if (id === null) return;
+  const id = getFriendId(req, res);
+  if (id === null) return;
 
-	const { result, error } = await query(() =>
-		friendsService.unblock(req.user!.id, id),
-	);
-	if (error) {
-		const treatedErr = treatError(error);
-		return res.status(treatedErr.status).json(treatedErr.error);
-	}
-	if (!result)
-		return res.status(404).json({ error: 'user not found' });
+  const { result, error } = await query(() =>
+    friendsService.unblock(req.user!.id, id),
+  );
+  if (error) {
+    const treatedErr = treatError(error);
+    return res.status(treatedErr.status).json(treatedErr.error);
+  }
+  if (!result) return res.status(404).json({ error: 'user not found' });
 
-	notifyFriendChanged(req.user!.id, id, 'friend.unblocked');
-	return res.status(204).send();
+  notifyFriendChanged(req.user!.id, id, 'friend.unblocked');
+  return res.status(204).send();
 }

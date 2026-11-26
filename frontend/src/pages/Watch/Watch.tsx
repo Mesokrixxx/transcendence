@@ -103,18 +103,28 @@ function Watch() {
                 </MiniBoard>
 
                 <div>
-                  <h2>{t('versus', { ns: 'chess', white: whiteName, black: blackName })}</h2>
+                  <h2>
+                    {t('versus', {
+                      ns: 'chess',
+                      white: whiteName,
+                      black: blackName,
+                    })}
+                  </h2>
                   <p>
                     {activeGame.status === 'PLAYING'
                       ? t('gameInProgress', { ns: 'chess' })
                       : t('waitingForFriend', { ns: 'chess' })}
                   </p>
-                  {isOwnGame && (
-                    <p>{t('yourGame', { ns: 'chess' })}</p>
-                  )}
+                  {isOwnGame && <p>{t('yourGame', { ns: 'chess' })}</p>}
                 </div>
 
-                <Button to={isOwnGame ? `/play/${activeGame.id}` : `/watch/${activeGame.id}`}>
+                <Button
+                  to={
+                    isOwnGame
+                      ? `/play/${activeGame.id}`
+                      : `/watch/${activeGame.id}`
+                  }
+                >
                   {isOwnGame
                     ? t('joinGame', { ns: 'chess' })
                     : t('watchGame', { ns: 'chess' })}

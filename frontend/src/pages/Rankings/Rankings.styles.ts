@@ -162,7 +162,7 @@ export const StatusMessage = styled.p`
   padding: 24px;
   text-align: center;
   color: var(--color-text-secondary);
-`
+`;
 
 export const SearchBox = styled.label`
   display: flex;
@@ -185,7 +185,7 @@ export const SearchBox = styled.label`
     height: 18px;
     flex-shrink: 0;
   }
-  
+
   input {
     flex: 1;
     min-width: 0;
@@ -195,4 +195,4 @@ export const SearchBox = styled.label`
     outline: none;
     color: var(--color-text-primary);
   }
-`
+`;

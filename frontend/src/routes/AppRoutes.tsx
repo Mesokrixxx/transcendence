@@ -14,7 +14,13 @@ import Watch from '../pages/Watch/Watch';
 import ErrorPage from '../pages/Errors/ErrorPage';
 import ApiTest from '../pages/ApiTest';
 import ProtectedPage from '../pages/ProtectedPage';
-import { publicPageLoader, guestOnlyLoader, requireAuthLoader, githubLoader, githubCallbackLoader } from '../loaders/authLoaders';
+import {
+  publicPageLoader,
+  guestOnlyLoader,
+  requireAuthLoader,
+  githubLoader,
+  githubCallbackLoader,
+} from '../loaders/authLoaders';
 
 // Shown while a route loader runs on the first page load (e.g. after F5).
 // Kept empty on purpose: translations may not be loaded yet at that moment.

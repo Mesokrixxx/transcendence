@@ -14,5 +14,5 @@ attachWebSocket(server);
 
 const port = 8080;
 server.listen(port, '0.0.0.0', () => {
-	console.log(`Backend is listening on port ${port}`);
+  console.log(`Backend is listening on port ${port}`);
 });

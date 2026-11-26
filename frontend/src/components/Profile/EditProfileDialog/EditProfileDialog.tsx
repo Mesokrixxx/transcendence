@@ -9,7 +9,11 @@ import Avatar from '../../Avatar/Avatar';
 import Button from '../../Button/Button';
 import Form from '../../Form/Form';
 import Input from '../../Input/Input';
-import { ProfileDialog, DialogHeader, DialogActions } from './EditProfileDialog.styles';
+import {
+  ProfileDialog,
+  DialogHeader,
+  DialogActions,
+} from './EditProfileDialog.styles';
 
 export type LocalProfile = {
   displayName: string;
@@ -115,55 +119,55 @@ function EditProfileDialog({
   }
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (isSaving || avatarError) return;
+    if (isSaving || avatarError) return;
 
-  const nextDisplayName = displayName.trim();
+    const nextDisplayName = displayName.trim();
 
-  setError('');
-  setIsSaving(true);
+    setError('');
+    setIsSaving(true);
 
-  let updatedUser = user;
+    let updatedUser = user;
 
-  try {
-    if (nextDisplayName !== profile.displayName) {
-      await updateProfileDisplayName(nextDisplayName);
-    }
-
-    if (removeAvatarOnSave) {
-      const response = await fetch('/api/users/me/avatar', {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Avatar removal failed');
+    try {
+      if (nextDisplayName !== profile.displayName) {
+        await updateProfileDisplayName(nextDisplayName);
       }
 
-      updatedUser = { ...updatedUser, avatar: null };
-      setUser(updatedUser);
-      setRemoveAvatarOnSave(false);
-    } else if (avatarFile) {
-      const avatar = await uploadAvatar(avatarFile);
+      if (removeAvatarOnSave) {
+        const response = await fetch('/api/users/me/avatar', {
+          method: 'DELETE',
+          credentials: 'include',
+        });
 
-      updatedUser = { ...updatedUser, avatar };
-      setUser(updatedUser);
-      setAvatarFile(null);
-      setAvatarSrc(avatar);
+        if (!response.ok) {
+          throw new Error('Avatar removal failed');
+        }
+
+        updatedUser = { ...updatedUser, avatar: null };
+        setUser(updatedUser);
+        setRemoveAvatarOnSave(false);
+      } else if (avatarFile) {
+        const avatar = await uploadAvatar(avatarFile);
+
+        updatedUser = { ...updatedUser, avatar };
+        setUser(updatedUser);
+        setAvatarFile(null);
+        setAvatarSrc(avatar);
+      }
+
+      onSave({
+        displayName: nextDisplayName,
+        ...(updatedUser.avatar ? { avatar: updatedUser.avatar } : {}),
+      });
+    } catch {
+      setError('saveError');
+    } finally {
+      setIsSaving(false);
     }
-
-    onSave({
-      displayName: nextDisplayName,
-      ...(updatedUser.avatar ? { avatar: updatedUser.avatar } : {}),
-    });
-  } catch {
-    setError('saveError');
-  } finally {
-    setIsSaving(false);
   }
-}
-return(
+  return (
     <ProfileDialog
       ref={dialogRef}
       id="profile-edit"
@@ -172,12 +176,10 @@ return(
         if (event.target !== event.currentTarget) return;
         event.preventDefault();
         closeEditor();
-      }}  
+      }}
     >
       <DialogHeader>
-        <h2 id="profile-edit-title">
-          {t('editProfile', { ns: 'profile' })}
-        </h2>
+        <h2 id="profile-edit-title">{t('editProfile', { ns: 'profile' })}</h2>
 
         <button
           type="button"
@@ -216,7 +218,11 @@ return(
           </p>
 
           {(avatarFile || (user.avatar && !removeAvatarOnSave)) && (
-            <Button type="button" variant="secondary" onClick={handleResetAvatar}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleResetAvatar}
+            >
               {t('resetAvatar', { ns: 'profile' })}
             </Button>
           )}

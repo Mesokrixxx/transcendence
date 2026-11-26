@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import * as userController from '../controllers/users.controller.js';
 import { requireAuth } from '../middlewares/auth.middleware.js';
-import { receiveAvatar,removeAvatar, uploadAvatar } from '../controllers/avatar.controller.js';
+import {
+  receiveAvatar,
+  removeAvatar,
+  uploadAvatar,
+} from '../controllers/avatar.controller.js';
 
 const router = Router();
 

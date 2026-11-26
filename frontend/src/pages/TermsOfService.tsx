@@ -31,7 +31,9 @@ function TermsOfService() {
             i18nKey="chessPieceArtworkCredit"
             components={{
               kosal: <a href="https://github.com/philatype/kosal" />,
-              license: <a href="https://creativecommons.org/licenses/by/4.0/" />,
+              license: (
+                <a href="https://creativecommons.org/licenses/by/4.0/" />
+              ),
             }}
           />
         </p>

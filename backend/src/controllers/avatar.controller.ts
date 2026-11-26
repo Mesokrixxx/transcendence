@@ -20,11 +20,7 @@ const readAvatar = multer({
   },
 }).single('avatar');
 
-export function receiveAvatar(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export function receiveAvatar(req: Request, res: Response, next: NextFunction) {
   readAvatar(req, res, (error: unknown) => {
     if (!error) {
       next();
@@ -32,8 +28,7 @@ export function receiveAvatar(
     }
 
     const tooLarge =
-      error instanceof multer.MulterError &&
-      error.code === 'LIMIT_FILE_SIZE';
+      error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE';
 
     res.status(tooLarge ? 413 : 400).json({
       error: tooLarge ? 'avatarTooLarge' : 'invalidAvatarUpload',
@@ -79,7 +74,7 @@ export async function uploadAvatar(req: Request, res: Response) {
   const filename = `${randomUUID()}.webp`;
   const filepath = join(avatarDirectory, filename);
   const avatar = `${avatarPrefix}${filename}`;
-  let previousAvatar: string | null = null;
+  let previousAvatar: string | null;
   let fileWritten = false;
 
   try {

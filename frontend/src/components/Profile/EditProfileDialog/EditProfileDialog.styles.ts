@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const ProfileDialog = styled.dialog`
   box-sizing: border-box;
@@ -17,8 +17,8 @@ export const ProfileDialog = styled.dialog`
   }
 
   .profile-username-display {
-  cursor: default;
-  opacity: 0.7;
+    cursor: default;
+    opacity: 0.7;
   }
 
   .profile-username-display p {
@@ -33,7 +33,7 @@ export const ProfileDialog = styled.dialog`
     padding: 20px;
   }
 
-  form{
+  form {
     margin-top: 24px;
   }
 
@@ -64,7 +64,7 @@ export const ProfileDialog = styled.dialog`
     color: var(--color-text-secondary);
     font-size: 13px;
   }
-`
+`;
 
 export const DialogHeader = styled.div`
   display: flex;

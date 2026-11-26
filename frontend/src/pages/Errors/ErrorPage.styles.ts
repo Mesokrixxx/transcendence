@@ -14,15 +14,15 @@ export const ErrorCard = styled.section`
   text-align: center;
 
   .visually-hidden {
-   position: absolute;
-   width: 1px;
-   height: 1px;
-   padding: 0;
-   margin: -1px;
-   overflow: hidden;
-   clip-path: inset(50%);
-   white-space: nowrap;
-   border: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 
   > p {
@@ -48,12 +48,12 @@ export const ErrorIllustration = styled.div`
   }
 
   .lost-knight {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 112px;
-  height: 112px;
-  flex-shrink: 0;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 112px;
+    height: 112px;
+    flex-shrink: 0;
   }
 
   .fallen {

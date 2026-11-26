@@ -1,6 +1,6 @@
-import fetchAPI from "./fetchAPI";
+import fetchAPI from './fetchAPI';
 // import { faker } from '@faker-js/faker';
-import type { Game } from "../types/game";
+import type { Game } from '../types/game';
 // import { GameEndType, GameResult, GameStatus } from "../types/game";
 // import ChessGame from "../../../chessgame/src/chessgame";
 

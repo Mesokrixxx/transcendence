@@ -7,11 +7,11 @@ inchangée.
 
 ## Dépendances ajoutées au backend
 
-| Dépendance | Rôle |
-| --- | --- |
-| `multer` | Lit la requête `multipart/form-data` et récupère le fichier du champ `avatar`. Il limite l’envoi à un fichier de 2 Mio maximum. |
-| `sharp` | Lit l’image, vérifie son format et la redimensionne en WebP de 256 × 256 pixels avant de l’enregistrer. |
-| `@types/multer` | Fournit à TypeScript les types de Multer, dont `req.file`. C’est une dépendance de développement. |
+| Dépendance      | Rôle                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `multer`        | Lit la requête `multipart/form-data` et récupère le fichier du champ `avatar`. Il limite l’envoi à un fichier de 2 Mio maximum. |
+| `sharp`         | Lit l’image, vérifie son format et la redimensionne en WebP de 256 × 256 pixels avant de l’enregistrer.                         |
+| `@types/multer` | Fournit à TypeScript les types de Multer, dont `req.file`. C’est une dépendance de développement.                               |
 
 Commandes utilisées pour ajouter ces dépendances, depuis la racine du dépôt :
 

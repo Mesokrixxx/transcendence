@@ -31,21 +31,24 @@ function ProfileActivity({ userId, isOwnProfile }: ProfileActivityProps) {
   const [activeTab, setActiveTab] = useState<Tab>('history');
   const id = useId();
   const [games, setGames] = useState<Game[] | null>(null);
-  const [gamesLoading, setGamesLoading] = useState(true);
+  const [loadedUserId, setLoadedUserId] = useState<number | null>(null);
+  const gamesLoading = loadedUserId !== userId;
 
   useEffect(() => {
     let active = true;
-    setGamesLoading(true);
 
     getUserGames(userId)
       .then((g) => {
-        if (active) setGames(g);
+        if (active) {
+          setGames(g);
+          setLoadedUserId(userId);
+        }
       })
       .catch(() => {
-        if (active) setGames(null);
-      })
-      .finally(() => {
-        if (active) setGamesLoading(false);
+        if (active) {
+          setGames(null);
+          setLoadedUserId(userId);
+        }
       });
 
     return () => {

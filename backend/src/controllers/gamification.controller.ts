@@ -55,7 +55,9 @@ export async function setBadgeFeatured(req: Request, res: Response) {
   }
   if (!result) return res.status(404).json({ error: 'badge not found' });
   const progress = await gamificationService.getProgress(req.user.id);
-  const featuredBadges = await gamificationService.getFeaturedBadges(req.user.id);
+  const featuredBadges = await gamificationService.getFeaturedBadges(
+    req.user.id,
+  );
   presenceService.broadcast({
     type: 'gamification.updated',
     userId: req.user.id,

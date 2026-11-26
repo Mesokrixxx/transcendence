@@ -51,7 +51,7 @@ function PlayGame({ gameId }: { gameId: number }) {
   const game = isRemoteGame ? online.game : localGame;
   const remoteStatus = isRemoteGame ? online.status : undefined;
   const boardOrientation = isRemoteGame
-    ? online.side?.playerColor ?? null
+    ? (online.side?.playerColor ?? null)
     : orientation;
   const opponentName = online.side?.opponentName ?? tChess('opponent');
   const gameIsOver = game.isOver() || remoteStatus === 'OVER';
@@ -60,7 +60,9 @@ function PlayGame({ gameId }: { gameId: number }) {
   const isOpponentTurn =
     isRemoteGame && online.side?.playerColor !== game.getTurn();
   const canClaimDraw =
-    isRemoteGame && !isOpponentTurn && !gameIsOver &&
+    isRemoteGame &&
+    !isOpponentTurn &&
+    !gameIsOver &&
     game.canClaimDraw().length > 0;
   const isBoardDisabled =
     isOpponentTurn ||
@@ -155,7 +157,9 @@ function PlayGame({ gameId }: { gameId: number }) {
             {boardOrientation !== null && (
               <GameStatus
                 game={game}
-                message={waitingForFriend ? tChess('waitingForFriend') : undefined}
+                message={
+                  waitingForFriend ? tChess('waitingForFriend') : undefined
+                }
                 remoteStatus={remoteStatus}
                 remoteResult={isRemoteGame ? online.result : undefined}
               />
@@ -164,7 +168,9 @@ function PlayGame({ gameId }: { gameId: number }) {
             {isRemoteGame && !gameIsOver && (
               <PlayGameActions
                 drawRequestSent={online.drawRequestSent}
-                onClaimDraw={canClaimDraw ? () => void online.claimDraw() : undefined}
+                onClaimDraw={
+                  canClaimDraw ? () => void online.claimDraw() : undefined
+                }
                 onOfferDraw={() => void online.offerDraw()}
                 onResign={() => void online.resign()}
               />
@@ -228,7 +234,9 @@ function PlayGame({ gameId }: { gameId: number }) {
 
 export default function Play() {
   const { gameId } = useParams();
-  return gameId === undefined
-    ? <PlayLobby />
-    : <PlayGame key={gameId} gameId={Number(gameId)} />;
+  return gameId === undefined ? (
+    <PlayLobby />
+  ) : (
+    <PlayGame key={gameId} gameId={Number(gameId)} />
+  );
 }

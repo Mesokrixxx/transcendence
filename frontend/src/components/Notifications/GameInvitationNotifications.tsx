@@ -99,9 +99,11 @@ export default function GameInvitationNotifications() {
   useEffect(() => {
     if (!user) return;
 
+    /* eslint-disable react-hooks/set-state-in-effect -- initial data fetch on mount */
     void loadInvitations();
     void loadDrawOffers();
     void loadFriendRequests();
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     return realtimeSocket.subscribe((event: RealtimeEvent) => {
       if (event.type === 'game.invitation.received') {
@@ -111,7 +113,7 @@ export default function GameInvitationNotifications() {
         event.type === 'game.invitation.accepted' &&
         typeof event.gameId === 'number'
       ) {
-        navigate(`/play/${event.gameId}`);
+        void navigate(`/play/${event.gameId}`);
       }
       if (event.type === 'game.draw.received') {
         void loadDrawOffers();
@@ -215,7 +217,7 @@ export default function GameInvitationNotifications() {
     setInvitations((current) =>
       current.filter((item) => item.id !== invitationId),
     );
-    navigate(`/play/${response.result.gameId}`);
+    void navigate(`/play/${response.result.gameId}`);
   }
 
   async function decline(invitationId: number) {
@@ -415,7 +417,7 @@ export default function GameInvitationNotifications() {
                 setPrivateMessages((current) =>
                   current.filter((item) => item.id !== message.id),
                 );
-                navigate('/chat');
+                void navigate('/chat');
               }}
             >
               {t('invitations.openMessages')}

@@ -5,7 +5,12 @@ import ChatBox from '../../components/ChatBox/ChatBox';
 import { getFriends, type FriendUser } from '../../services/friends';
 import fetchAPI from '../../services/fetchAPI';
 import realtimeSocket, { type RealtimeEvent } from '../../services/websocket';
-import { ChatLayout, ConversationList, ConversationButton, ConversationPanel } from './Chat.styles';
+import {
+  ChatLayout,
+  ConversationList,
+  ConversationButton,
+  ConversationPanel,
+} from './Chat.styles';
 
 type Conversation = FriendUser & { chatId: number };
 
@@ -56,7 +61,8 @@ function Messaging() {
         event.type !== 'presence.changed' ||
         typeof event.userId !== 'number' ||
         typeof event.online !== 'boolean'
-      ) return;
+      )
+        return;
 
       const userId = event.userId;
       const online = event.online;
@@ -65,8 +71,8 @@ function Messaging() {
         current.map((conversation) =>
           conversation.id === userId
             ? { ...conversation, isOnline: online }
-            : conversation
-        )
+            : conversation,
+        ),
       );
     }
 
@@ -105,7 +111,8 @@ function Messaging() {
         typeof event.userId !== 'number' ||
         typeof event.username !== 'string' ||
         (event.avatar !== null && typeof event.avatar !== 'string')
-      ) return;
+      )
+        return;
 
       const displayName =
         typeof event.displayName === 'string'
@@ -125,8 +132,8 @@ function Messaging() {
                 displayName,
                 avatar,
               }
-            : conversation
-        )
+            : conversation,
+        ),
       );
     }
 
@@ -138,9 +145,7 @@ function Messaging() {
   return (
     <ChatLayout>
       <ConversationList aria-labelledby={`${id}-conversations`}>
-        <h2 id={`${id}-conversations`}>
-          {t('conversations')}
-        </h2>
+        <h2 id={`${id}-conversations`}>{t('conversations')}</h2>
 
         <ul>
           {conversations.map((conversation) => (
@@ -157,7 +162,9 @@ function Messaging() {
                   isOnline={conversation.isOnline}
                   size={40}
                 />
-                <span>{conversation.displayName?.trim() || conversation.username}</span>
+                <span>
+                  {conversation.displayName?.trim() || conversation.username}
+                </span>
               </ConversationButton>
             </li>
           ))}

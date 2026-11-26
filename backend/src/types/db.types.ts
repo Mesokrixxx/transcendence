@@ -1,7 +1,19 @@
-import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError, PrismaClientRustPanicError, PrismaClientInitializationError, PrismaClientValidationError } from "@prisma/client/runtime/client";
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientUnknownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientInitializationError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/client';
 
-type PrismaError = PrismaClientKnownRequestError | PrismaClientUnknownRequestError | PrismaClientRustPanicError | PrismaClientInitializationError | PrismaClientValidationError;
+type PrismaError =
+  | PrismaClientKnownRequestError
+  | PrismaClientUnknownRequestError
+  | PrismaClientRustPanicError
+  | PrismaClientInitializationError
+  | PrismaClientValidationError;
 
-type QueryResponse<Type> = { result: Type, error: null } | { result: null, error: unknown };
+type QueryResponse<Type> =
+  { result: Type; error: null } | { result: null; error: unknown };
 
-export type { PrismaError, QueryResponse }
+export type { PrismaError, QueryResponse };
