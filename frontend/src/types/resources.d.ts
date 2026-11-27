@@ -165,6 +165,7 @@ export default interface Resources {
     versus: '{{white}} vs {{black}}';
     waitingForFriend: 'Waiting for your friend…';
     watchGame: 'Watch game';
+    watchOtherGames: 'Watch other games';
     white: 'White';
     winnerStatus: '{{winner}} won';
     yourGame: 'Your game';

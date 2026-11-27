@@ -175,6 +175,8 @@ function WatchGame() {
     setOrientation((current) => (current === 'white' ? 'black' : 'white'));
   }
 
+  const gameIsOver = game.isOver() || remoteStatus === 'OVER';
+
   return (
     <Page>
       <Navbar />
@@ -225,6 +227,17 @@ function WatchGame() {
               remoteStatus={remoteStatus}
               remoteResult={remoteResult}
             />
+
+            {gameIsOver && (
+              <div role="group" aria-label={t('gameOver', { ns: 'chess' })}>
+                <Button to="/watch">
+                  {t('watchOtherGames', { ns: 'chess' })}
+                </Button>
+                <Button to="/" variant="secondary">
+                  {t('backHome', { ns: 'errors' })}
+                </Button>
+              </div>
+            )}
           </GameInfo>
 
           <ChessBoard

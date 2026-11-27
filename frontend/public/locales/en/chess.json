@@ -72,6 +72,7 @@
   "unableToPlayThisMove": "Unable to play this move.",
   "waitingForFriend": "Waiting for your friend…",
   "watchGame": "Watch game",
+  "watchOtherGames": "Watch other games",
   "white": "White",
   "lobby": {
     "checkError": "Could not check the game",

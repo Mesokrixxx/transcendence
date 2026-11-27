@@ -110,11 +110,7 @@ function Watch() {
                       black: blackName,
                     })}
                   </h2>
-                  <p>
-                    {activeGame.status === 'PLAYING'
-                      ? t('gameInProgress', { ns: 'chess' })
-                      : t('waitingForFriend', { ns: 'chess' })}
-                  </p>
+                  <p>{t('gameInProgress', { ns: 'chess' })}</p>
                   {isOwnGame && <p>{t('yourGame', { ns: 'chess' })}</p>}
                 </div>
 
